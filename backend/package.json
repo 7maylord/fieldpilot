@@ -1,0 +1,75 @@
+{
+  "name": "@fieldpilot/backend",
+  "private": true,
+  "version": "0.0.0",
+  "packageManager": "pnpm@10.25.0",
+  "scripts": {
+    "dev": "tsx watch src/entrypoints/api.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/entrypoints/api.js",
+    "start:worker": "node dist/entrypoints/worker.js",
+    "start:scheduler": "node dist/entrypoints/scheduler.js",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --exclude 'test/integration/**'",
+    "test:integration": "vitest run test/integration",
+    "migrations:check": "node scripts/check-migrations.mjs",
+    "prisma:generate": "prisma generate",
+    "prisma:validate": "DATABASE_URL=postgresql://validation:validation@localhost:5432/validation prisma validate",
+    "prisma:migrate": "prisma migrate deploy",
+    "openapi:generate": "tsx scripts/generate-openapi.ts",
+    "openapi:check": "pnpm openapi:generate && git diff --exit-code -- openapi.json"
+  },
+  "dependencies": {
+    "@nestjs/common": "11.1.27",
+    "@nestjs/core": "11.1.27",
+    "@nestjs/platform-express": "11.1.27",
+    "@nestjs/swagger": "^11.4.4",
+    "@nestjs/throttler": "^6.5.0",
+    "@node-rs/argon2": "^2.0.2",
+    "@opentelemetry/api": "^1.9.1",
+    "@prisma/client": "6.19.3",
+    "bullmq": "^5.79.2",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "cookie-parser": "^1.4.7",
+    "ioredis": "^5.11.1",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "swagger-ui-express": "^5.0.1",
+    "uuid": "^14.0.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.0",
+    "@nestjs/testing": "11.1.27",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.15.0",
+    "@types/supertest": "^6.0.0",
+    "eslint": "^9.39.0",
+    "eslint-config-prettier": "^10.1.0",
+    "globals": "^16.5.0",
+    "prettier": "^3.7.0",
+    "prisma": "6.19.3",
+    "supertest": "^7.1.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.52.0",
+    "vitest": "^4.1.9"
+  },
+  "pnpm": {
+    "overrides": {
+      "multer": "^2.2.0"
+    },
+    "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "@node-rs/argon2",
+      "@prisma/client",
+      "@prisma/engines",
+      "esbuild",
+      "prisma"
+    ]
+  }
+}

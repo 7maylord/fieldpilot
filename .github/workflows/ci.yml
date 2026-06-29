@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.25.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: |
+            frontend/pnpm-lock.yaml
+            backend/pnpm-lock.yaml
+      - run: pnpm --dir frontend install --frozen-lockfile
+      - run: pnpm --dir backend install --frozen-lockfile
+      - run: pnpm --dir frontend format:check
+      - run: pnpm --dir backend format:check
+      - run: pnpm --dir frontend lint
+      - run: pnpm --dir backend lint
+      - run: pnpm --dir frontend typecheck
+      - run: pnpm --dir backend typecheck
+      - run: pnpm --dir frontend test
+      - run: pnpm --dir backend test
+      - run: pnpm --dir backend run --if-present prisma:validate
+      - run: pnpm --dir backend migrations:check
+      - run: docker compose up -d --wait postgres redis
+      - run: pnpm --dir backend prisma:migrate
+        env:
+          DATABASE_URL: postgresql://fieldpilot:fieldpilot@localhost:5433/fieldpilot
+      - run: pnpm --dir backend test:integration
+        env:
+          DATABASE_URL: postgresql://fieldpilot_runtime:fieldpilot_runtime@localhost:5433/fieldpilot
+      - run: pnpm --dir frontend build
+      - run: pnpm --dir backend build
+      - run: pnpm --dir backend openapi:generate
+      - run: pnpm --dir frontend api:generate
+      - run: git diff --exit-code -- backend/openapi.json frontend/src/generated/api/schema.d.ts
+      - run: pnpm --dir frontend audit --prod --audit-level high
+      - run: pnpm --dir backend audit --prod --audit-level high
+      - run: docker build -f frontend/Dockerfile .
+      - run: docker build -f backend/Dockerfile .
+      - if: always()
+        run: docker compose down -v
+
+  accessibility-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.25.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - run: pnpm --dir frontend install --frozen-lockfile
+      - run: pnpm --dir frontend exec playwright install --with-deps chromium
+      - run: pnpm --dir frontend test:e2e
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2

@@ -1,0 +1,191 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                    String   @id @db.Uuid
+  email                 String   @unique
+  passwordHash          String   @map("password_hash")
+  emailVerifiedAt       DateTime? @map("email_verified_at") @db.Timestamptz
+  createdAt             DateTime @default(now()) @map("created_at") @db.Timestamptz
+  sessions              Session[]
+  memberships           Membership[]
+
+  @@map("users")
+}
+
+model Session {
+  id                 String    @id @db.Uuid
+  userId             String    @map("user_id") @db.Uuid
+  tokenHash          String    @unique @map("token_hash")
+  refreshTokenHash   String    @unique @map("refresh_token_hash")
+  expiresAt          DateTime  @map("expires_at") @db.Timestamptz
+  refreshExpiresAt   DateTime  @map("refresh_expires_at") @db.Timestamptz
+  revokedAt          DateTime? @map("revoked_at") @db.Timestamptz
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model EmailVerificationToken {
+  id        String   @id @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  tokenHash String   @unique @map("token_hash")
+  expiresAt DateTime @map("expires_at") @db.Timestamptz
+  usedAt    DateTime? @map("used_at") @db.Timestamptz
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([userId])
+  @@map("email_verification_tokens")
+}
+
+model PasswordResetToken {
+  id        String   @id @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  tokenHash String   @unique @map("token_hash")
+  expiresAt DateTime @map("expires_at") @db.Timestamptz
+  usedAt    DateTime? @map("used_at") @db.Timestamptz
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([userId])
+  @@map("password_reset_tokens")
+}
+
+model IdentityOutboxEvent {
+  id          String   @id @db.Uuid
+  userId      String   @map("user_id") @db.Uuid
+  eventType   String   @map("event_type")
+  payload     Json
+  publishedAt DateTime? @map("published_at") @db.Timestamptz
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([createdAt])
+  @@map("identity_outbox_events")
+}
+
+model Organization {
+  id        String       @id @db.Uuid
+  name      String
+  slug      String       @unique
+  createdBy String       @map("created_by") @db.Uuid
+  version   Int          @default(1)
+  createdAt DateTime     @default(now()) @map("created_at") @db.Timestamptz
+  members  Membership[]
+  teams     Team[]
+
+  @@map("organizations")
+}
+
+model Membership {
+  id             String       @id @db.Uuid
+  organizationId String       @map("organization_id") @db.Uuid
+  userId         String       @map("user_id") @db.Uuid
+  role           String
+  status         String       @default("active")
+  isExternal     Boolean      @default(false) @map("is_external")
+  version        Int          @default(1)
+  createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamptz
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+  @@index([userId])
+  @@map("organization_memberships")
+}
+
+model Invitation {
+  id             String   @id @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  email          String
+  role           String
+  tokenHash      String   @unique @map("token_hash")
+  expiresAt      DateTime @map("expires_at") @db.Timestamptz
+  acceptedAt     DateTime? @map("accepted_at") @db.Timestamptz
+  version        Int      @default(1)
+  createdBy      String   @map("created_by") @db.Uuid
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([organizationId])
+  @@map("organization_invitations")
+}
+
+model Team {
+  id             String   @id @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  name           String
+  version        Int      @default(1)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, name])
+  @@map("teams")
+}
+
+model TeamMembership {
+  id             String @id @db.Uuid
+  organizationId String @map("organization_id") @db.Uuid
+  teamId         String @map("team_id") @db.Uuid
+  userId         String @map("user_id") @db.Uuid
+  version        Int    @default(1)
+
+  @@unique([teamId, userId])
+  @@index([organizationId])
+  @@map("team_memberships")
+}
+
+model ProjectAccess {
+  id             String @id @db.Uuid
+  organizationId String @map("organization_id") @db.Uuid
+  projectId      String @map("project_id") @db.Uuid
+  userId         String @map("user_id") @db.Uuid
+  version        Int    @default(1)
+
+  @@unique([projectId, userId])
+  @@index([organizationId])
+  @@map("project_access")
+}
+
+model AuditEvent {
+  id             String   @id @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  actorId        String?  @map("actor_id") @db.Uuid
+  action         String
+  resourceType   String   @map("resource_type")
+  resourceId     String   @map("resource_id") @db.Uuid
+  requestId      String?  @map("request_id")
+  summary        Json
+  occurredAt     DateTime @default(now()) @map("occurred_at") @db.Timestamptz
+
+  @@index([organizationId, occurredAt])
+  @@map("audit_events")
+}
+
+model OutboxEvent {
+  id             String   @id @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  eventType      String   @map("event_type")
+  aggregateId    String   @map("aggregate_id") @db.Uuid
+  payload        Json
+  publishedAt    DateTime? @map("published_at") @db.Timestamptz
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@index([organizationId, createdAt])
+  @@map("outbox_events")
+}
+
+model JobExecution {
+  id             String   @id @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  jobKey         String   @map("job_key")
+  completedAt    DateTime @default(now()) @map("completed_at") @db.Timestamptz
+
+  @@unique([organizationId, jobKey])
+  @@map("job_executions")
+}
