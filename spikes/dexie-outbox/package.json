@@ -1,0 +1,12 @@
+{
+  "name": "@fieldpilot/dexie-outbox-spike",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node check.mjs"
+  },
+  "dependencies": {
+    "dexie": "^4.0.0",
+    "fake-indexeddb": "^6.0.0"
+  }
+}

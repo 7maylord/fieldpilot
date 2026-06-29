@@ -1,0 +1,11 @@
+{
+  "name": "@fieldpilot/multipart-upload-spike",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node check.mjs"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.0.0"
+  }
+}
