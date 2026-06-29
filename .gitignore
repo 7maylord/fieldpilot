@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Build output
+.next/
+dist/
+coverage/
+
+# Local configuration
+.env
+.env.*
+!.env.example
+
+# Logs and editor files
+*.log
+.DS_Store
+
+# Local service data
+.data/
+fieldpilot-trd.md
+fieldpilot-prd.md
+implementation.md
