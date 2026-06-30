@@ -1,7 +1,10 @@
+import { AppShell } from '../../../../components/app-shell';
+import { OperationsDashboard } from '../../../../components/operations-dashboard';
+
 export default function DashboardPage() {
   return (
-    <main>
-      <h1>Dashboard</h1>
-    </main>
+    <AppShell mode="office">
+      <OperationsDashboard />
+    </AppShell>
   );
 }
