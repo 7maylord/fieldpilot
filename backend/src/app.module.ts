@@ -11,6 +11,7 @@ import { RequestTelemetryMiddleware } from './common/request-telemetry.middlewar
 import { DatabaseModule } from './database/database.module';
 import { HealthController } from './health/health.controller';
 import { OrganizationsModule } from './organizations/organizations.module';
+import { ProjectsModule } from './projects/projects.module';
 import { QueueModule } from './queue/queue.module';
 
 @Module({
@@ -21,6 +22,7 @@ import { QueueModule } from './queue/queue.module';
     QueueModule,
     AuthModule,
     OrganizationsModule,
+    ProjectsModule,
   ],
   controllers: [HealthController],
   providers: [
