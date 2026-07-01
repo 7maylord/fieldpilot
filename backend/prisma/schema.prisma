@@ -79,6 +79,7 @@ model Organization {
   createdAt DateTime     @default(now()) @map("created_at") @db.Timestamptz
   members  Membership[]
   teams     Team[]
+  projects  Project[]
 
   @@map("organizations")
 }
@@ -146,10 +147,35 @@ model ProjectAccess {
   projectId      String @map("project_id") @db.Uuid
   userId         String @map("user_id") @db.Uuid
   version        Int    @default(1)
+  project        Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@unique([projectId, userId])
   @@index([organizationId])
   @@map("project_access")
+}
+
+model Project {
+  id             String   @id @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  code           String
+  name           String
+  description    String?
+  client         String?
+  status         String   @default("draft")
+  timezone       String
+  startDate      DateTime? @map("start_date") @db.Date
+  endDate        DateTime? @map("end_date") @db.Date
+  address        String?
+  archivedAt     DateTime? @map("archived_at") @db.Timestamptz
+  version        Int      @default(1)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  access         ProjectAccess[]
+
+  @@unique([organizationId, code])
+  @@index([organizationId, status])
+  @@map("projects")
 }
 
 model AuditEvent {
