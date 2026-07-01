@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useUiStore } from '../lib/ui-store';
 
 export function ServiceWorkerLifecycle() {
+  const reloadForUpdate = useRef(false);
   const updateAvailable = useUiStore((state) => state.updateAvailable);
   const setUpdateAvailable = useUiStore((state) => state.setUpdateAvailable);
 
@@ -18,7 +19,9 @@ export function ServiceWorkerLifecycle() {
         });
       });
     });
-    const reload = () => window.location.reload();
+    const reload = () => {
+      if (reloadForUpdate.current) window.location.reload();
+    };
     navigator.serviceWorker.addEventListener('controllerchange', reload);
     return () =>
       navigator.serviceWorker.removeEventListener('controllerchange', reload);
@@ -30,13 +33,14 @@ export function ServiceWorkerLifecycle() {
       A FieldPilot update is ready.
       <button
         type="button"
-        onClick={() =>
-          navigator.serviceWorker
+        onClick={() => {
+          reloadForUpdate.current = true;
+          void navigator.serviceWorker
             .getRegistration()
             .then((registration) =>
               registration?.waiting?.postMessage('SKIP_WAITING'),
-            )
-        }
+            );
+        }}
       >
         Update now
       </button>

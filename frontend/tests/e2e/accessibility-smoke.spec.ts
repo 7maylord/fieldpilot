@@ -49,6 +49,24 @@ test('sign-in validates locally before authentication', async ({ page }) => {
   ).toBeVisible();
 });
 
+test('office projects screen exposes an accessible creation workflow', async ({
+  page,
+}) => {
+  await page.goto('/horizon/projects');
+  await expect(
+    page.getByRole('heading', { name: 'Projects', exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'All projects' }),
+  ).toBeVisible();
+  await page.getByRole('textbox', { name: 'Code' }).fill('bad code');
+  await page.getByRole('button', { name: 'Create project' }).click();
+  await expect(page.getByText('Name is required')).toBeVisible();
+  await expect(
+    page.getByText('Use uppercase letters, numbers, or hyphens'),
+  ).toBeVisible();
+});
+
 test('field shell reloads from the service-worker cache while offline', async ({
   page,
   context,
