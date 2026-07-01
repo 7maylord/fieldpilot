@@ -61,8 +61,27 @@ describe('platform integration', () => {
         });
       },
     );
+    const projectId = uuidv7();
+    await tenants.withTenant({ organizationId: organizationA, userId }, (tx) =>
+      tx.project.create({
+        data: {
+          id: projectId,
+          organizationId: organizationA,
+          code: 'RLS-TEST',
+          name: 'Tenant A project',
+          timezone: 'Africa/Lagos',
+        },
+      }),
+    );
 
     expect(await prisma.organization.count()).toBe(0);
+    expect(await prisma.project.count()).toBe(0);
+    expect(
+      await tenants.withTenant(
+        { organizationId: organizationB, userId },
+        (tx) => tx.project.findUnique({ where: { id: projectId } }),
+      ),
+    ).toBeNull();
     const visible = await tenants.withTenant(
       { organizationId: organizationA, userId },
       (tx) =>
@@ -82,10 +101,11 @@ describe('platform integration', () => {
       FROM pg_class
       WHERE relname IN (
         'organizations', 'organization_memberships', 'organization_invitations', 'teams',
-        'team_memberships', 'project_access', 'audit_events', 'outbox_events', 'job_executions'
+        'team_memberships', 'project_access', 'audit_events', 'outbox_events', 'job_executions',
+        'projects'
       )
     `;
-    expect(policies).toHaveLength(9);
+    expect(policies).toHaveLength(10);
     expect(
       policies.every(
         (policy) => policy.relrowsecurity && policy.relforcerowsecurity,
