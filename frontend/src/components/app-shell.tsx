@@ -1,11 +1,13 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useState, type ReactNode } from 'react';
 import { OfflineStatus } from './offline-status';
 
 const officeLinks = [
   'Overview',
+  'Projects',
   'Work',
   'Assets',
   'Teams',
@@ -24,6 +26,8 @@ export function AppShell({
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const pathname = usePathname();
+  const organizationSlug = pathname.split('/')[1] || 'horizon';
   const links = mode === 'office' ? officeLinks : fieldLinks;
 
   function sync() {
@@ -79,21 +83,27 @@ export function AppShell({
       </header>
       <aside className="glass sidebar">
         <nav aria-label={`${mode} navigation`}>
-          {links.map((label, index) => (
-            <Link
-              className={index === 0 ? 'active' : ''}
-              href={
-                index === 0
-                  ? mode === 'office'
-                    ? '/horizon/dashboard'
-                    : '/field/today'
+          {links.map((label, index) => {
+            const href =
+              mode === 'field'
+                ? index === 0
+                  ? '/field/today'
                   : '#'
-              }
-              key={label}
-            >
-              {label}
-            </Link>
-          ))}
+                : label === 'Overview'
+                  ? `/${organizationSlug}/dashboard`
+                  : label === 'Projects'
+                    ? `/${organizationSlug}/projects`
+                    : '#';
+            return (
+              <Link
+                className={pathname === href ? 'active' : ''}
+                href={href}
+                key={label}
+              >
+                {label}
+              </Link>
+            );
+          })}
         </nav>
         <div className="offline-note">
           <strong>Offline-first active</strong>

@@ -80,6 +80,58 @@ a:focus-visible {
   font-size: 13px;
   font-weight: 500;
 }
+.projects-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.7fr);
+  gap: 16px;
+}
+.project-list {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+}
+.project-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+}
+.project-list li div {
+  display: grid;
+  gap: 5px;
+}
+.project-list li span {
+  color: var(--muted);
+  font-size: 13px;
+}
+.project-list .status-pill {
+  padding: 5px 9px;
+  color: #076dd2;
+  background: #e6f2ff;
+  border-radius: 999px;
+  text-transform: capitalize;
+}
+.project-form {
+  display: grid;
+  gap: 14px;
+  margin-top: 16px;
+}
+.project-form label {
+  display: grid;
+  gap: 6px;
+  font-weight: 650;
+}
+.project-form input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #afbed1;
+  border-radius: 10px;
+}
+.warning-text {
+  color: #a44b00;
+}
 .app-frame {
   min-height: 100vh;
   padding: 12px;
@@ -729,6 +781,9 @@ a:focus-visible {
     transform: none;
   }
   .feature-strip {
+    grid-template-columns: 1fr;
+  }
+  .projects-grid {
     grid-template-columns: 1fr;
   }
   .feature-strip article {
