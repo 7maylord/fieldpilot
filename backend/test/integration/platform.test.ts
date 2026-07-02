@@ -6,6 +6,7 @@ import { PrismaService } from '../../src/database/prisma.service';
 import { TenantDatabase } from '../../src/database/tenant-database.service';
 import { QueueService } from '../../src/queue/queue.service';
 import { OutboxPublisher } from '../../src/queue/outbox-publisher.service';
+import { createToken, hashToken } from '../../src/auth/token';
 import request from 'supertest';
 
 const prisma = new PrismaService();
@@ -73,9 +74,73 @@ describe('platform integration', () => {
         },
       }),
     );
+    const siteId = uuidv7();
+    const locationId = uuidv7();
+    await tenants.withTenant(
+      { organizationId: organizationA, userId },
+      async (tx) => {
+        await tx.site.create({
+          data: {
+            id: siteId,
+            organizationId: organizationA,
+            projectId,
+            name: 'Bridge',
+            code: 'BR-01',
+          },
+        });
+        await tx.$executeRaw`
+          INSERT INTO locations (id, organization_id, project_id, site_id, name, location_type, geometry)
+          VALUES (${locationId}::uuid, ${organizationA}::uuid, ${projectId}::uuid, ${siteId}::uuid, 'Pier 1', 'gps_point', ST_SetSRID(ST_MakePoint(3.4, 6.5), 4326))
+        `;
+      },
+    );
+    const firstWorkOrderId = uuidv7();
+    const secondWorkOrderId = uuidv7();
+    await tenants.withTenant(
+      { organizationId: organizationA, userId },
+      async (tx) => {
+        await tx.workOrder.createMany({
+          data: [
+            {
+              id: firstWorkOrderId,
+              organizationId: organizationA,
+              projectId,
+              siteId,
+              locationId,
+              title: 'Inspect pier',
+              workType: 'inspection',
+              priority: 'high',
+              createdBy: userId,
+            },
+            {
+              id: secondWorkOrderId,
+              organizationId: organizationA,
+              projectId,
+              siteId,
+              title: 'Repair pier',
+              workType: 'repair',
+              priority: 'medium',
+              createdBy: userId,
+            },
+          ],
+        });
+        await tx.workOrderDependency.create({
+          data: {
+            id: uuidv7(),
+            organizationId: organizationA,
+            workOrderId: secondWorkOrderId,
+            prerequisiteWorkOrderId: firstWorkOrderId,
+          },
+        });
+      },
+    );
 
     expect(await prisma.organization.count()).toBe(0);
     expect(await prisma.project.count()).toBe(0);
+    expect(await prisma.site.count()).toBe(0);
+    expect(await prisma.location.count()).toBe(0);
+    expect(await prisma.workOrder.count()).toBe(0);
+    expect(await prisma.workOrderDependency.count()).toBe(0);
     expect(
       await tenants.withTenant(
         { organizationId: organizationB, userId },
@@ -102,10 +167,11 @@ describe('platform integration', () => {
       WHERE relname IN (
         'organizations', 'organization_memberships', 'organization_invitations', 'teams',
         'team_memberships', 'project_access', 'audit_events', 'outbox_events', 'job_executions',
-        'projects'
+        'projects', 'sites', 'locations', 'work_orders', 'work_order_assignments',
+        'work_order_dependencies'
       )
     `;
-    expect(policies).toHaveLength(10);
+    expect(policies).toHaveLength(15);
     expect(
       policies.every(
         (policy) => policy.relrowsecurity && policy.relforcerowsecurity,
@@ -158,6 +224,9 @@ describe('platform integration', () => {
       .post('/api/v1/auth/refresh')
       .set('x-csrf-token', csrfToken)
       .expect(201);
+    await agent
+      .get('/api/v1/auth/me')
+      .expect(200, { id: registration.body.userId as string, email });
 
     const created = await agent
       .post('/api/v1/organizations')
@@ -165,27 +234,196 @@ describe('platform integration', () => {
       .send({ name: 'Bridge Team', slug: `bridge-${uuidv7()}` })
       .expect(201);
     await agent.get('/api/v1/organizations').expect(200);
-    await agent
+    const team = await agent
       .post(`/api/v1/organizations/${created.body.id as string}/teams`)
       .set('x-csrf-token', csrfToken)
       .send({ name: 'Inspectors' })
       .expect(201);
+    const organizationId = created.body.id as string;
+    const project = await agent
+      .post(`/api/v1/organizations/${organizationId}/projects`)
+      .set('x-csrf-token', csrfToken)
+      .send({
+        name: 'Bridge Rehabilitation',
+        code: 'BRIDGE-01',
+        timezone: 'Africa/Lagos',
+      })
+      .expect(201);
+    await agent
+      .get(`/api/v1/organizations/${organizationId}/projects`)
+      .expect(200);
+    const site = await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/projects/${project.body.id as string}/sites`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({ name: 'Main Bridge', code: 'SITE-01' })
+      .expect(201);
+    const location = await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/projects/${project.body.id as string}/sites/${site.body.id as string}/locations`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({
+        name: 'Pier One',
+        locationType: 'gps_point',
+        latitude: 6.5,
+        longitude: 3.4,
+      })
+      .expect(201);
+    expect(location.body.geometry).toContain('Point');
+    await agent
+      .get(
+        `/api/v1/organizations/${organizationId}/projects/${project.body.id as string}/locations/viewport`,
+      )
+      .query({ west: 3, south: 6, east: 4, north: 7 })
+      .expect(200)
+      .expect(({ body }) => expect(body).toHaveLength(1));
+
+    const prerequisite = await agent
+      .post(`/api/v1/organizations/${organizationId}/work-orders`)
+      .set('x-csrf-token', csrfToken)
+      .send({
+        projectId: project.body.id,
+        siteId: site.body.id,
+        locationId: location.body.id,
+        title: 'Inspect pier',
+        workType: 'inspection',
+        priority: 'high',
+        evidenceRequirements: ['photo'],
+      })
+      .expect(201);
+    const workOrder = await agent
+      .post(`/api/v1/organizations/${organizationId}/work-orders`)
+      .set('x-csrf-token', csrfToken)
+      .send({
+        projectId: project.body.id,
+        siteId: site.body.id,
+        title: 'Repair pier',
+        workType: 'repair',
+        priority: 'medium',
+        evidenceRequirements: ['photo', 'signature'],
+      })
+      .expect(201);
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/work-orders/${workOrder.body.id as string}/assignments`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({ version: 1, assigneeType: 'team', assigneeId: team.body.id })
+      .expect(201);
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/work-orders/${workOrder.body.id as string}/dependencies`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({ version: 2, prerequisiteWorkOrderId: prerequisite.body.id })
+      .expect(201);
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/work-orders/${workOrder.body.id as string}/transitions`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({ version: 3, status: 'scheduled' })
+      .expect(201);
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/work-orders/${workOrder.body.id as string}/transitions`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({ version: 3, status: 'assigned' })
+      .expect(409)
+      .expect(({ body }) => expect(body.code).toBe('RESOURCE_CONFLICT'));
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/work-orders/${workOrder.body.id as string}/transitions`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({ version: 4, status: 'assigned' })
+      .expect(201);
+
+    const viewerId = uuidv7();
+    const viewerToken = createToken();
+    const viewerCsrf = createToken();
+    await prisma.user.create({
+      data: {
+        id: viewerId,
+        email: `${viewerId}@example.test`,
+        passwordHash: 'not-used',
+      },
+    });
+    await prisma.session.create({
+      data: {
+        id: uuidv7(),
+        userId: viewerId,
+        tokenHash: hashToken(viewerToken),
+        refreshTokenHash: hashToken(createToken()),
+        expiresAt: new Date(Date.now() + 60_000),
+        refreshExpiresAt: new Date(Date.now() + 120_000),
+      },
+    });
+    await tenants.withTenant(
+      { organizationId, userId: registration.body.userId as string },
+      (tx) =>
+        tx.membership.create({
+          data: {
+            id: uuidv7(),
+            organizationId,
+            userId: viewerId,
+            role: 'viewer',
+          },
+        }),
+    );
+    await request(app.getHttpServer())
+      .post(`/api/v1/organizations/${organizationId}/projects`)
+      .set('Cookie', [
+        `fieldpilot_session=${viewerToken}`,
+        `fieldpilot_csrf=${viewerCsrf}`,
+      ])
+      .set('x-csrf-token', viewerCsrf)
+      .send({ name: 'Forbidden', code: 'NO-ACCESS', timezone: 'UTC' })
+      .expect(403)
+      .expect(({ body }) => expect(body.code).toBe('AUTHORIZATION_DENIED'));
     const history = await tenants.withTenant(
       {
-        organizationId: created.body.id as string,
+        organizationId,
         userId: registration.body.userId as string,
       },
       async (tx) => ({
         audit: await tx.auditEvent.findFirstOrThrow(),
+        actions: (
+          await tx.auditEvent.findMany({ select: { action: true } })
+        ).map(({ action }) => action),
         outbox: await tx.outboxEvent.count(),
+        eventTypes: (
+          await tx.outboxEvent.findMany({ select: { eventType: true } })
+        ).map(({ eventType }) => eventType),
       }),
     );
     expect(history.audit.id).toBeTruthy();
+    expect(history.actions).toEqual(
+      expect.arrayContaining([
+        'project.created',
+        'site.created',
+        'location.created',
+        'work_order.created',
+        'work_order.assigned',
+        'work_order.dependency_added',
+        'work_order.transitioned',
+      ]),
+    );
+    expect(history.eventTypes).toEqual(
+      expect.arrayContaining([
+        'project.created',
+        'work_order.created',
+        'work_order.transitioned',
+      ]),
+    );
     expect(history.outbox).toBeGreaterThan(0);
     await expect(
       tenants.withTenant(
         {
-          organizationId: created.body.id as string,
+          organizationId,
           userId: registration.body.userId as string,
         },
         (tx) =>
@@ -198,7 +436,7 @@ describe('platform integration', () => {
     await app.get(OutboxPublisher).publishBatch();
     const unpublished = await tenants.withTenant(
       {
-        organizationId: created.body.id as string,
+        organizationId,
         userId: registration.body.userId as string,
       },
       (tx) => tx.outboxEvent.count({ where: { publishedAt: null } }),
