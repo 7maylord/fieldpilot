@@ -111,6 +111,11 @@ export class AuthController {
     return this.auth.listSessions(user.id);
   }
 
+  @Get('me')
+  me(@CurrentUser() user: AuthenticatedUser) {
+    return { id: user.id, email: user.email };
+  }
+
   @Delete('sessions/:sessionId')
   async revoke(
     @CurrentUser() user: AuthenticatedUser,

@@ -13,6 +13,8 @@ import { HealthController } from './health/health.controller';
 import { OrganizationsModule } from './organizations/organizations.module';
 import { ProjectsModule } from './projects/projects.module';
 import { QueueModule } from './queue/queue.module';
+import { SitesModule } from './sites/sites.module';
+import { WorkOrdersModule } from './work-orders/work-orders.module';
 
 @Module({
   imports: [
@@ -23,6 +25,8 @@ import { QueueModule } from './queue/queue.module';
     AuthModule,
     OrganizationsModule,
     ProjectsModule,
+    SitesModule,
+    WorkOrdersModule,
   ],
   controllers: [HealthController],
   providers: [
