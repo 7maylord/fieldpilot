@@ -10,9 +10,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "Health"
-        ]
+        "tags": ["Health"]
       }
     },
     "/api/v1/health/ready": {
@@ -24,9 +22,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "Health"
-        ]
+        "tags": ["Health"]
       }
     },
     "/api/v1/auth/csrf": {
@@ -38,9 +34,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "auth"
-        ]
+        "tags": ["auth"]
       }
     },
     "/api/v1/auth/register": {
@@ -52,9 +46,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "auth"
-        ]
+        "tags": ["auth"]
       }
     },
     "/api/v1/auth/verify-email": {
@@ -66,9 +58,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "auth"
-        ]
+        "tags": ["auth"]
       }
     },
     "/api/v1/auth/login": {
@@ -80,9 +70,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "auth"
-        ]
+        "tags": ["auth"]
       }
     },
     "/api/v1/auth/refresh": {
@@ -94,9 +82,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "auth"
-        ]
+        "tags": ["auth"]
       }
     },
     "/api/v1/auth/password-reset/request": {
@@ -108,9 +94,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "auth"
-        ]
+        "tags": ["auth"]
       }
     },
     "/api/v1/auth/password-reset/complete": {
@@ -122,9 +106,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "auth"
-        ]
+        "tags": ["auth"]
       }
     },
     "/api/v1/auth/logout": {
@@ -136,9 +118,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "auth"
-        ]
+        "tags": ["auth"]
       }
     },
     "/api/v1/auth/sessions": {
@@ -150,9 +130,19 @@
             "description": ""
           }
         },
-        "tags": [
-          "auth"
-        ]
+        "tags": ["auth"]
+      }
+    },
+    "/api/v1/auth/me": {
+      "get": {
+        "operationId": "AuthController_me",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["auth"]
       }
     },
     "/api/v1/auth/sessions/{sessionId}": {
@@ -164,9 +154,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "auth"
-        ]
+        "tags": ["auth"]
       }
     },
     "/api/v1/organizations": {
@@ -178,9 +166,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "organizations"
-        ]
+        "tags": ["organizations"]
       },
       "post": {
         "operationId": "OrganizationsController_create",
@@ -190,9 +176,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "organizations"
-        ]
+        "tags": ["organizations"]
       }
     },
     "/api/v1/invitations/accept": {
@@ -204,9 +188,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "organizations"
-        ]
+        "tags": ["organizations"]
       }
     },
     "/api/v1/organizations/{organizationId}/members": {
@@ -218,9 +200,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "organizations"
-        ]
+        "tags": ["organizations"]
       }
     },
     "/api/v1/organizations/{organizationId}/audit": {
@@ -232,9 +212,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "organizations"
-        ]
+        "tags": ["organizations"]
       }
     },
     "/api/v1/organizations/{organizationId}/invitations": {
@@ -246,9 +224,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "organizations"
-        ]
+        "tags": ["organizations"]
       }
     },
     "/api/v1/organizations/{organizationId}/members/{membershipId}": {
@@ -260,9 +236,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "organizations"
-        ]
+        "tags": ["organizations"]
       }
     },
     "/api/v1/organizations/{organizationId}/teams": {
@@ -274,9 +248,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "organizations"
-        ]
+        "tags": ["organizations"]
       }
     },
     "/api/v1/organizations/{organizationId}/teams/{teamId}/members": {
@@ -288,9 +260,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "organizations"
-        ]
+        "tags": ["organizations"]
       }
     },
     "/api/v1/organizations/{organizationId}/project-access": {
@@ -302,9 +272,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "organizations"
-        ]
+        "tags": ["organizations"]
       }
     },
     "/api/v1/organizations/{organizationId}/projects": {
@@ -316,9 +284,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "projects"
-        ]
+        "tags": ["projects"]
       },
       "post": {
         "operationId": "ProjectsController_create",
@@ -328,9 +294,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "projects"
-        ]
+        "tags": ["projects"]
       }
     },
     "/api/v1/organizations/{organizationId}/projects/{projectId}": {
@@ -342,9 +306,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "projects"
-        ]
+        "tags": ["projects"]
       },
       "patch": {
         "operationId": "ProjectsController_update",
@@ -354,9 +316,7 @@
             "description": ""
           }
         },
-        "tags": [
-          "projects"
-        ]
+        "tags": ["projects"]
       }
     },
     "/api/v1/organizations/{organizationId}/projects/{projectId}/archive": {
@@ -368,9 +328,121 @@
             "description": ""
           }
         },
-        "tags": [
-          "projects"
-        ]
+        "tags": ["projects"]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/projects/{projectId}/sites": {
+      "get": {
+        "operationId": "SitesController_listSites",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["sites and locations"]
+      },
+      "post": {
+        "operationId": "SitesController_createSite",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["sites and locations"]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/projects/{projectId}/sites/{siteId}/locations": {
+      "get": {
+        "operationId": "SitesController_listLocations",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["sites and locations"]
+      },
+      "post": {
+        "operationId": "SitesController_createLocation",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["sites and locations"]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/projects/{projectId}/locations/viewport": {
+      "get": {
+        "operationId": "SitesController_viewport",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["sites and locations"]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/work-orders": {
+      "get": {
+        "operationId": "WorkOrdersController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["work orders"]
+      },
+      "post": {
+        "operationId": "WorkOrdersController_create",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["work orders"]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/work-orders/{workOrderId}/assignments": {
+      "post": {
+        "operationId": "WorkOrdersController_assign",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["work orders"]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/work-orders/{workOrderId}/dependencies": {
+      "post": {
+        "operationId": "WorkOrdersController_dependency",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["work orders"]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/work-orders/{workOrderId}/transitions": {
+      "post": {
+        "operationId": "WorkOrdersController_transition",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["work orders"]
       }
     }
   },
