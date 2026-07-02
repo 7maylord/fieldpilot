@@ -15,6 +15,7 @@ model User {
   createdAt             DateTime @default(now()) @map("created_at") @db.Timestamptz
   sessions              Session[]
   memberships           Membership[]
+  syncDevices           SyncDevice[]
 
   @@map("users")
 }
@@ -80,6 +81,7 @@ model Organization {
   members  Membership[]
   teams     Team[]
   projects  Project[]
+  syncDevices SyncDevice[]
 
   @@map("organizations")
 }
@@ -318,6 +320,105 @@ model OutboxEvent {
 
   @@index([organizationId, createdAt])
   @@map("outbox_events")
+}
+
+model SyncDevice {
+  id                    String    @id @db.Uuid
+  organizationId        String    @map("organization_id") @db.Uuid
+  userId                String    @map("user_id") @db.Uuid
+  name                  String
+  platform              String
+  appVersion            String    @map("app_version")
+  currentCheckpoint     String?   @map("current_checkpoint") @db.Uuid
+  packageExpiresAt      DateTime  @map("package_expires_at") @db.Timestamptz
+  lastSeenAt            DateTime  @default(now()) @map("last_seen_at") @db.Timestamptz
+  revokedAt             DateTime? @map("revoked_at") @db.Timestamptz
+  purgeRequestedAt      DateTime? @map("purge_requested_at") @db.Timestamptz
+  purgeReason           String?   @map("purge_reason")
+  purgeAcknowledgedAt   DateTime? @map("purge_acknowledged_at") @db.Timestamptz
+  createdAt             DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt             DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  organization          Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  operations            SyncOperation[]
+  conflicts             SyncConflict[]
+  checkpoints           SyncCheckpoint[]
+
+  @@index([organizationId, userId])
+  @@map("sync_devices")
+}
+
+model SyncOperation {
+  id                String    @id @db.Uuid
+  organizationId    String    @map("organization_id") @db.Uuid
+  deviceId          String    @map("device_id") @db.Uuid
+  clientOperationId String    @map("client_operation_id") @db.Uuid
+  entityType        String    @map("entity_type")
+  entityId          String    @map("entity_id") @db.Uuid
+  operationType     String    @map("operation_type")
+  baseVersion       Int?      @map("base_version")
+  payload           Json
+  status            String
+  rejectionCode     String?   @map("rejection_code")
+  conflictId        String?   @map("conflict_id") @db.Uuid
+  clientCreatedAt   DateTime  @map("client_created_at") @db.Timestamptz
+  receivedAt        DateTime  @default(now()) @map("received_at") @db.Timestamptz
+  appliedAt         DateTime? @map("applied_at") @db.Timestamptz
+  device            SyncDevice @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  conflict          SyncConflict? @relation(fields: [conflictId], references: [id], onDelete: SetNull)
+
+  @@unique([organizationId, deviceId, clientOperationId])
+  @@index([organizationId, receivedAt])
+  @@map("sync_operations")
+}
+
+model SyncConflict {
+  id             String    @id @db.Uuid
+  organizationId String    @map("organization_id") @db.Uuid
+  deviceId       String    @map("device_id") @db.Uuid
+  entityType     String    @map("entity_type")
+  entityId       String    @map("entity_id") @db.Uuid
+  operationType  String    @map("operation_type")
+  localValue     Json      @map("local_value")
+  serverValue    Json      @map("server_value")
+  status         String    @default("unresolved")
+  resolution     Json?
+  resolvedBy     String?   @map("resolved_by") @db.Uuid
+  resolvedAt     DateTime? @map("resolved_at") @db.Timestamptz
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  device         SyncDevice @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  operations     SyncOperation[]
+
+  @@index([organizationId, status, createdAt])
+  @@map("sync_conflicts")
+}
+
+model SyncCheckpoint {
+  token          String   @id @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  deviceId       String   @map("device_id") @db.Uuid
+  sequence       BigInt
+  projectIds     String[] @map("project_ids") @db.Uuid
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  device         SyncDevice @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, deviceId, createdAt])
+  @@map("sync_checkpoints")
+}
+
+model EntityChangeLog {
+  sequence       BigInt   @id @default(autoincrement())
+  organizationId String   @map("organization_id") @db.Uuid
+  entityType     String   @map("entity_type")
+  entityId       String   @map("entity_id") @db.Uuid
+  projectId      String?  @map("project_id") @db.Uuid
+  operationType  String   @map("operation_type")
+  version        Int?
+  payload        Json
+  occurredAt     DateTime @default(now()) @map("occurred_at") @db.Timestamptz
+
+  @@index([organizationId, projectId, sequence])
+  @@map("entity_change_log")
 }
 
 model JobExecution {
