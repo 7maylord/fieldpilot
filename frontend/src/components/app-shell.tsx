@@ -8,7 +8,9 @@ import { OfflineStatus } from './offline-status';
 const officeLinks = [
   'Overview',
   'Projects',
+  'Sites',
   'Work',
+  'Assignments',
   'Assets',
   'Teams',
   'Maps',
@@ -83,17 +85,25 @@ export function AppShell({
       </header>
       <aside className="glass sidebar">
         <nav aria-label={`${mode} navigation`}>
-          {links.map((label, index) => {
+          {links.map((label) => {
             const href =
               mode === 'field'
-                ? index === 0
+                ? label === 'Today'
                   ? '/field/today'
-                  : '#'
+                  : label === 'My work'
+                    ? '/field/work'
+                    : '#'
                 : label === 'Overview'
                   ? `/${organizationSlug}/dashboard`
                   : label === 'Projects'
                     ? `/${organizationSlug}/projects`
-                    : '#';
+                    : label === 'Sites'
+                      ? `/${organizationSlug}/sites`
+                      : label === 'Work'
+                        ? `/${organizationSlug}/work`
+                        : label === 'Assignments'
+                          ? `/${organizationSlug}/assignments`
+                          : '#';
             return (
               <Link
                 className={pathname === href ? 'active' : ''}
