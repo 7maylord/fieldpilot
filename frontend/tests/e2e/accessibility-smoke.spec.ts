@@ -67,6 +67,38 @@ test('office projects screen exposes an accessible creation workflow', async ({
   ).toBeVisible();
 });
 
+test('office domain navigation exposes site, work, and assignment workflows', async ({
+  page,
+}) => {
+  await page.goto('/horizon/sites');
+  await expect(
+    page.getByRole('heading', { name: 'Sites & locations' }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Location hierarchy' }),
+  ).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'New site' })).toBeVisible();
+
+  await page.getByRole('link', { name: 'Work', exact: true }).click();
+  await expect(page).toHaveURL(/\/horizon\/work/);
+  await expect(
+    page.getByRole('heading', { name: 'Work orders' }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'New work order' }),
+  ).toBeVisible();
+  await expect(page.getByRole('checkbox', { name: 'Photo' })).toBeVisible();
+
+  await page.getByRole('link', { name: 'Assignments', exact: true }).click();
+  await expect(page).toHaveURL(/\/horizon\/assignments/);
+  await expect(
+    page.getByRole('heading', { name: 'Assignments' }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: 'Assign work' }),
+  ).toBeVisible();
+});
+
 test('field shell reloads from the service-worker cache while offline', async ({
   page,
   context,
@@ -74,10 +106,16 @@ test('field shell reloads from the service-worker cache while offline', async ({
   await page.goto('/field/today');
   await page.evaluate(() => navigator.serviceWorker.ready);
   await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller));
+  await expect(
+    page.getByRole('heading', { name: 'Today', exact: true }),
+  ).toBeVisible();
+  await page.getByRole('link', { name: 'My work' }).click();
+  await expect(page.getByRole('heading', { name: 'My Work' })).toBeVisible();
   await context.setOffline(true);
   await page.reload();
+  await expect(page.getByRole('heading', { name: 'My Work' })).toBeVisible();
   await expect(
-    page.getByRole('heading', { name: 'Today’s Operations' }),
+    page.getByText('No downloaded work matches this view'),
   ).toBeVisible();
   await context.setOffline(false);
 });

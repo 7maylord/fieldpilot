@@ -2,9 +2,9 @@
 
 - Source visual truth: `/Users/macbook/.codex/generated_images/019f10d9-c532-7742-afa9-9da61b5a8480/exec-96f962fe-eea0-4bfd-a88e-8fa95facf9bf.png`
 - Implementation screenshot: `docs/design-qa/field-bridge-dashboard.png`
-- Additional evidence: `docs/design-qa/landing-desktop.png`, `docs/design-qa/landing-mobile.png`
+- Additional evidence: `docs/design-qa/landing-desktop.png`, `docs/design-qa/landing-mobile.png`, `docs/design-qa/office-work-orders.png`, `docs/design-qa/field-today.png`
 - Viewports: 1440 × 1024 desktop; 390 × 844 mobile
-- State: authenticated Office dashboard and public landing page
+- State: authenticated Office dashboard, unauthenticated empty office/field work states, and public landing page
 
 ## Full-view comparison
 
@@ -22,6 +22,8 @@ The implementation preserves the selected Field Bridge composition: glass top ba
 
 No actionable P0, P1, or P2 mismatches remain.
 
+The work-order capture is intentionally an empty API state while the source is populated. Layout, hierarchy, typography, tokens, controls, and responsive structure were compared; row-density fidelity remains covered by the populated dashboard evidence.
+
 ## Patches made
 
 - Added responsive Office and Field shells, authentication, organization selection, loading, empty, not-found, and error states.
@@ -29,6 +31,8 @@ No actionable P0, P1, or P2 mismatches remain.
 - Added a responsive liquid-glass landing page and mobile navigation.
 - Fixed work filtering so the review filter exposes the accessible empty state.
 - Added desktop/mobile Playwright coverage and captured visual evidence.
+- Added connected project, site/location, work-order, and assignment routes with functional forms, navigation, CSRF handling, empty states, and production-browser coverage.
+- Added Dexie-backed Today and My Work field views that render local data before background refresh and survive offline reloads.
 
 ## Follow-up polish
 

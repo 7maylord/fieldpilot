@@ -1,10 +1,10 @@
 import { AppShell } from '../../../../components/app-shell';
 import { FieldWorkScreen } from '../../../../components/field-work-screen';
 
-export default function TodayPage() {
+export default function MyWorkPage() {
   return (
     <AppShell mode="field">
-      <FieldWorkScreen view="today" />
+      <FieldWorkScreen view="mine" />
     </AppShell>
   );
 }

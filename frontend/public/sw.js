@@ -1,9 +1,10 @@
-const CACHE = 'fieldpilot-shell-v1';
+const CACHE = 'fieldpilot-shell-v2';
 const SHELL = [
   '/',
   '/sign-in',
   '/organizations',
   '/field/today',
+  '/field/work',
   '/fieldpilot-icon.svg',
 ];
 
