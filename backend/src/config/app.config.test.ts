@@ -23,6 +23,13 @@ describe('loadConfig', () => {
     const config = loadConfig({ NODE_ENV: 'development' });
     expect(config.port).toBe(3001);
     expect(config.storage.bucket).toBe('fieldpilot');
+    expect(config.offlinePackageTtlHours).toBe(72);
+  });
+
+  it('rejects an invalid offline package policy', () => {
+    expect(() =>
+      loadConfig({ NODE_ENV: 'development', OFFLINE_PACKAGE_TTL_HOURS: '0' }),
+    ).toThrow(/OFFLINE_PACKAGE_TTL_HOURS/);
   });
 
   it('fails startup when production configuration is missing', () => {

@@ -12,6 +12,7 @@ export interface AppConfig {
   sessionSecret: string;
   accessTokenSecret: string;
   refreshTokenSecret: string;
+  offlinePackageTtlHours: number;
   storage: {
     endpoint: string;
     bucket: string;
@@ -80,6 +81,10 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
       value('REFRESH_TOKEN_SECRET'),
       required,
     ),
+    offlinePackageTtlHours: parsePositiveInteger(
+      'OFFLINE_PACKAGE_TTL_HOURS',
+      env.OFFLINE_PACKAGE_TTL_HOURS ?? '72',
+    ),
     storage: {
       endpoint: parseUrl('S3_ENDPOINT', value('S3_ENDPOINT')),
       bucket: value('S3_BUCKET'),
@@ -146,4 +151,11 @@ function parseSecret(name: string, value: string, enforceLength: boolean) {
   if (enforceLength && value.length < 32)
     throw new Error(`${name} must contain at least 32 characters`);
   return value;
+}
+
+function parsePositiveInteger(name: string, value: string) {
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed < 1)
+    throw new Error(`${name} must be a positive integer`);
+  return parsed;
 }
