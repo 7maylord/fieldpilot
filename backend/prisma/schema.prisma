@@ -172,10 +172,124 @@ model Project {
   updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   access         ProjectAccess[]
+  sites          Site[]
+  locations      Location[]
+  workOrders     WorkOrder[]
 
   @@unique([organizationId, code])
   @@index([organizationId, status])
   @@map("projects")
+}
+
+model Site {
+  id             String   @id @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  projectId      String   @map("project_id") @db.Uuid
+  name           String
+  code           String
+  status         String   @default("active")
+  boundary       Unsupported("geometry")?
+  version        Int      @default(1)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  project        Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  locations      Location[]
+  workOrders     WorkOrder[]
+
+  @@unique([organizationId, projectId, code])
+  @@index([organizationId, projectId])
+  @@map("sites")
+}
+
+model Location {
+  id             String   @id @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  projectId      String   @map("project_id") @db.Uuid
+  siteId         String   @map("site_id") @db.Uuid
+  parentId       String?  @map("parent_id") @db.Uuid
+  name           String
+  locationType   String   @map("location_type")
+  status         String   @default("active")
+  geometry       Unsupported("geometry")?
+  chainageStart  Decimal? @map("chainage_start") @db.Decimal
+  chainageEnd    Decimal? @map("chainage_end") @db.Decimal
+  version        Int      @default(1)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  project        Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  site           Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  parent         Location? @relation("LocationHierarchy", fields: [parentId], references: [id], onDelete: Restrict)
+  children       Location[] @relation("LocationHierarchy")
+  workOrders     WorkOrder[]
+
+  @@index([organizationId, projectId, siteId])
+  @@index([parentId])
+  @@map("locations")
+}
+
+model WorkOrder {
+  id                   String   @id @db.Uuid
+  organizationId       String   @map("organization_id") @db.Uuid
+  projectId            String   @map("project_id") @db.Uuid
+  siteId               String?  @map("site_id") @db.Uuid
+  locationId           String?  @map("location_id") @db.Uuid
+  title                String
+  description          String?
+  workType             String   @map("work_type")
+  priority             String
+  status               String   @default("draft")
+  plannedStart         DateTime? @map("planned_start") @db.Timestamptz
+  plannedEnd           DateTime? @map("planned_end") @db.Timestamptz
+  dueAt                DateTime? @map("due_at") @db.Timestamptz
+  estimatedMinutes     Int?      @map("estimated_minutes")
+  requiredSkills       String[]  @default([]) @map("required_skills")
+  evidenceRequirements Json      @default("[]") @map("evidence_requirements")
+  completionRules      Json      @default("{}") @map("completion_rules")
+  checklistId          String?   @map("checklist_id") @db.Uuid
+  version              Int       @default(1)
+  createdBy            String    @map("created_by") @db.Uuid
+  createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt            DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+  archivedAt           DateTime? @map("archived_at") @db.Timestamptz
+  project              Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  site                 Site?     @relation(fields: [siteId], references: [id], onDelete: Restrict)
+  location             Location? @relation(fields: [locationId], references: [id], onDelete: Restrict)
+  assignments          WorkOrderAssignment[]
+  prerequisites        WorkOrderDependency[] @relation("DependentWorkOrder")
+  dependents           WorkOrderDependency[] @relation("PrerequisiteWorkOrder")
+
+  @@index([organizationId, projectId, status])
+  @@index([organizationId, dueAt])
+  @@map("work_orders")
+}
+
+model WorkOrderAssignment {
+  id             String   @id @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  workOrderId    String   @map("work_order_id") @db.Uuid
+  assigneeType   String   @map("assignee_type")
+  assigneeId     String   @map("assignee_id") @db.Uuid
+  createdBy      String   @map("created_by") @db.Uuid
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  workOrder      WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+
+  @@unique([workOrderId, assigneeType, assigneeId])
+  @@index([organizationId, assigneeType, assigneeId])
+  @@map("work_order_assignments")
+}
+
+model WorkOrderDependency {
+  id                      String   @id @db.Uuid
+  organizationId          String   @map("organization_id") @db.Uuid
+  workOrderId             String   @map("work_order_id") @db.Uuid
+  prerequisiteWorkOrderId String   @map("prerequisite_work_order_id") @db.Uuid
+  createdAt               DateTime @default(now()) @map("created_at") @db.Timestamptz
+  workOrder               WorkOrder @relation("DependentWorkOrder", fields: [workOrderId], references: [id], onDelete: Cascade)
+  prerequisite            WorkOrder @relation("PrerequisiteWorkOrder", fields: [prerequisiteWorkOrderId], references: [id], onDelete: Cascade)
+
+  @@unique([workOrderId, prerequisiteWorkOrderId])
+  @@index([organizationId])
+  @@map("work_order_dependencies")
 }
 
 model AuditEvent {
