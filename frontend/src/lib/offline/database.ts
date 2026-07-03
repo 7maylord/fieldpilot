@@ -34,12 +34,21 @@ export interface PendingOperation {
   entityType: string;
   entityId: string;
   action: string;
-  baseVersion: number;
+  baseVersion: number | null;
   payload: unknown;
-  state: 'pending' | 'sending' | 'applied' | 'rejected';
+  state:
+    | 'pending'
+    | 'uploading'
+    | 'applied'
+    | 'conflict'
+    | 'rejected'
+    | 'retry_scheduled'
+    | 'failed_permanently';
   priority: number;
   attempts: number;
-  createdAt: string;
+  clientCreatedAt: string;
+  nextAttemptAt: string | null;
+  lastErrorCode?: string;
 }
 
 export interface MediaRecord extends OfflineEntity {
@@ -105,6 +114,24 @@ export class FieldPilotDatabase extends Dexie {
           .modify((operation) => {
             operation.attempts ??= 0;
             operation.priority ??= 0;
+          });
+      });
+    this.version(3)
+      .stores({
+        pendingOperations:
+          'id, organizationId, [organizationId+state], entityId, state, priority, clientCreatedAt',
+      })
+      .upgrade(async (transaction) => {
+        await transaction
+          .table<PendingOperation & { createdAt?: string }>('pendingOperations')
+          .toCollection()
+          .modify((operation) => {
+            operation.clientCreatedAt ??=
+              operation.createdAt ?? new Date().toISOString();
+            operation.nextAttemptAt ??= null;
+            if (operation.state === ('sending' as PendingOperation['state']))
+              operation.state = 'pending';
+            delete operation.createdAt;
           });
       });
   }
