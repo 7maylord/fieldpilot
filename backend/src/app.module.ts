@@ -9,23 +9,27 @@ import { CapabilityGuard } from './authorization/capability.guard';
 import { RequestIdMiddleware } from './common/request-id.middleware';
 import { RequestTelemetryMiddleware } from './common/request-telemetry.middleware';
 import { DatabaseModule } from './database/database.module';
+import { DevicesModule } from './devices/devices.module';
 import { HealthController } from './health/health.controller';
 import { OrganizationsModule } from './organizations/organizations.module';
 import { ProjectsModule } from './projects/projects.module';
 import { QueueModule } from './queue/queue.module';
 import { SitesModule } from './sites/sites.module';
+import { SyncModule } from './sync/sync.module';
 import { WorkOrdersModule } from './work-orders/work-orders.module';
 
 @Module({
   imports: [
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
     DatabaseModule,
+    DevicesModule,
     AuditModule,
     QueueModule,
     AuthModule,
     OrganizationsModule,
     ProjectsModule,
     SitesModule,
+    SyncModule,
     WorkOrdersModule,
   ],
   controllers: [HealthController],
