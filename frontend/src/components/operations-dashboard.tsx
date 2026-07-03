@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { SyncConflicts } from './sync-conflicts';
 
 const work = [
   {
@@ -29,7 +30,11 @@ const work = [
   },
 ];
 
-export function OperationsDashboard() {
+export function OperationsDashboard({
+  organizationSlug,
+}: {
+  organizationSlug: string;
+}) {
   const [filter, setFilter] = useState('All');
   const [notice, setNotice] = useState('');
   const visibleWork = filter === 'Review' ? [] : work;
@@ -104,6 +109,7 @@ export function OperationsDashboard() {
           </div>
         </section>
         <aside className="status-stack">
+          <SyncConflicts organizationSlug={organizationSlug} />
           <section className="panel">
             <h2>Field deployment</h2>
             <p className="big-number">

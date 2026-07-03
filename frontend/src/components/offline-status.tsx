@@ -79,16 +79,20 @@ export function OfflineStatus({
   }
 
   async function downloadPackage() {
-    const version = new Date().toISOString().slice(0, 10);
-    await db.downloadManifests.put({
-      id: `${organizationId}:${version}`,
-      organizationId,
-      version,
-      downloadedAt: new Date().toISOString(),
-      expiresAt: new Date(Date.now() + 3 * 86_400_000).toISOString(),
-    });
-    setStatus((current) => ({ ...current, packageVersion: version }));
-    setMessage('Offline package downloaded.');
+    try {
+      const version = new Date().toISOString().slice(0, 10);
+      await db.downloadManifests.put({
+        id: `${organizationId}:${version}`,
+        organizationId,
+        version,
+        downloadedAt: new Date().toISOString(),
+        expiresAt: new Date(Date.now() + 3 * 86_400_000).toISOString(),
+      });
+      setStatus((current) => ({ ...current, packageVersion: version }));
+      setMessage('Offline package downloaded.');
+    } catch (error) {
+      setMessage(`Offline package failed: ${String(error)}`);
+    }
   }
 
   return (
