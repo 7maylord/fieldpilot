@@ -132,6 +132,17 @@ describe('platform integration', () => {
             prerequisiteWorkOrderId: firstWorkOrderId,
           },
         });
+        await tx.syncDevice.create({
+          data: {
+            id: uuidv7(),
+            organizationId: organizationA,
+            userId,
+            name: 'RLS device',
+            platform: 'web',
+            appVersion: '1.0.0',
+            packageExpiresAt: new Date(Date.now() + 60_000),
+          },
+        });
       },
     );
 
@@ -141,6 +152,7 @@ describe('platform integration', () => {
     expect(await prisma.location.count()).toBe(0);
     expect(await prisma.workOrder.count()).toBe(0);
     expect(await prisma.workOrderDependency.count()).toBe(0);
+    expect(await prisma.syncDevice.count()).toBe(0);
     expect(
       await tenants.withTenant(
         { organizationId: organizationB, userId },
@@ -168,10 +180,11 @@ describe('platform integration', () => {
         'organizations', 'organization_memberships', 'organization_invitations', 'teams',
         'team_memberships', 'project_access', 'audit_events', 'outbox_events', 'job_executions',
         'projects', 'sites', 'locations', 'work_orders', 'work_order_assignments',
-        'work_order_dependencies'
+        'work_order_dependencies', 'sync_devices', 'sync_operations', 'sync_conflicts',
+        'sync_checkpoints', 'entity_change_log'
       )
     `;
-    expect(policies).toHaveLength(15);
+    expect(policies).toHaveLength(20);
     expect(
       policies.every(
         (policy) => policy.relrowsecurity && policy.relforcerowsecurity,
@@ -240,6 +253,86 @@ describe('platform integration', () => {
       .send({ name: 'Inspectors' })
       .expect(201);
     const organizationId = created.body.id as string;
+    const deviceId = uuidv7();
+    const device = await agent
+      .post(`/api/v1/organizations/${organizationId}/devices`)
+      .set('x-csrf-token', csrfToken)
+      .send({
+        deviceId,
+        name: 'Site tablet',
+        platform: 'web',
+        appVersion: '1.0.0',
+      })
+      .expect(201);
+    expect(new Date(device.body.packageExpiresAt).getTime()).toBeGreaterThan(
+      Date.now(),
+    );
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/devices/${deviceId}/heartbeat`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({ appVersion: '1.1.0' })
+      .expect(201)
+      .expect(({ body }) => expect(body.appVersion).toBe('1.1.0'));
+    await tenants.withTenant(
+      { organizationId, userId: registration.body.userId as string },
+      (tx) =>
+        tx.syncDevice.update({
+          where: { id: deviceId },
+          data: { packageExpiresAt: new Date(Date.now() - 1_000) },
+        }),
+    );
+    await agent
+      .get(`/api/v1/organizations/${organizationId}/devices/${deviceId}/status`)
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body.purgeReason).toBe('package_expired');
+        expect(body.localAction).toBe('quarantine_unsynced_then_purge');
+      });
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/devices/${deviceId}/package`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .expect(409);
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/devices/${deviceId}/purge/acknowledge`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .expect(201);
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/devices/${deviceId}/package`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .expect(201)
+      .expect(({ body }) => expect(body.purgeRequestedAt).toBeNull());
+    await agent
+      .post(`/api/v1/organizations/${organizationId}/devices/${deviceId}/purge`)
+      .set('x-csrf-token', csrfToken)
+      .expect(201);
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/devices/${deviceId}/purge/acknowledge`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .expect(201)
+      .expect(({ body }) => expect(body.purgeAcknowledgedAt).toBeTruthy());
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/devices/${deviceId}/revoke`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .expect(201);
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/devices/${deviceId}/heartbeat`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({ appVersion: '1.2.0' })
+      .expect(403);
     const project = await agent
       .post(`/api/v1/organizations/${organizationId}/projects`)
       .set('x-csrf-token', csrfToken)
@@ -342,6 +435,255 @@ describe('platform integration', () => {
       .send({ version: 4, status: 'assigned' })
       .expect(201);
 
+    const syncDeviceId = uuidv7();
+    await agent
+      .post(`/api/v1/organizations/${organizationId}/devices`)
+      .set('x-csrf-token', csrfToken)
+      .send({
+        deviceId: syncDeviceId,
+        name: 'Offline tablet',
+        platform: 'web',
+        appVersion: '1.0.0',
+      })
+      .expect(201);
+    const bootstrap = await agent
+      .post('/api/v1/sync/bootstrap')
+      .set('x-csrf-token', csrfToken)
+      .send({
+        deviceId: syncDeviceId,
+        organizationId,
+        projectIds: [project.body.id],
+        lastCheckpoint: null,
+      })
+      .expect(201);
+    expect(bootstrap.body.checkpoint).toBeTruthy();
+    expect(bootstrap.body.projects).toHaveLength(1);
+    expect(bootstrap.body.workOrders).toHaveLength(2);
+    const transitionOperationId = uuidv7();
+    const rejectedOperationId = uuidv7();
+    const push = await agent
+      .post('/api/v1/sync/push')
+      .set('x-csrf-token', csrfToken)
+      .set('idempotency-key', uuidv7())
+      .send({
+        organizationId,
+        deviceId: syncDeviceId,
+        operations: [
+          {
+            operationId: transitionOperationId,
+            entityType: 'work_order',
+            entityId: workOrder.body.id,
+            operationType: 'status_transition',
+            baseVersion: 5,
+            clientCreatedAt: new Date().toISOString(),
+            payload: { status: 'accepted' },
+          },
+          {
+            operationId: rejectedOperationId,
+            entityType: 'work_order',
+            entityId: workOrder.body.id,
+            operationType: 'unknown_operation',
+            baseVersion: 5,
+            clientCreatedAt: new Date().toISOString(),
+            payload: {},
+          },
+          {
+            operationId: uuidv7(),
+            entityType: 'comment',
+            entityId: uuidv7(),
+            operationType: 'comment_append',
+            baseVersion: null,
+            clientCreatedAt: new Date().toISOString(),
+            payload: { projectId: project.body.id, body: 'Field note' },
+          },
+        ],
+      })
+      .expect(201);
+    expect(push.body.results[0].status).toBe('applied');
+    expect(push.body.results[1].status).toBe('rejected');
+    expect(push.body.results[2].status).toBe('auto_merged');
+    await agent
+      .post('/api/v1/sync/push')
+      .set('x-csrf-token', csrfToken)
+      .set('idempotency-key', uuidv7())
+      .send({
+        organizationId,
+        deviceId: syncDeviceId,
+        operations: [
+          {
+            operationId: transitionOperationId,
+            entityType: 'work_order',
+            entityId: workOrder.body.id,
+            operationType: 'status_transition',
+            baseVersion: 5,
+            clientCreatedAt: new Date().toISOString(),
+            payload: { status: 'accepted' },
+          },
+        ],
+      })
+      .expect(201)
+      .expect(({ body }) =>
+        expect(body.results[0].status).toBe('already_applied'),
+      );
+    const conflictPush = await agent
+      .post('/api/v1/sync/push')
+      .set('x-csrf-token', csrfToken)
+      .set('idempotency-key', uuidv7())
+      .send({
+        organizationId,
+        deviceId: syncDeviceId,
+        operations: [
+          {
+            operationId: uuidv7(),
+            entityType: 'work_order',
+            entityId: workOrder.body.id,
+            operationType: 'update',
+            baseVersion: 1,
+            clientCreatedAt: new Date(0).toISOString(),
+            payload: { title: 'Offline title' },
+          },
+        ],
+      })
+      .expect(201);
+    expect(conflictPush.body.results[0].status).toBe('conflict');
+    const preservedClock = await tenants.withTenant(
+      { organizationId, userId: registration.body.userId as string },
+      (tx) =>
+        tx.syncOperation.findUniqueOrThrow({
+          where: {
+            organizationId_deviceId_clientOperationId: {
+              organizationId,
+              deviceId: syncDeviceId,
+              clientOperationId: conflictPush.body.results[0]
+                .operationId as string,
+            },
+          },
+        }),
+    );
+    expect(preservedClock.clientCreatedAt.toISOString()).toBe(
+      new Date(0).toISOString(),
+    );
+    const pulled = await agent
+      .post('/api/v1/sync/pull')
+      .set('x-csrf-token', csrfToken)
+      .send({
+        organizationId,
+        deviceId: syncDeviceId,
+        checkpoint: bootstrap.body.checkpoint,
+        limit: 1,
+      })
+      .expect(201);
+    expect(pulled.body.changes).toHaveLength(1);
+    expect(pulled.body.hasMore).toBe(true);
+    const conflicts = await agent
+      .get('/api/v1/sync/conflicts')
+      .query({ organizationId })
+      .expect(200);
+    expect(conflicts.body).toHaveLength(1);
+    await agent
+      .post(`/api/v1/sync/conflicts/${conflicts.body[0].id as string}/resolve`)
+      .set('x-csrf-token', csrfToken)
+      .send({ organizationId, resolution: { choice: 'local' } })
+      .expect(201)
+      .expect(({ body }) => expect(body.status).toBe('resolved'));
+    await agent
+      .get(`/api/v1/organizations/${organizationId}/work-orders`)
+      .query({ projectId: project.body.id })
+      .expect(200)
+      .expect(({ body }) =>
+        expect(
+          body.find(({ id }: { id: string }) => id === workOrder.body.id).title,
+        ).toBe('Offline title'),
+      );
+    await agent
+      .post('/api/v1/sync/pull')
+      .set('x-csrf-token', csrfToken)
+      .send({
+        organizationId,
+        deviceId: syncDeviceId,
+        checkpoint: pulled.body.nextCheckpoint,
+        limit: 10,
+      })
+      .expect(201)
+      .expect(({ body }) =>
+        expect(
+          body.changes.some(
+            ({ operationType }: { operationType: string }) =>
+              operationType === 'conflict_resolution',
+          ),
+        ).toBe(true),
+      );
+    await agent
+      .post('/api/v1/sync/bootstrap')
+      .set('x-csrf-token', csrfToken)
+      .send({
+        deviceId: syncDeviceId,
+        organizationId,
+        projectIds: [project.body.id],
+        lastCheckpoint: uuidv7(),
+      })
+      .expect(409);
+
+    const secondSyncDeviceId = uuidv7();
+    await agent
+      .post(`/api/v1/organizations/${organizationId}/devices`)
+      .set('x-csrf-token', csrfToken)
+      .send({
+        deviceId: secondSyncDeviceId,
+        name: 'Second offline tablet',
+        platform: 'web',
+        appVersion: '1.0.0',
+      })
+      .expect(201);
+    const secondBootstrap = await agent
+      .post('/api/v1/sync/bootstrap')
+      .set('x-csrf-token', csrfToken)
+      .send({
+        organizationId,
+        deviceId: secondSyncDeviceId,
+        projectIds: [project.body.id],
+        lastCheckpoint: null,
+      })
+      .expect(201);
+    expect(secondBootstrap.body.checkpoint).not.toBe(bootstrap.body.checkpoint);
+    await tenants.withTenant(
+      { organizationId, userId: registration.body.userId as string },
+      (tx) =>
+        tx.syncDevice.update({
+          where: { id: secondSyncDeviceId },
+          data: { packageExpiresAt: new Date(0) },
+        }),
+    );
+    await agent
+      .post('/api/v1/sync/pull')
+      .set('x-csrf-token', csrfToken)
+      .send({
+        organizationId,
+        deviceId: secondSyncDeviceId,
+        checkpoint: secondBootstrap.body.checkpoint,
+      })
+      .expect(403);
+    await agent
+      .post('/api/v1/sync/push')
+      .set('x-csrf-token', csrfToken)
+      .set('idempotency-key', uuidv7())
+      .send({
+        organizationId,
+        deviceId,
+        operations: [
+          {
+            operationId: uuidv7(),
+            entityType: 'work_order',
+            entityId: workOrder.body.id,
+            operationType: 'update',
+            baseVersion: 1,
+            clientCreatedAt: new Date().toISOString(),
+            payload: {},
+          },
+        ],
+      })
+      .expect(403);
+
     const viewerId = uuidv7();
     const viewerToken = createToken();
     const viewerCsrf = createToken();
@@ -410,6 +752,12 @@ describe('platform integration', () => {
         'work_order.assigned',
         'work_order.dependency_added',
         'work_order.transitioned',
+        'sync.bootstrap_created',
+        'sync.operation_applied',
+        'sync.operation_auto_merged',
+        'sync.operation_conflict',
+        'sync.operation_rejected',
+        'sync.conflict_resolved',
       ]),
     );
     expect(history.eventTypes).toEqual(

@@ -10,7 +10,9 @@
             "description": ""
           }
         },
-        "tags": ["Health"]
+        "tags": [
+          "Health"
+        ]
       }
     },
     "/api/v1/health/ready": {
@@ -22,7 +24,119 @@
             "description": ""
           }
         },
-        "tags": ["Health"]
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/devices": {
+      "post": {
+        "operationId": "DevicesController_register",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "devices"
+        ]
+      },
+      "get": {
+        "operationId": "DevicesController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "devices"
+        ]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/devices/{deviceId}/heartbeat": {
+      "post": {
+        "operationId": "DevicesController_heartbeat",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "devices"
+        ]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/devices/{deviceId}/package": {
+      "post": {
+        "operationId": "DevicesController_renewPackage",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "devices"
+        ]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/devices/{deviceId}/status": {
+      "get": {
+        "operationId": "DevicesController_status",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "devices"
+        ]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/devices/{deviceId}/revoke": {
+      "post": {
+        "operationId": "DevicesController_revoke",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "devices"
+        ]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/devices/{deviceId}/purge": {
+      "post": {
+        "operationId": "DevicesController_requestPurge",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "devices"
+        ]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/devices/{deviceId}/purge/acknowledge": {
+      "post": {
+        "operationId": "DevicesController_acknowledgePurge",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "devices"
+        ]
       }
     },
     "/api/v1/auth/csrf": {
@@ -34,7 +148,9 @@
             "description": ""
           }
         },
-        "tags": ["auth"]
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/v1/auth/register": {
@@ -46,7 +162,9 @@
             "description": ""
           }
         },
-        "tags": ["auth"]
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/v1/auth/verify-email": {
@@ -58,7 +176,9 @@
             "description": ""
           }
         },
-        "tags": ["auth"]
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/v1/auth/login": {
@@ -70,7 +190,9 @@
             "description": ""
           }
         },
-        "tags": ["auth"]
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/v1/auth/refresh": {
@@ -82,7 +204,9 @@
             "description": ""
           }
         },
-        "tags": ["auth"]
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/v1/auth/password-reset/request": {
@@ -94,7 +218,9 @@
             "description": ""
           }
         },
-        "tags": ["auth"]
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/v1/auth/password-reset/complete": {
@@ -106,7 +232,9 @@
             "description": ""
           }
         },
-        "tags": ["auth"]
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/v1/auth/logout": {
@@ -118,7 +246,9 @@
             "description": ""
           }
         },
-        "tags": ["auth"]
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/v1/auth/sessions": {
@@ -130,7 +260,9 @@
             "description": ""
           }
         },
-        "tags": ["auth"]
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/v1/auth/me": {
@@ -142,7 +274,9 @@
             "description": ""
           }
         },
-        "tags": ["auth"]
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/v1/auth/sessions/{sessionId}": {
@@ -154,7 +288,9 @@
             "description": ""
           }
         },
-        "tags": ["auth"]
+        "tags": [
+          "auth"
+        ]
       }
     },
     "/api/v1/organizations": {
@@ -166,7 +302,9 @@
             "description": ""
           }
         },
-        "tags": ["organizations"]
+        "tags": [
+          "organizations"
+        ]
       },
       "post": {
         "operationId": "OrganizationsController_create",
@@ -176,7 +314,9 @@
             "description": ""
           }
         },
-        "tags": ["organizations"]
+        "tags": [
+          "organizations"
+        ]
       }
     },
     "/api/v1/invitations/accept": {
@@ -188,7 +328,9 @@
             "description": ""
           }
         },
-        "tags": ["organizations"]
+        "tags": [
+          "organizations"
+        ]
       }
     },
     "/api/v1/organizations/{organizationId}/members": {
@@ -200,7 +342,9 @@
             "description": ""
           }
         },
-        "tags": ["organizations"]
+        "tags": [
+          "organizations"
+        ]
       }
     },
     "/api/v1/organizations/{organizationId}/audit": {
@@ -212,7 +356,9 @@
             "description": ""
           }
         },
-        "tags": ["organizations"]
+        "tags": [
+          "organizations"
+        ]
       }
     },
     "/api/v1/organizations/{organizationId}/invitations": {
@@ -224,7 +370,9 @@
             "description": ""
           }
         },
-        "tags": ["organizations"]
+        "tags": [
+          "organizations"
+        ]
       }
     },
     "/api/v1/organizations/{organizationId}/members/{membershipId}": {
@@ -236,7 +384,9 @@
             "description": ""
           }
         },
-        "tags": ["organizations"]
+        "tags": [
+          "organizations"
+        ]
       }
     },
     "/api/v1/organizations/{organizationId}/teams": {
@@ -248,7 +398,9 @@
             "description": ""
           }
         },
-        "tags": ["organizations"]
+        "tags": [
+          "organizations"
+        ]
       }
     },
     "/api/v1/organizations/{organizationId}/teams/{teamId}/members": {
@@ -260,7 +412,9 @@
             "description": ""
           }
         },
-        "tags": ["organizations"]
+        "tags": [
+          "organizations"
+        ]
       }
     },
     "/api/v1/organizations/{organizationId}/project-access": {
@@ -272,7 +426,9 @@
             "description": ""
           }
         },
-        "tags": ["organizations"]
+        "tags": [
+          "organizations"
+        ]
       }
     },
     "/api/v1/organizations/{organizationId}/projects": {
@@ -284,7 +440,9 @@
             "description": ""
           }
         },
-        "tags": ["projects"]
+        "tags": [
+          "projects"
+        ]
       },
       "post": {
         "operationId": "ProjectsController_create",
@@ -294,7 +452,9 @@
             "description": ""
           }
         },
-        "tags": ["projects"]
+        "tags": [
+          "projects"
+        ]
       }
     },
     "/api/v1/organizations/{organizationId}/projects/{projectId}": {
@@ -306,7 +466,9 @@
             "description": ""
           }
         },
-        "tags": ["projects"]
+        "tags": [
+          "projects"
+        ]
       },
       "patch": {
         "operationId": "ProjectsController_update",
@@ -316,7 +478,9 @@
             "description": ""
           }
         },
-        "tags": ["projects"]
+        "tags": [
+          "projects"
+        ]
       }
     },
     "/api/v1/organizations/{organizationId}/projects/{projectId}/archive": {
@@ -328,7 +492,9 @@
             "description": ""
           }
         },
-        "tags": ["projects"]
+        "tags": [
+          "projects"
+        ]
       }
     },
     "/api/v1/organizations/{organizationId}/projects/{projectId}/sites": {
@@ -340,7 +506,9 @@
             "description": ""
           }
         },
-        "tags": ["sites and locations"]
+        "tags": [
+          "sites and locations"
+        ]
       },
       "post": {
         "operationId": "SitesController_createSite",
@@ -350,7 +518,9 @@
             "description": ""
           }
         },
-        "tags": ["sites and locations"]
+        "tags": [
+          "sites and locations"
+        ]
       }
     },
     "/api/v1/organizations/{organizationId}/projects/{projectId}/sites/{siteId}/locations": {
@@ -362,7 +532,9 @@
             "description": ""
           }
         },
-        "tags": ["sites and locations"]
+        "tags": [
+          "sites and locations"
+        ]
       },
       "post": {
         "operationId": "SitesController_createLocation",
@@ -372,7 +544,9 @@
             "description": ""
           }
         },
-        "tags": ["sites and locations"]
+        "tags": [
+          "sites and locations"
+        ]
       }
     },
     "/api/v1/organizations/{organizationId}/projects/{projectId}/locations/viewport": {
@@ -384,7 +558,79 @@
             "description": ""
           }
         },
-        "tags": ["sites and locations"]
+        "tags": [
+          "sites and locations"
+        ]
+      }
+    },
+    "/api/v1/sync/bootstrap": {
+      "post": {
+        "operationId": "SyncController_bootstrap",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "sync"
+        ]
+      }
+    },
+    "/api/v1/sync/push": {
+      "post": {
+        "operationId": "SyncController_push",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "sync"
+        ]
+      }
+    },
+    "/api/v1/sync/pull": {
+      "post": {
+        "operationId": "SyncController_pull",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "sync"
+        ]
+      }
+    },
+    "/api/v1/sync/conflicts": {
+      "get": {
+        "operationId": "SyncController_conflicts",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "sync"
+        ]
+      }
+    },
+    "/api/v1/sync/conflicts/{conflictId}/resolve": {
+      "post": {
+        "operationId": "SyncController_resolve",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "sync"
+        ]
       }
     },
     "/api/v1/organizations/{organizationId}/work-orders": {
@@ -396,7 +642,9 @@
             "description": ""
           }
         },
-        "tags": ["work orders"]
+        "tags": [
+          "work orders"
+        ]
       },
       "post": {
         "operationId": "WorkOrdersController_create",
@@ -406,7 +654,9 @@
             "description": ""
           }
         },
-        "tags": ["work orders"]
+        "tags": [
+          "work orders"
+        ]
       }
     },
     "/api/v1/organizations/{organizationId}/work-orders/{workOrderId}/assignments": {
@@ -418,7 +668,9 @@
             "description": ""
           }
         },
-        "tags": ["work orders"]
+        "tags": [
+          "work orders"
+        ]
       }
     },
     "/api/v1/organizations/{organizationId}/work-orders/{workOrderId}/dependencies": {
@@ -430,7 +682,9 @@
             "description": ""
           }
         },
-        "tags": ["work orders"]
+        "tags": [
+          "work orders"
+        ]
       }
     },
     "/api/v1/organizations/{organizationId}/work-orders/{workOrderId}/transitions": {
@@ -442,7 +696,9 @@
             "description": ""
           }
         },
-        "tags": ["work orders"]
+        "tags": [
+          "work orders"
+        ]
       }
     }
   },
