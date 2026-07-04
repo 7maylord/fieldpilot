@@ -20,6 +20,7 @@ export interface BootstrapPackage {
   locations: ServerEntity[];
   workOrders: ServerEntity[];
   formVersions: ServerEntity[];
+  inspections?: ServerEntity[];
   referenceData: ServerEntity[];
 }
 
@@ -53,6 +54,7 @@ export async function importBootstrap(
     [database.locations, snapshot.locations],
     [database.workOrders, snapshot.workOrders],
     [database.formVersions, snapshot.formVersions],
+    [database.inspectionDrafts, snapshot.inspections ?? []],
     [database.referenceData, snapshot.referenceData],
   ] as const;
   if (

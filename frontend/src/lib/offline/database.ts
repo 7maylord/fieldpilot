@@ -53,7 +53,15 @@ export interface PendingOperation {
 
 export interface MediaRecord extends OfflineEntity {
   file?: Blob;
+  originalFile?: Blob;
+  thumbnail?: Blob;
   sha256?: string;
+  projectId?: string;
+  entityType?: string;
+  entityId?: string;
+  mediaType?: 'photo' | 'signature' | 'video' | 'file';
+  uploadSessionId?: string;
+  uploadedParts?: { partNumber: number; etag: string }[];
   uploadState: 'local' | 'uploading' | 'uploaded' | 'failed';
 }
 
@@ -134,6 +142,10 @@ export class FieldPilotDatabase extends Dexie {
             delete operation.createdAt;
           });
       });
+    this.version(4).stores({
+      mediaRecords:
+        'id, organizationId, projectId, entityId, syncState, uploadState',
+    });
   }
 }
 

@@ -23,6 +23,10 @@ import {
   type BootstrapPackage,
 } from '../src/lib/offline/bootstrap';
 import { syncNow } from '../src/lib/offline/sync';
+import {
+  saveInspectionDraft,
+  type InspectionDraft,
+} from '../src/lib/offline/inspections';
 
 const names: string[] = [];
 const makeName = () => {
@@ -66,6 +70,45 @@ function records() {
 }
 
 describe('offline platform', () => {
+  test('stores an inspection draft and its exact form-version operation atomically', async () => {
+    const database = new FieldPilotDatabase(makeName());
+    const draft: InspectionDraft = {
+      id: 'inspection-1',
+      organizationId: 'org-1',
+      formVersionId: 'form-v3',
+      answers: { result: 'ok' },
+      serverVersion: 1,
+      localUpdatedAt: new Date().toISOString(),
+      serverUpdatedAt: null,
+      syncState: 'synced',
+      tombstone: false,
+    };
+    await saveInspectionDraft(
+      draft,
+      {
+        schemaVersion: 1,
+        title: 'Check',
+        fields: [
+          { id: 'result', type: 'text', label: 'Result', required: true },
+        ],
+      },
+      true,
+      database,
+    );
+    expect(await database.inspectionDrafts.get(draft.id)).toMatchObject({
+      formVersionId: 'form-v3',
+      syncState: 'pending',
+    });
+    expect(
+      await database.pendingOperations.toCollection().first(),
+    ).toMatchObject({
+      entityId: draft.id,
+      action: 'form_submission_create',
+      payload: { formVersionId: 'form-v3' },
+    });
+    database.close();
+  });
+
   test('imports bootstrap atomically without overwriting pending local work', async () => {
     const database = new FieldPilotDatabase(makeName());
     const { workOrder } = records();
