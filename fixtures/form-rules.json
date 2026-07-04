@@ -1,0 +1,41 @@
+{
+  "schema": {
+    "schemaVersion": 1,
+    "title": "Concrete check",
+    "fields": [
+      {
+        "id": "temperature",
+        "type": "number",
+        "label": "Temperature",
+        "required": true,
+        "target": 10,
+        "tolerance": 1,
+        "evidence": { "when": "failed", "types": ["photo"], "minimum": 1 }
+      },
+      { "id": "needs_note", "type": "boolean", "label": "Add note" },
+      {
+        "id": "note",
+        "type": "text",
+        "label": "Note",
+        "required": true,
+        "visibleWhen": { "fieldId": "needs_note", "operator": "equals", "value": true }
+      },
+      {
+        "id": "total",
+        "type": "calculated",
+        "label": "Total",
+        "calculation": { "operator": "sum", "fieldIds": ["temperature"] }
+      }
+    ]
+  },
+  "cases": [
+    {
+      "answers": { "temperature": 10, "needs_note": false },
+      "expected": { "valid": true, "noteVisible": false, "temperaturePassed": true, "total": 10, "evidence": [] }
+    },
+    {
+      "answers": { "temperature": 12, "needs_note": true, "note": "" },
+      "expected": { "valid": false, "noteVisible": true, "temperaturePassed": false, "total": 12, "evidence": ["temperature"] }
+    }
+  ]
+}
