@@ -15,6 +15,7 @@ import {
   type WorkOrderStatus,
 } from '../work-orders/work-order-state';
 import { syncOutcome } from './conflict-strategy';
+import { evaluateForm, type FormSchema } from '../forms/form-schema';
 import type {
   SyncBootstrapDto,
   SyncOperationDto,
@@ -69,7 +70,14 @@ export class SyncService {
         if (projects.length !== new Set(input.projectIds).size)
           throw new ForbiddenException('Project access denied');
         const projectIds = projects.map(({ id }) => id);
-        const [sites, locations, workOrders, latest] = await Promise.all([
+        const [
+          sites,
+          locations,
+          workOrders,
+          formVersions,
+          inspections,
+          latest,
+        ] = await Promise.all([
           tx.site.findMany({
             where: { organizationId, projectId: { in: projectIds } },
           }),
@@ -92,6 +100,16 @@ export class SyncService {
           }),
           tx.workOrder.findMany({
             where: { organizationId, projectId: { in: projectIds } },
+          }),
+          tx.formVersion.findMany({
+            where: { organizationId, status: 'published' },
+          }),
+          tx.inspection.findMany({
+            where: {
+              organizationId,
+              projectId: { in: projectIds },
+              inspectorId: userId,
+            },
           }),
           tx.entityChangeLog.aggregate({
             where: { organizationId },
@@ -128,7 +146,11 @@ export class SyncService {
           sites,
           locations,
           workOrders,
-          formVersions: [],
+          formVersions: formVersions.map((version) => ({
+            ...version,
+            version: version.versionNumber,
+          })),
+          inspections,
           assets: [],
           referenceData: [],
         };
@@ -389,6 +411,12 @@ export class SyncService {
             where: { id: operation.entityId, organizationId },
           })
         : null;
+    const inspection =
+      operation.entityType === 'inspection'
+        ? await tx.inspection.findFirst({
+            where: { id: operation.entityId, organizationId },
+          })
+        : null;
     if (!supportedOperations.has(operation.operationType))
       return this.storeOutcome(
         tx,
@@ -413,11 +441,21 @@ export class SyncService {
           rejectionCode: 'ENTITY_NOT_FOUND',
         },
       );
+    if (operation.entityType === 'inspection' && !inspection)
+      return this.storeOutcome(
+        tx,
+        organizationId,
+        userId,
+        deviceId,
+        operation,
+        'rejected',
+        { rejectionCode: 'ENTITY_NOT_FOUND' },
+      );
 
     let outcome = syncOutcome(
       operation.operationType,
       operation.baseVersion,
-      workOrder?.version ?? null,
+      workOrder?.version ?? inspection?.version ?? null,
       operation.payload,
       (workOrder?.completionRules as Record<string, unknown>) ?? {},
     );
@@ -463,7 +501,7 @@ export class SyncService {
           entityId: operation.entityId,
           operationType: operation.operationType,
           localValue: operation.payload as Prisma.InputJsonValue,
-          serverValue: (workOrder ?? {}) as Prisma.InputJsonValue,
+          serverValue: (workOrder ?? inspection ?? {}) as Prisma.InputJsonValue,
         },
       });
       const result = await this.storeOutcome(
@@ -477,10 +515,118 @@ export class SyncService {
           conflictId: conflict.id,
         },
       );
-      return { ...result, serverValue: workOrder ?? {} };
+      return { ...result, serverValue: workOrder ?? inspection ?? {} };
+    }
+    if (inspection && operation.operationType === 'update')
+      await tx.inspection.update({
+        where: { id: inspection.id },
+        data: {
+          draftAnswers: operation.payload.answers as Prisma.InputJsonValue,
+          version: { increment: 1 },
+        },
+      });
+    if (inspection && operation.operationType === 'form_submission_create') {
+      const answers = operation.payload.answers;
+      const outcomeValue = operation.payload.outcome;
+      if (
+        !answers ||
+        typeof answers !== 'object' ||
+        Array.isArray(answers) ||
+        ![
+          'passed',
+          'passed_with_observations',
+          'failed',
+          'incomplete',
+          'not_applicable',
+        ].includes(String(outcomeValue)) ||
+        operation.payload.formVersionId !== inspection.formVersionId ||
+        !['draft', 'rejected', 'clarification_requested'].includes(
+          inspection.status,
+        )
+      )
+        return this.storeOutcome(
+          tx,
+          organizationId,
+          userId,
+          deviceId,
+          operation,
+          'rejected',
+          { rejectionCode: 'INVALID_SUBMISSION' },
+        );
+      const formVersion = await tx.formVersion.findUniqueOrThrow({
+        where: { id: inspection.formVersionId },
+      });
+      const evaluation = evaluateForm(
+        formVersion.schema as FormSchema,
+        answers as Record<string, unknown>,
+      );
+      if (!evaluation.valid)
+        return this.storeOutcome(
+          tx,
+          organizationId,
+          userId,
+          deviceId,
+          operation,
+          'rejected',
+          { rejectionCode: 'FORM_VALIDATION_FAILED' },
+        );
+      for (const [fieldId, rule] of Object.entries(evaluation.evidence)) {
+        const ids = evaluation.answers[`${fieldId}_evidence`];
+        if (
+          !Array.isArray(ids) ||
+          (await tx.mediaObject.count({
+            where: {
+              id: {
+                in: ids.filter((id): id is string => typeof id === 'string'),
+              },
+              organizationId,
+              status: 'ready',
+              links: {
+                some: { entityType: 'inspection', entityId: inspection.id },
+              },
+            },
+          })) < rule!.minimum
+        )
+          return this.storeOutcome(
+            tx,
+            organizationId,
+            userId,
+            deviceId,
+            operation,
+            'rejected',
+            { rejectionCode: 'EVIDENCE_REQUIRED' },
+          );
+      }
+      const revision =
+        (await tx.formSubmission.count({
+          where: { inspectionId: inspection.id },
+        })) + 1;
+      await tx.formSubmission.create({
+        data: {
+          id: newId(),
+          organizationId,
+          inspectionId: inspection.id,
+          formVersionId: inspection.formVersionId,
+          revision,
+          answers: evaluation.answers as Prisma.InputJsonValue,
+          outcome: String(outcomeValue),
+          submittedBy: userId,
+        },
+      });
+      await tx.inspection.update({
+        where: { id: inspection.id },
+        data: {
+          status: 'submitted',
+          draftAnswers: evaluation.answers as Prisma.InputJsonValue,
+          version: { increment: 1 },
+        },
+      });
+      outcome = 'applied';
     }
     const projectId =
-      workOrder?.projectId ?? this.payloadUuid(operation.payload.projectId);
+      workOrder?.projectId ??
+      inspection?.projectId ??
+      this.payloadUuid(operation.payload.projectId);
     await tx.entityChangeLog.create({
       data: {
         organizationId,
@@ -488,9 +634,10 @@ export class SyncService {
         entityType: operation.entityType,
         entityId: operation.entityId,
         operationType: operation.operationType,
-        version: workOrder
-          ? workOrder.version + 1
-          : (operation.baseVersion ?? 0) + 1,
+        version:
+          workOrder || inspection
+            ? (workOrder?.version ?? inspection!.version) + 1
+            : (operation.baseVersion ?? 0) + 1,
         payload: operation.payload as Prisma.InputJsonValue,
       },
     });

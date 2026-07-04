@@ -3,7 +3,6 @@ const appendOperations = new Set([
   'media_append',
   'defect_create',
   'asset_create',
-  'form_submission_create',
 ]);
 
 export function syncOutcome(

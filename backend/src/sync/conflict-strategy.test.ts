@@ -8,7 +8,6 @@ describe('syncOutcome', () => {
       'media_append',
       'defect_create',
       'asset_create',
-      'form_submission_create',
     ])
       expect(syncOutcome(operation, 1, 4)).toBe('auto_merged');
     expect(
