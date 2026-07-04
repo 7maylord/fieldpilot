@@ -67,6 +67,21 @@ test('office projects screen exposes an accessible creation workflow', async ({
   ).toBeVisible();
 });
 
+test('form editor adds only approved fields and previews them', async ({
+  page,
+}) => {
+  await page.goto('/horizon/forms');
+  await expect(
+    page.getByRole('heading', { name: 'Form editor' }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Add field' }).click();
+  await page
+    .getByRole('textbox', { name: 'Label' })
+    .fill('Concrete temperature');
+  await expect(page.getByLabel('Concrete temperature')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Publish' })).toBeDisabled();
+});
+
 test('office domain navigation exposes site, work, and assignment workflows', async ({
   page,
 }) => {

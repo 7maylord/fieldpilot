@@ -103,7 +103,9 @@ export function AppShell({
                         ? `/${organizationSlug}/work`
                         : label === 'Assignments'
                           ? `/${organizationSlug}/assignments`
-                          : '#';
+                          : label === 'Forms'
+                            ? `/${organizationSlug}/forms`
+                            : '#';
             return (
               <Link
                 className={pathname === href ? 'active' : ''}
