@@ -48,6 +48,12 @@ services:
       - '1025:1025'
       - '8025:8025'
 
+  clamav:
+    image: clamav/clamav:latest
+    platform: linux/amd64
+    ports:
+      - '3310:3310'
+
 volumes:
   postgres-data:
   minio-data:

@@ -26,6 +26,8 @@ export interface AppConfig {
   };
   otelEndpoint?: string;
   mapProviderToken?: string;
+  clamavHost: string;
+  clamavPort: number;
 }
 
 const developmentDefaults = {
@@ -101,6 +103,8 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
       env.OTEL_EXPORTER_OTLP_ENDPOINT,
     ),
     mapProviderToken: env.MAP_PROVIDER_TOKEN?.trim() || undefined,
+    clamavHost: env.CLAMAV_HOST?.trim() || 'localhost',
+    clamavPort: parsePositiveInteger('CLAMAV_PORT', env.CLAMAV_PORT ?? '3310'),
   };
 }
 
