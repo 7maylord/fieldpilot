@@ -13,7 +13,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run --exclude tests/e2e/**",
     "test:e2e": "playwright test",
-    "api:generate": "openapi-typescript ../backend/openapi.json -o src/generated/api/schema.d.ts",
+    "api:generate": "openapi-typescript ../backend/openapi.json -o src/generated/api/schema.d.ts && prettier --write src/generated/api/schema.d.ts",
     "api:check": "pnpm api:generate && git diff --exit-code -- src/generated/api/schema.d.ts"
   },
   "dependencies": {

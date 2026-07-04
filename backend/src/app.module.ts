@@ -10,7 +10,10 @@ import { RequestIdMiddleware } from './common/request-id.middleware';
 import { RequestTelemetryMiddleware } from './common/request-telemetry.middleware';
 import { DatabaseModule } from './database/database.module';
 import { DevicesModule } from './devices/devices.module';
+import { FormsModule } from './forms/forms.module';
 import { HealthController } from './health/health.controller';
+import { InspectionsModule } from './inspections/inspections.module';
+import { MediaModule } from './media/media.module';
 import { OrganizationsModule } from './organizations/organizations.module';
 import { ProjectsModule } from './projects/projects.module';
 import { QueueModule } from './queue/queue.module';
@@ -23,6 +26,9 @@ import { WorkOrdersModule } from './work-orders/work-orders.module';
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
     DatabaseModule,
     DevicesModule,
+    FormsModule,
+    InspectionsModule,
+    MediaModule,
     AuditModule,
     QueueModule,
     AuthModule,

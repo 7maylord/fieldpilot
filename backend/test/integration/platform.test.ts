@@ -1,4 +1,6 @@
 import { v7 as uuidv7 } from 'uuid';
+import { createHash } from 'node:crypto';
+import { createServer, type Server } from 'node:net';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createApiApp } from '../../src/bootstrap/api-app';
 import { loadConfig } from '../../src/config/app.config';
@@ -14,14 +16,38 @@ const tenants = new TenantDatabase(prisma);
 
 describe('platform integration', () => {
   let app: Awaited<ReturnType<typeof createApiApp>>;
+  let scanner: Server;
 
   beforeAll(async () => {
+    scanner = createServer((socket) => {
+      let received = Buffer.alloc(0);
+      socket.on('data', (chunk) => {
+        received = Buffer.concat([received, chunk]);
+        if (
+          received.length >= 4 &&
+          received.subarray(-4).every((byte) => byte === 0)
+        )
+          socket.end(
+            received.includes(Buffer.from('EICAR'))
+              ? 'stream: Eicar-Test-Signature FOUND\0'
+              : 'stream: OK\0',
+          );
+      });
+    });
+    await new Promise<void>((resolve) =>
+      scanner.listen(3311, '127.0.0.1', resolve),
+    );
+    process.env.CLAMAV_HOST = '127.0.0.1';
+    process.env.CLAMAV_PORT = '3311';
     app = await createApiApp(loadConfig({ NODE_ENV: 'test' }));
     await app.init();
   });
 
   afterAll(async () => {
     await app.close();
+    await new Promise<void>((resolve, reject) =>
+      scanner.close((error) => (error ? reject(error) : resolve())),
+    );
     await prisma.$disconnect();
   });
 
@@ -181,10 +207,12 @@ describe('platform integration', () => {
         'team_memberships', 'project_access', 'audit_events', 'outbox_events', 'job_executions',
         'projects', 'sites', 'locations', 'work_orders', 'work_order_assignments',
         'work_order_dependencies', 'sync_devices', 'sync_operations', 'sync_conflicts',
-        'sync_checkpoints', 'entity_change_log'
+        'sync_checkpoints', 'entity_change_log', 'form_templates', 'form_versions',
+        'inspections', 'form_submissions', 'inspection_reviews', 'media_objects',
+        'media_upload_sessions', 'media_links', 'media_derivatives'
       )
     `;
-    expect(policies).toHaveLength(20);
+    expect(policies).toHaveLength(29);
     expect(
       policies.every(
         (policy) => policy.relrowsecurity && policy.relforcerowsecurity,
@@ -683,6 +711,309 @@ describe('platform integration', () => {
         ],
       })
       .expect(403);
+
+    const formSchema = {
+      schemaVersion: 1,
+      title: 'Concrete inspection',
+      fields: [
+        {
+          id: 'temperature',
+          type: 'number',
+          label: 'Temperature',
+          required: true,
+          target: 10,
+          tolerance: 1,
+          evidence: { when: 'failed', types: ['photo'], minimum: 1 },
+        },
+      ],
+    };
+    const template = await agent
+      .post(`/api/v1/organizations/${organizationId}/form-templates`)
+      .set('x-csrf-token', csrfToken)
+      .send({ name: 'Concrete inspection', schema: formSchema })
+      .expect(201);
+    const formVersionId = template.body.versions[0].id as string;
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/form-templates/${template.body.id as string}/publish`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .expect(201);
+    await expect(
+      tenants.withTenant(
+        { organizationId, userId: registration.body.userId as string },
+        (tx) =>
+          tx.formVersion.update({
+            where: { id: formVersionId },
+            data: {
+              schema: { schemaVersion: 1, title: 'Tampered', fields: [] },
+            },
+          }),
+      ),
+    ).rejects.toThrow();
+    const nextDraft = await agent
+      .patch(
+        `/api/v1/organizations/${organizationId}/form-templates/${template.body.id as string}/draft`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({
+        schema: {
+          ...formSchema,
+          fields: [
+            ...formSchema.fields,
+            { id: 'notes', type: 'text', label: 'Notes' },
+          ],
+        },
+      })
+      .expect(200);
+    await agent
+      .get(
+        `/api/v1/organizations/${organizationId}/form-templates/versions/${formVersionId}/compare`,
+      )
+      .query({ otherVersionId: nextDraft.body.id })
+      .expect(200)
+      .expect(({ body }) => expect(body.added).toEqual(['notes']));
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/form-templates/${template.body.id as string}/duplicate`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({ name: 'Concrete inspection copy' })
+      .expect(201)
+      .expect(({ body }) => expect(body.versions[0].versionNumber).toBe(1));
+
+    const inspection = await agent
+      .post(`/api/v1/organizations/${organizationId}/inspections`)
+      .set('x-csrf-token', csrfToken)
+      .send({
+        projectId: project.body.id,
+        workOrderId: workOrder.body.id,
+        formVersionId,
+        inspectionType: 'quality',
+      })
+      .expect(201);
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/inspections/${inspection.body.id as string}/submit`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({ version: 1, answers: { temperature: 12 }, outcome: 'failed' })
+      .expect(400);
+    const image = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 1, 2, 3]);
+    const offlineMediaId = uuidv7();
+    const upload = await agent
+      .post(`/api/v1/organizations/${organizationId}/media/upload-sessions`)
+      .set('x-csrf-token', csrfToken)
+      .send({
+        mediaId: offlineMediaId,
+        projectId: project.body.id,
+        mimeType: 'image/png',
+        byteSize: image.length,
+        sha256: createHash('sha256').update(image).digest('hex'),
+        entityType: 'inspection',
+        entityId: inspection.body.id,
+      })
+      .expect(201);
+    expect(upload.body.mediaId).toBe(offlineMediaId);
+    const uploadedPart = await fetch(upload.body.partUrls[0].url as string, {
+      method: 'PUT',
+      body: image,
+    });
+    expect(uploadedPart.ok).toBe(true);
+    const etag = uploadedPart.headers.get('etag');
+    expect(etag).toBeTruthy();
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/media/upload-sessions/${upload.body.sessionId as string}/complete`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({ parts: [{ partNumber: 1, etag }] })
+      .expect(201)
+      .expect(({ body }) => expect(body.status).toBe('ready'));
+    const derivativeUpload = await agent
+      .post(`/api/v1/organizations/${organizationId}/media/upload-sessions`)
+      .set('x-csrf-token', csrfToken)
+      .send({
+        projectId: project.body.id,
+        mimeType: 'image/png',
+        byteSize: image.length,
+        sha256: createHash('sha256').update(image).digest('hex'),
+        entityType: 'inspection',
+        entityId: inspection.body.id,
+        sourceMediaId: upload.body.mediaId,
+        derivativeType: 'thumbnail',
+      })
+      .expect(201);
+    await agent
+      .get(
+        `/api/v1/organizations/${organizationId}/media/upload-sessions/${derivativeUpload.body.sessionId as string}`,
+      )
+      .expect(200)
+      .expect(({ body }) => expect(body.partUrls).toHaveLength(1));
+    const derivativePart = await fetch(
+      derivativeUpload.body.partUrls[0].url as string,
+      { method: 'PUT', body: image },
+    );
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/media/upload-sessions/${derivativeUpload.body.sessionId as string}/complete`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({
+        parts: [{ partNumber: 1, etag: derivativePart.headers.get('etag') }],
+      })
+      .expect(201)
+      .expect(({ body }) => expect(body.status).toBe('ready'));
+    expect(
+      await tenants.withTenant(
+        { organizationId, userId: registration.body.userId as string },
+        (tx) =>
+          tx.mediaDerivative.count({
+            where: {
+              sourceMediaId: upload.body.mediaId as string,
+              derivativeType: 'thumbnail',
+            },
+          }),
+      ),
+    ).toBe(1);
+    const infected = Buffer.from('%PDF-1.4\nEICAR test payload');
+    const infectedUpload = await agent
+      .post(`/api/v1/organizations/${organizationId}/media/upload-sessions`)
+      .set('x-csrf-token', csrfToken)
+      .send({
+        projectId: project.body.id,
+        mimeType: 'application/pdf',
+        byteSize: infected.length,
+        sha256: createHash('sha256').update(infected).digest('hex'),
+        entityType: 'inspection',
+        entityId: inspection.body.id,
+      })
+      .expect(201);
+    const infectedPart = await fetch(
+      infectedUpload.body.partUrls[0].url as string,
+      { method: 'PUT', body: infected },
+    );
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/media/upload-sessions/${infectedUpload.body.sessionId as string}/complete`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({
+        parts: [{ partNumber: 1, etag: infectedPart.headers.get('etag') }],
+      })
+      .expect(201)
+      .expect(({ body }) => {
+        expect(body.status).toBe('quarantined');
+        expect(body.scanStatus).toBe('infected');
+      });
+    await agent
+      .get(
+        `/api/v1/organizations/${organizationId}/media/${infectedUpload.body.mediaId as string}/url`,
+      )
+      .expect(404);
+    const privateMedia = await agent
+      .get(
+        `/api/v1/organizations/${organizationId}/media/${upload.body.mediaId as string}/url`,
+      )
+      .expect(200);
+    expect(
+      Buffer.from(await (await fetch(privateMedia.body.url)).arrayBuffer()),
+    ).toEqual(image);
+    await expect(
+      tenants.withTenant(
+        { organizationId, userId: registration.body.userId as string },
+        (tx) =>
+          tx.mediaObject.update({
+            where: { id: upload.body.mediaId as string },
+            data: { sha256: '0'.repeat(64) },
+          }),
+      ),
+    ).rejects.toThrow();
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/inspections/${inspection.body.id as string}/submit`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({
+        version: 1,
+        answers: {
+          temperature: 12,
+          temperature_evidence: [upload.body.mediaId],
+        },
+        outcome: 'failed',
+      })
+      .expect(201);
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/inspections/${inspection.body.id as string}/reviews`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({ decision: 'reject', comment: 'Repeat the reading' })
+      .expect(201);
+    const corrected = await agent
+      .patch(
+        `/api/v1/organizations/${organizationId}/inspections/${inspection.body.id as string}/draft`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({ version: 3, answers: { temperature: 10.5 } })
+      .expect(200);
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/inspections/${inspection.body.id as string}/submit`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({
+        version: corrected.body.version,
+        answers: { temperature: 10.5 },
+        outcome: 'passed',
+      })
+      .expect(201);
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/inspections/${inspection.body.id as string}/reviews`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({ decision: 'clarification', comment: 'Confirm calibration' })
+      .expect(201);
+    const clarified = await agent
+      .patch(
+        `/api/v1/organizations/${organizationId}/inspections/${inspection.body.id as string}/draft`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({ version: 6, answers: { temperature: 10.2 } })
+      .expect(200);
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/inspections/${inspection.body.id as string}/submit`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({
+        version: clarified.body.version,
+        answers: { temperature: 10.2 },
+        outcome: 'passed',
+      })
+      .expect(201);
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/inspections/${inspection.body.id as string}/reviews`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({ decision: 'approve' })
+      .expect(201);
+    await agent
+      .get(
+        `/api/v1/organizations/${organizationId}/inspections/${inspection.body.id as string}`,
+      )
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body.status).toBe('approved');
+        expect(body.formVersionId).toBe(formVersionId);
+        expect(body.submissions).toHaveLength(3);
+        expect(body.submissions[0].answers).toEqual({
+          temperature: 12,
+          temperature_evidence: [upload.body.mediaId],
+        });
+      });
 
     const viewerId = uuidv7();
     const viewerToken = createToken();
