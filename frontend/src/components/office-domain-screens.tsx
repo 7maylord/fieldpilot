@@ -20,6 +20,8 @@ type WorkOrder = {
   priority: string;
   version: number;
   assignments: Assignment[];
+  plannedStart?: string | null;
+  plannedEnd?: string | null;
 };
 type Assignment = { id: string; assigneeType: string; assigneeId: string };
 
@@ -377,6 +379,134 @@ export function WorkOrdersScreen({
                 Create work order
               </button>
             </form>
+          )}
+        </section>
+      </div>
+    </DomainPage>
+  );
+}
+
+type DispatchData = {
+  workOrders: WorkOrder[];
+  unassigned: WorkOrder[];
+  resources: { resourceId: string; resourceType: string; name: string }[];
+  recommendations: {
+    workOrderId: string;
+    resourceId: string;
+    resourceType: string;
+    resourceName: string;
+    score: number;
+    conflicts: { code: string; severity: string }[];
+  }[];
+};
+
+export function DispatchScreen({
+  organizationSlug,
+}: {
+  organizationSlug: string;
+}) {
+  const workspace = useWorkspace(organizationSlug);
+  const dispatch = useQuery({
+    queryKey: ['dispatch', workspace.organizationId, workspace.projectId],
+    enabled: Boolean(workspace.organizationId && workspace.projectId),
+    queryFn: () =>
+      apiRequest<DispatchData>(
+        `/organizations/${workspace.organizationId}/work-orders/dispatch?projectId=${workspace.projectId}`,
+      ),
+  });
+  return (
+    <DomainPage title="Dispatch" eyebrow="Coordinator recommendations">
+      <ProjectPicker
+        projects={workspace.projects.data ?? []}
+        value={workspace.projectId}
+        onChange={workspace.setProjectId}
+      />
+      <p className="notice">
+        Recommendations are advisory. FieldPilot never assigns work
+        automatically.
+      </p>
+      <div className="domain-grid">
+        <section className="panel">
+          <h2>Calendar</h2>
+          <ul className="domain-list">
+            {dispatch.data?.workOrders.map((workOrder) => (
+              <li key={workOrder.id}>
+                <div>
+                  <strong>{workOrder.title}</strong>
+                  <span>
+                    {workOrder.plannedStart
+                      ? new Date(workOrder.plannedStart).toLocaleString()
+                      : 'Unscheduled'}{' '}
+                    · {workOrder.status}
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ul>
+          {!dispatch.data?.workOrders.length && (
+            <Empty text="No scheduled work" />
+          )}
+        </section>
+        <section className="panel">
+          <h2>Resource board</h2>
+          <ul className="domain-list">
+            {dispatch.data?.resources.map((resource) => (
+              <li key={`${resource.resourceType}-${resource.resourceId}`}>
+                <div>
+                  <strong>{resource.name}</strong>
+                  <span>{resource.resourceType}</span>
+                </div>
+              </li>
+            ))}
+          </ul>
+          {!dispatch.data?.resources.length && (
+            <Empty text="No schedule resources" />
+          )}
+        </section>
+        <section className="panel">
+          <h2>Unassigned work</h2>
+          <ul className="domain-list">
+            {dispatch.data?.unassigned.map((workOrder) => (
+              <li key={workOrder.id}>
+                <div>
+                  <strong>{workOrder.title}</strong>
+                  <span>{workOrder.priority} priority</span>
+                </div>
+              </li>
+            ))}
+          </ul>
+          {!dispatch.data?.unassigned.length && (
+            <Empty text="All work is assigned" />
+          )}
+        </section>
+        <section className="panel">
+          <h2>Recommendations</h2>
+          <ul className="domain-list">
+            {dispatch.data?.recommendations.map((recommendation) => {
+              const workOrder = dispatch.data?.workOrders.find(
+                ({ id }) => id === recommendation.workOrderId,
+              );
+              return (
+                <li
+                  key={`${recommendation.workOrderId}-${recommendation.resourceId}`}
+                >
+                  <div>
+                    <strong>
+                      {workOrder?.title} → {recommendation.resourceName}
+                    </strong>
+                    <span>
+                      Score {recommendation.score} ·{' '}
+                      {recommendation.conflicts
+                        .map(({ code }) => code.replaceAll('_', ' '))
+                        .join(', ') || 'no conflicts'}
+                    </span>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+          {!dispatch.data?.recommendations.length && (
+            <Empty text="No recommendations available" />
           )}
         </section>
       </div>
