@@ -119,6 +119,76 @@
         "tags": ["devices"]
       }
     },
+    "/api/v1/organizations/{organizationId}/defects": {
+      "get": {
+        "operationId": "DefectsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["defects"]
+      },
+      "post": {
+        "operationId": "DefectsController_create",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["defects"]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/defects/{defectId}/assignments": {
+      "post": {
+        "operationId": "DefectsController_assign",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["defects"]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/defects/{defectId}/transitions": {
+      "post": {
+        "operationId": "DefectsController_transition",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["defects"]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/defects/{defectId}/corrections": {
+      "post": {
+        "operationId": "DefectsController_correct",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["defects"]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/defects/{defectId}/verifications": {
+      "post": {
+        "operationId": "DefectsController_verify",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["defects"]
+      }
+    },
     "/api/v1/organizations/{organizationId}/form-templates": {
       "get": {
         "operationId": "FormsController_list",
@@ -295,6 +365,122 @@
           }
         },
         "tags": ["media"]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/notifications/stream": {
+      "get": {
+        "operationId": "NotificationsController_openStream",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["notifications"]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/notifications": {
+      "get": {
+        "operationId": "NotificationsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["notifications"]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/notifications/{notificationId}/read": {
+      "patch": {
+        "operationId": "NotificationsController_markRead",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["notifications"]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/assets/types": {
+      "get": {
+        "operationId": "AssetsController_types",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["assets"]
+      },
+      "post": {
+        "operationId": "AssetsController_createType",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["assets"]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/assets/qr/{qrCode}": {
+      "get": {
+        "operationId": "AssetsController_lookup",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["assets"]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/assets": {
+      "get": {
+        "operationId": "AssetsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["assets"]
+      },
+      "post": {
+        "operationId": "AssetsController_create",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["assets"]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/assets/{assetId}": {
+      "get": {
+        "operationId": "AssetsController_get",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["assets"]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/assets/{assetId}/meter-readings": {
+      "post": {
+        "operationId": "AssetsController_reading",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["assets"]
       }
     },
     "/api/v1/auth/csrf": {
@@ -603,6 +789,100 @@
         "tags": ["projects"]
       }
     },
+    "/api/v1/organizations/{organizationId}/daily-reports": {
+      "get": {
+        "operationId": "ReportsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["daily reports"]
+      },
+      "post": {
+        "operationId": "ReportsController_create",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["daily reports"]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/daily-reports/{reportId}/revisions": {
+      "patch": {
+        "operationId": "ReportsController_revise",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["daily reports"]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/daily-reports/{reportId}/reviews": {
+      "post": {
+        "operationId": "ReportsController_review",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["daily reports"]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/daily-reports/{reportId}/signatures": {
+      "post": {
+        "operationId": "ReportsController_sign",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["daily reports"]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/daily-reports/{reportId}/publish": {
+      "post": {
+        "operationId": "ReportsController_publish",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["daily reports"]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/daily-reports/{reportId}/export.pdf": {
+      "get": {
+        "operationId": "ReportsController_pdf",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["daily reports"]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/daily-reports/{reportId}/export.csv": {
+      "get": {
+        "operationId": "ReportsController_csv",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["daily reports"]
+      }
+    },
     "/api/v1/organizations/{organizationId}/projects/{projectId}/sites": {
       "get": {
         "operationId": "SitesController_listSites",
@@ -741,9 +1021,45 @@
         "tags": ["work orders"]
       }
     },
+    "/api/v1/organizations/{organizationId}/work-orders/dispatch": {
+      "get": {
+        "operationId": "WorkOrdersController_dispatch",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["work orders"]
+      }
+    },
     "/api/v1/organizations/{organizationId}/work-orders/{workOrderId}/assignments": {
       "post": {
         "operationId": "WorkOrdersController_assign",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["work orders"]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/work-orders/schedule-resources": {
+      "post": {
+        "operationId": "WorkOrdersController_upsertScheduleResource",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["work orders"]
+      }
+    },
+    "/api/v1/organizations/{organizationId}/work-orders/{workOrderId}/schedule-checks": {
+      "post": {
+        "operationId": "WorkOrdersController_checkSchedule",
         "parameters": [],
         "responses": {
           "201": {

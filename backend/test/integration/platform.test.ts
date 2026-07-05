@@ -8,6 +8,7 @@ import { PrismaService } from '../../src/database/prisma.service';
 import { TenantDatabase } from '../../src/database/tenant-database.service';
 import { QueueService } from '../../src/queue/queue.service';
 import { OutboxPublisher } from '../../src/queue/outbox-publisher.service';
+import { NotificationsService } from '../../src/notifications/notifications.service';
 import { createToken, hashToken } from '../../src/auth/token';
 import request from 'supertest';
 
@@ -209,10 +210,13 @@ describe('platform integration', () => {
         'work_order_dependencies', 'sync_devices', 'sync_operations', 'sync_conflicts',
         'sync_checkpoints', 'entity_change_log', 'form_templates', 'form_versions',
         'inspections', 'form_submissions', 'inspection_reviews', 'media_objects',
-        'media_upload_sessions', 'media_links', 'media_derivatives'
+        'media_upload_sessions', 'media_links', 'media_derivatives', 'schedule_resources',
+        'notifications', 'defects', 'defect_assignments', 'defect_corrections',
+        'defect_verifications', 'defect_status_events', 'asset_types', 'assets', 'meter_readings',
+        'daily_reports', 'daily_report_versions', 'report_reviews', 'report_signatures'
       )
     `;
-    expect(policies).toHaveLength(29);
+    expect(policies).toHaveLength(43);
     expect(
       policies.every(
         (policy) => policy.relrowsecurity && policy.relforcerowsecurity,
@@ -281,6 +285,13 @@ describe('platform integration', () => {
       .send({ name: 'Inspectors' })
       .expect(201);
     const organizationId = created.body.id as string;
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/teams/${team.body.id as string}/members`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({ userId: registration.body.userId })
+      .expect(201);
     const deviceId = uuidv7();
     const device = await agent
       .post(`/api/v1/organizations/${organizationId}/devices`)
@@ -423,9 +434,49 @@ describe('platform integration', () => {
         title: 'Repair pier',
         workType: 'repair',
         priority: 'medium',
+        plannedStart: '2026-07-06T10:00:00.000Z',
+        plannedEnd: '2026-07-06T11:00:00.000Z',
         evidenceRequirements: ['photo', 'signature'],
       })
       .expect(201);
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/work-orders/schedule-resources`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({
+        resourceType: 'team',
+        resourceId: team.body.id,
+        name: 'Field team',
+        shifts: [
+          {
+            startsAt: '2026-07-06T08:00:00.000Z',
+            endsAt: '2026-07-06T17:00:00.000Z',
+          },
+        ],
+      })
+      .expect(201);
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/work-orders/${workOrder.body.id as string}/schedule-checks`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({ assigneeType: 'team', assigneeId: team.body.id })
+      .expect(201)
+      .expect(({ body }) => expect(body).toEqual([]));
+    await agent
+      .get(`/api/v1/organizations/${organizationId}/work-orders/dispatch`)
+      .query({ projectId: project.body.id })
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body.unassigned).toHaveLength(2);
+        expect(body.resources).toHaveLength(1);
+        expect(body.recommendations[0]).toMatchObject({
+          workOrderId: workOrder.body.id,
+          resourceId: team.body.id,
+          score: 100,
+        });
+      });
     await agent
       .post(
         `/api/v1/organizations/${organizationId}/work-orders/${workOrder.body.id as string}/assignments`,
@@ -433,6 +484,32 @@ describe('platform integration', () => {
       .set('x-csrf-token', csrfToken)
       .send({ version: 1, assigneeType: 'team', assigneeId: team.body.id })
       .expect(201);
+    const assignmentEvent = await tenants.withMembership(
+      { organizationId, userId: registration.body.userId as string },
+      (tx) =>
+        tx.outboxEvent.findFirstOrThrow({
+          where: { organizationId, eventType: 'work_order.assigned' },
+          orderBy: { createdAt: 'desc' },
+        }),
+    );
+    await app
+      .get(NotificationsService)
+      .deliver(
+        assignmentEvent.eventType,
+        { organizationId, ...(assignmentEvent.payload as object) },
+        assignmentEvent.id,
+      );
+    const notification = await agent
+      .get(`/api/v1/organizations/${organizationId}/notifications`)
+      .expect(200)
+      .expect(({ body }) => expect(body).toHaveLength(1));
+    await agent
+      .patch(
+        `/api/v1/organizations/${organizationId}/notifications/${notification.body[0].id as string}/read`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .expect(200)
+      .expect(({ body }) => expect(body.readAt).toBeTruthy());
     await agent
       .post(
         `/api/v1/organizations/${organizationId}/work-orders/${workOrder.body.id as string}/dependencies`,
@@ -1015,6 +1092,328 @@ describe('platform integration', () => {
         });
       });
 
+    const defect = await agent
+      .post(`/api/v1/organizations/${organizationId}/defects`)
+      .set('x-csrf-token', csrfToken)
+      .send({
+        projectId: project.body.id,
+        locationId: location.body.id,
+        inspectionId: inspection.body.id,
+        category: 'quality',
+        severity: 'high',
+        title: 'Concrete temperature variance',
+      })
+      .expect(201);
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/defects/${defect.body.id as string}/transitions`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({ version: 1, status: 'triaged' })
+      .expect(201);
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/defects/${defect.body.id as string}/assignments`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({ version: 2, assigneeType: 'team', assigneeId: team.body.id })
+      .expect(201);
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/defects/${defect.body.id as string}/transitions`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({ version: 3, status: 'correction_in_progress' })
+      .expect(201);
+    const defectUpload = await agent
+      .post(`/api/v1/organizations/${organizationId}/media/upload-sessions`)
+      .set('x-csrf-token', csrfToken)
+      .send({
+        projectId: project.body.id,
+        mimeType: 'image/png',
+        byteSize: image.length,
+        sha256: createHash('sha256').update(image).digest('hex'),
+        entityType: 'defect',
+        entityId: defect.body.id,
+      })
+      .expect(201);
+    const defectPart = await fetch(
+      defectUpload.body.partUrls[0].url as string,
+      { method: 'PUT', body: image },
+    );
+    const defectEtag = defectPart.headers.get('etag');
+    const completedDefectMedia = await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/media/upload-sessions/${defectUpload.body.sessionId as string}/complete`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({ parts: [{ partNumber: 1, etag: defectEtag }] })
+      .expect(201);
+    expect(completedDefectMedia.body.status).toBe('ready');
+    const firstCorrection = await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/defects/${defect.body.id as string}/corrections`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({
+        version: 4,
+        rootCause: 'Cooling delay',
+        correctiveAction: 'Reworked pour',
+        evidenceIds: [defectUpload.body.mediaId],
+      })
+      .expect(201);
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/defects/${defect.body.id as string}/verifications`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({
+        version: 5,
+        correctionId: firstCorrection.body.id,
+        decision: 'rejected',
+        comment: 'Repeat correction',
+      })
+      .expect(201);
+    const secondCorrection = await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/defects/${defect.body.id as string}/corrections`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({
+        version: 6,
+        rootCause: 'Cooling delay',
+        correctiveAction: 'Verified rework',
+        evidenceIds: [defectUpload.body.mediaId],
+      })
+      .expect(201);
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/defects/${defect.body.id as string}/verifications`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({
+        version: 7,
+        correctionId: secondCorrection.body.id,
+        decision: 'verified',
+      })
+      .expect(201);
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/defects/${defect.body.id as string}/transitions`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({ version: 8, status: 'closed' })
+      .expect(201);
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/defects/${defect.body.id as string}/transitions`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({ version: 9, status: 'reopened' })
+      .expect(201);
+    await agent
+      .get(`/api/v1/organizations/${organizationId}/defects`)
+      .query({ projectId: project.body.id })
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body[0].status).toBe('reopened');
+        expect(body[0].corrections).toHaveLength(2);
+        expect(
+          body[0].statusEvents.map(
+            ({ toStatus }: { toStatus: string }) => toStatus,
+          ),
+        ).toContain('closed');
+      });
+
+    const assetType = await agent
+      .post(`/api/v1/organizations/${organizationId}/assets/types`)
+      .set('x-csrf-token', csrfToken)
+      .send({ name: 'Pump' })
+      .expect(201);
+    const asset = await agent
+      .post(`/api/v1/organizations/${organizationId}/assets`)
+      .set('x-csrf-token', csrfToken)
+      .send({
+        projectId: project.body.id,
+        assetTypeId: assetType.body.id,
+        locationId: location.body.id,
+        name: 'Dewatering pump',
+        qrCode: `PUMP-${uuidv7()}`,
+        serialNumber: 'SN-100',
+        manufacturer: 'FieldCo',
+      })
+      .expect(201);
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/assets/${asset.body.id as string}/meter-readings`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({
+        meterType: 'hours',
+        value: 120,
+        unit: 'h',
+        recordedAt: '2026-07-05T08:00:00.000Z',
+      })
+      .expect(201);
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/assets/${asset.body.id as string}/meter-readings`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({
+        meterType: 'hours',
+        value: 119,
+        unit: 'h',
+        recordedAt: '2026-07-05T09:00:00.000Z',
+      })
+      .expect(400);
+    await agent
+      .post(`/api/v1/organizations/${organizationId}/inspections`)
+      .set('x-csrf-token', csrfToken)
+      .send({
+        projectId: project.body.id,
+        assetId: asset.body.id,
+        formVersionId,
+        inspectionType: 'asset',
+      })
+      .expect(201);
+    await agent
+      .post(`/api/v1/organizations/${organizationId}/defects`)
+      .set('x-csrf-token', csrfToken)
+      .send({
+        projectId: project.body.id,
+        assetId: asset.body.id,
+        category: 'mechanical',
+        severity: 'medium',
+        title: 'Seal wear',
+      })
+      .expect(201);
+    await agent
+      .get(
+        `/api/v1/organizations/${organizationId}/assets/qr/${encodeURIComponent(asset.body.qrCode as string)}`,
+      )
+      .expect(200)
+      .expect(({ body }) => expect(body.id).toBe(asset.body.id));
+    await agent
+      .get(
+        `/api/v1/organizations/${organizationId}/assets/${asset.body.id as string}`,
+      )
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body.meterReadings).toHaveLength(1);
+        expect(body.inspections).toHaveLength(1);
+        expect(body.defects).toHaveLength(1);
+      });
+
+    const report = await agent
+      .post(`/api/v1/organizations/${organizationId}/daily-reports`)
+      .set('x-csrf-token', csrfToken)
+      .send({
+        projectId: project.body.id,
+        reportDate: '2026-07-05',
+        weatherNotes: 'Clear',
+      })
+      .expect(201);
+    const revision = await agent
+      .patch(
+        `/api/v1/organizations/${organizationId}/daily-reports/${report.body.id as string}/revisions`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({
+        content: { weatherNotes: 'Clear', supervisorNotes: 'Shift complete' },
+      })
+      .expect(200);
+    expect(revision.body.revision).toBe(2);
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/daily-reports/${report.body.id as string}/reviews`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({ decision: 'approved' })
+      .expect(201);
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/daily-reports/${report.body.id as string}/publish`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .expect(400);
+    const signatureUpload = await agent
+      .post(`/api/v1/organizations/${organizationId}/media/upload-sessions`)
+      .set('x-csrf-token', csrfToken)
+      .send({
+        projectId: project.body.id,
+        mimeType: 'image/png',
+        byteSize: image.length,
+        sha256: createHash('sha256').update(image).digest('hex'),
+        entityType: 'daily_report',
+        entityId: report.body.id,
+      })
+      .expect(201);
+    const signaturePart = await fetch(
+      signatureUpload.body.partUrls[0].url as string,
+      { method: 'PUT', body: image },
+    );
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/media/upload-sessions/${signatureUpload.body.sessionId as string}/complete`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({
+        parts: [{ partNumber: 1, etag: signaturePart.headers.get('etag') }],
+      })
+      .expect(201);
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/daily-reports/${report.body.id as string}/signatures`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({ mediaId: signatureUpload.body.mediaId })
+      .expect(201);
+    await agent
+      .post(
+        `/api/v1/organizations/${organizationId}/daily-reports/${report.body.id as string}/publish`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .expect(201)
+      .expect(({ body }) => expect(body.status).toBe('published'));
+    await agent
+      .get(
+        `/api/v1/organizations/${organizationId}/daily-reports/${report.body.id as string}/export.pdf`,
+      )
+      .expect('Content-Type', /application\/pdf/)
+      .expect(200)
+      .expect(({ body }) =>
+        expect((body as Buffer).subarray(0, 4).toString()).toBe('%PDF'),
+      );
+    await agent
+      .get(
+        `/api/v1/organizations/${organizationId}/daily-reports/${report.body.id as string}/export.csv`,
+      )
+      .expect('Content-Type', /text\/csv/)
+      .expect(200)
+      .expect(({ text }) => expect(text).toContain('field,value'));
+    await agent
+      .patch(
+        `/api/v1/organizations/${organizationId}/daily-reports/${report.body.id as string}/revisions`,
+      )
+      .set('x-csrf-token', csrfToken)
+      .send({ content: { supervisorNotes: 'Correction revision' } })
+      .expect(200)
+      .expect(({ body }) => expect(body.revision).toBe(3));
+    await agent
+      .get(`/api/v1/organizations/${organizationId}/daily-reports`)
+      .query({ projectId: project.body.id })
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body[0].versions).toHaveLength(3);
+        expect(
+          body[0].versions.find(
+            ({ revision }: { revision: number }) => revision === 2,
+          ).publishedAt,
+        ).toBeTruthy();
+        expect(body[0].versions[0].sourceReferences.length).toBeGreaterThan(0);
+      });
+
     const viewerId = uuidv7();
     const viewerToken = createToken();
     const viewerCsrf = createToken();
@@ -1121,7 +1520,7 @@ describe('platform integration', () => {
       (tx) => tx.outboxEvent.count({ where: { publishedAt: null } }),
     );
     expect(unpublished).toBe(0);
-  });
+  }, 60_000);
 
   it('reports readiness and deduplicates queued jobs', async () => {
     await request(app.getHttpServer())

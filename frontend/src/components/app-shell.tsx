@@ -11,11 +11,13 @@ const officeLinks = [
   'Sites',
   'Work',
   'Assignments',
+  'Dispatch',
   'Assets',
   'Teams',
   'Maps',
   'Forms',
   'Reports',
+  'Notifications',
 ];
 const fieldLinks = ['Today', 'My work', 'Downloads', 'Conflicts'];
 
@@ -103,9 +105,17 @@ export function AppShell({
                         ? `/${organizationSlug}/work`
                         : label === 'Assignments'
                           ? `/${organizationSlug}/assignments`
-                          : label === 'Forms'
-                            ? `/${organizationSlug}/forms`
-                            : '#';
+                          : label === 'Dispatch'
+                            ? `/${organizationSlug}/dispatch`
+                            : label === 'Assets'
+                              ? `/${organizationSlug}/assets`
+                              : label === 'Forms'
+                                ? `/${organizationSlug}/forms`
+                                : label === 'Reports'
+                                  ? `/${organizationSlug}/reports`
+                                  : label === 'Notifications'
+                                    ? `/${organizationSlug}/notifications`
+                                    : '#';
             return (
               <Link
                 className={pathname === href ? 'active' : ''}
