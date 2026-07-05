@@ -8,94 +8,94 @@ datasource db {
 }
 
 model User {
-  id                    String   @id @db.Uuid
-  email                 String   @unique
-  passwordHash          String   @map("password_hash")
-  emailVerifiedAt       DateTime? @map("email_verified_at") @db.Timestamptz
-  createdAt             DateTime @default(now()) @map("created_at") @db.Timestamptz
-  sessions              Session[]
-  memberships           Membership[]
-  syncDevices           SyncDevice[]
+  id              String       @id @db.Uuid
+  email           String       @unique
+  passwordHash    String       @map("password_hash")
+  emailVerifiedAt DateTime?    @map("email_verified_at") @db.Timestamptz
+  createdAt       DateTime     @default(now()) @map("created_at") @db.Timestamptz
+  sessions        Session[]
+  memberships     Membership[]
+  syncDevices     SyncDevice[]
 
   @@map("users")
 }
 
 model Session {
-  id                 String    @id @db.Uuid
-  userId             String    @map("user_id") @db.Uuid
-  tokenHash          String    @unique @map("token_hash")
-  refreshTokenHash   String    @unique @map("refresh_token_hash")
-  expiresAt          DateTime  @map("expires_at") @db.Timestamptz
-  refreshExpiresAt   DateTime  @map("refresh_expires_at") @db.Timestamptz
-  revokedAt          DateTime? @map("revoked_at") @db.Timestamptz
-  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz
-  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id               String    @id @db.Uuid
+  userId           String    @map("user_id") @db.Uuid
+  tokenHash        String    @unique @map("token_hash")
+  refreshTokenHash String    @unique @map("refresh_token_hash")
+  expiresAt        DateTime  @map("expires_at") @db.Timestamptz
+  refreshExpiresAt DateTime  @map("refresh_expires_at") @db.Timestamptz
+  revokedAt        DateTime? @map("revoked_at") @db.Timestamptz
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("sessions")
 }
 
 model EmailVerificationToken {
-  id        String   @id @db.Uuid
-  userId    String   @map("user_id") @db.Uuid
-  tokenHash String   @unique @map("token_hash")
-  expiresAt DateTime @map("expires_at") @db.Timestamptz
+  id        String    @id @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  tokenHash String    @unique @map("token_hash")
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz
   usedAt    DateTime? @map("used_at") @db.Timestamptz
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
 
   @@index([userId])
   @@map("email_verification_tokens")
 }
 
 model PasswordResetToken {
-  id        String   @id @db.Uuid
-  userId    String   @map("user_id") @db.Uuid
-  tokenHash String   @unique @map("token_hash")
-  expiresAt DateTime @map("expires_at") @db.Timestamptz
+  id        String    @id @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  tokenHash String    @unique @map("token_hash")
+  expiresAt DateTime  @map("expires_at") @db.Timestamptz
   usedAt    DateTime? @map("used_at") @db.Timestamptz
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz
 
   @@index([userId])
   @@map("password_reset_tokens")
 }
 
 model IdentityOutboxEvent {
-  id          String   @id @db.Uuid
-  userId      String   @map("user_id") @db.Uuid
-  eventType   String   @map("event_type")
+  id          String    @id @db.Uuid
+  userId      String    @map("user_id") @db.Uuid
+  eventType   String    @map("event_type")
   payload     Json
   publishedAt DateTime? @map("published_at") @db.Timestamptz
-  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz
 
   @@index([createdAt])
   @@map("identity_outbox_events")
 }
 
 model Organization {
-  id        String       @id @db.Uuid
-  name      String
-  slug      String       @unique
-  createdBy String       @map("created_by") @db.Uuid
-  version   Int          @default(1)
-  createdAt DateTime     @default(now()) @map("created_at") @db.Timestamptz
-  members  Membership[]
-  teams     Team[]
-  projects  Project[]
-  syncDevices SyncDevice[]
+  id            String         @id @db.Uuid
+  name          String
+  slug          String         @unique
+  createdBy     String         @map("created_by") @db.Uuid
+  version       Int            @default(1)
+  createdAt     DateTime       @default(now()) @map("created_at") @db.Timestamptz
+  members       Membership[]
+  teams         Team[]
+  projects      Project[]
+  syncDevices   SyncDevice[]
   formTemplates FormTemplate[]
 
   @@map("organizations")
 }
 
 model FormTemplate {
-  id             String   @id @db.Uuid
-  organizationId String   @map("organization_id") @db.Uuid
+  id             String        @id @db.Uuid
+  organizationId String        @map("organization_id") @db.Uuid
   name           String
   description    String?
-  createdBy      String   @map("created_by") @db.Uuid
-  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdBy      String        @map("created_by") @db.Uuid
+  createdAt      DateTime      @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime      @updatedAt @map("updated_at") @db.Timestamptz
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   versions       FormVersion[]
 
   @@index([organizationId, name])
@@ -103,16 +103,16 @@ model FormTemplate {
 }
 
 model FormVersion {
-  id             String    @id @db.Uuid
-  organizationId String    @map("organization_id") @db.Uuid
-  templateId     String    @map("template_id") @db.Uuid
-  versionNumber  Int       @map("version_number")
-  status         String    @default("draft")
+  id             String           @id @db.Uuid
+  organizationId String           @map("organization_id") @db.Uuid
+  templateId     String           @map("template_id") @db.Uuid
+  versionNumber  Int              @map("version_number")
+  status         String           @default("draft")
   schema         Json
-  publishedAt    DateTime? @map("published_at") @db.Timestamptz
-  createdBy      String    @map("created_by") @db.Uuid
-  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz
-  template       FormTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  publishedAt    DateTime?        @map("published_at") @db.Timestamptz
+  createdBy      String           @map("created_by") @db.Uuid
+  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz
+  template       FormTemplate     @relation(fields: [templateId], references: [id], onDelete: Cascade)
   inspections    Inspection[]
   submissions    FormSubmission[]
 
@@ -139,27 +139,27 @@ model Membership {
 }
 
 model Invitation {
-  id             String   @id @db.Uuid
-  organizationId String   @map("organization_id") @db.Uuid
+  id             String    @id @db.Uuid
+  organizationId String    @map("organization_id") @db.Uuid
   email          String
   role           String
-  tokenHash      String   @unique @map("token_hash")
-  expiresAt      DateTime @map("expires_at") @db.Timestamptz
+  tokenHash      String    @unique @map("token_hash")
+  expiresAt      DateTime  @map("expires_at") @db.Timestamptz
   acceptedAt     DateTime? @map("accepted_at") @db.Timestamptz
-  version        Int      @default(1)
-  createdBy      String   @map("created_by") @db.Uuid
-  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  version        Int       @default(1)
+  createdBy      String    @map("created_by") @db.Uuid
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz
 
   @@index([organizationId])
   @@map("organization_invitations")
 }
 
 model Team {
-  id             String   @id @db.Uuid
-  organizationId String   @map("organization_id") @db.Uuid
+  id             String       @id @db.Uuid
+  organizationId String       @map("organization_id") @db.Uuid
   name           String
-  version        Int      @default(1)
-  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  version        Int          @default(1)
+  createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamptz
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@unique([organizationId, name])
@@ -179,11 +179,11 @@ model TeamMembership {
 }
 
 model ProjectAccess {
-  id             String @id @db.Uuid
-  organizationId String @map("organization_id") @db.Uuid
-  projectId      String @map("project_id") @db.Uuid
-  userId         String @map("user_id") @db.Uuid
-  version        Int    @default(1)
+  id             String  @id @db.Uuid
+  organizationId String  @map("organization_id") @db.Uuid
+  projectId      String  @map("project_id") @db.Uuid
+  userId         String  @map("user_id") @db.Uuid
+  version        Int     @default(1)
   project        Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@unique([projectId, userId])
@@ -192,27 +192,30 @@ model ProjectAccess {
 }
 
 model Project {
-  id             String   @id @db.Uuid
-  organizationId String   @map("organization_id") @db.Uuid
+  id             String          @id @db.Uuid
+  organizationId String          @map("organization_id") @db.Uuid
   code           String
   name           String
   description    String?
   client         String?
-  status         String   @default("draft")
+  status         String          @default("draft")
   timezone       String
-  startDate      DateTime? @map("start_date") @db.Date
-  endDate        DateTime? @map("end_date") @db.Date
+  startDate      DateTime?       @map("start_date") @db.Date
+  endDate        DateTime?       @map("end_date") @db.Date
   address        String?
-  archivedAt     DateTime? @map("archived_at") @db.Timestamptz
-  version        Int      @default(1)
-  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  archivedAt     DateTime?       @map("archived_at") @db.Timestamptz
+  version        Int             @default(1)
+  createdAt      DateTime        @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime        @updatedAt @map("updated_at") @db.Timestamptz
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   access         ProjectAccess[]
   sites          Site[]
   locations      Location[]
   workOrders     WorkOrder[]
   inspections    Inspection[]
+  defects        Defect[]
+  assets         Asset[]
+  dailyReports   DailyReport[]
   mediaObjects   MediaObject[]
 
   @@unique([organizationId, code])
@@ -221,52 +224,52 @@ model Project {
 }
 
 model MediaObject {
-  id             String    @id @db.Uuid
-  organizationId String    @map("organization_id") @db.Uuid
-  projectId      String    @map("project_id") @db.Uuid
-  objectKey      String    @unique @map("object_key")
-  mimeType       String    @map("mime_type")
-  byteSize       BigInt    @map("byte_size")
+  id             String               @id @db.Uuid
+  organizationId String               @map("organization_id") @db.Uuid
+  projectId      String               @map("project_id") @db.Uuid
+  objectKey      String               @unique @map("object_key")
+  mimeType       String               @map("mime_type")
+  byteSize       BigInt               @map("byte_size")
   sha256         String
-  status         String    @default("pending")
-  scanStatus     String    @default("pending") @map("scan_status")
-  immutableAt    DateTime? @map("immutable_at") @db.Timestamptz
-  createdBy      String    @map("created_by") @db.Uuid
-  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz
-  project        Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  status         String               @default("pending")
+  scanStatus     String               @default("pending") @map("scan_status")
+  immutableAt    DateTime?            @map("immutable_at") @db.Timestamptz
+  createdBy      String               @map("created_by") @db.Uuid
+  createdAt      DateTime             @default(now()) @map("created_at") @db.Timestamptz
+  project        Project              @relation(fields: [projectId], references: [id], onDelete: Cascade)
   sessions       MediaUploadSession[]
   links          MediaLink[]
-  derivatives    MediaDerivative[] @relation("MediaSource")
-  derivativeOf   MediaDerivative[] @relation("MediaDerivativeObject")
+  derivatives    MediaDerivative[]    @relation("MediaSource")
+  derivativeOf   MediaDerivative[]    @relation("MediaDerivativeObject")
 
   @@index([organizationId, projectId, status])
   @@map("media_objects")
 }
 
 model MediaUploadSession {
-  id                String   @id @db.Uuid
-  organizationId    String   @map("organization_id") @db.Uuid
-  mediaId           String   @map("media_id") @db.Uuid
-  multipartUploadId String   @map("multipart_upload_id")
-  partSize           Int      @map("part_size")
-  totalParts         Int      @map("total_parts")
-  completedParts     Json     @default("[]") @map("completed_parts")
-  status             String   @default("open")
-  expiresAt          DateTime @map("expires_at") @db.Timestamptz
-  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz
-  media              MediaObject @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  id                String      @id @db.Uuid
+  organizationId    String      @map("organization_id") @db.Uuid
+  mediaId           String      @map("media_id") @db.Uuid
+  multipartUploadId String      @map("multipart_upload_id")
+  partSize          Int         @map("part_size")
+  totalParts        Int         @map("total_parts")
+  completedParts    Json        @default("[]") @map("completed_parts")
+  status            String      @default("open")
+  expiresAt         DateTime    @map("expires_at") @db.Timestamptz
+  createdAt         DateTime    @default(now()) @map("created_at") @db.Timestamptz
+  media             MediaObject @relation(fields: [mediaId], references: [id], onDelete: Cascade)
 
   @@index([organizationId, status, expiresAt])
   @@map("media_upload_sessions")
 }
 
 model MediaLink {
-  id             String   @id @db.Uuid
-  organizationId String   @map("organization_id") @db.Uuid
-  mediaId        String   @map("media_id") @db.Uuid
-  entityType     String   @map("entity_type")
-  entityId       String   @map("entity_id") @db.Uuid
-  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  id             String      @id @db.Uuid
+  organizationId String      @map("organization_id") @db.Uuid
+  mediaId        String      @map("media_id") @db.Uuid
+  entityType     String      @map("entity_type")
+  entityId       String      @map("entity_id") @db.Uuid
+  createdAt      DateTime    @default(now()) @map("created_at") @db.Timestamptz
   media          MediaObject @relation(fields: [mediaId], references: [id], onDelete: Restrict)
 
   @@unique([mediaId, entityType, entityId])
@@ -275,12 +278,12 @@ model MediaLink {
 }
 
 model MediaDerivative {
-  id                String   @id @db.Uuid
-  organizationId    String   @map("organization_id") @db.Uuid
-  sourceMediaId     String   @map("source_media_id") @db.Uuid
-  derivativeMediaId String   @map("derivative_media_id") @db.Uuid
-  derivativeType    String   @map("derivative_type")
-  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz
+  id                String      @id @db.Uuid
+  organizationId    String      @map("organization_id") @db.Uuid
+  sourceMediaId     String      @map("source_media_id") @db.Uuid
+  derivativeMediaId String      @map("derivative_media_id") @db.Uuid
+  derivativeType    String      @map("derivative_type")
+  createdAt         DateTime    @default(now()) @map("created_at") @db.Timestamptz
   source            MediaObject @relation("MediaSource", fields: [sourceMediaId], references: [id], onDelete: Cascade)
   derivative        MediaObject @relation("MediaDerivativeObject", fields: [derivativeMediaId], references: [id], onDelete: Restrict)
 
@@ -290,17 +293,17 @@ model MediaDerivative {
 }
 
 model Site {
-  id             String   @id @db.Uuid
-  organizationId String   @map("organization_id") @db.Uuid
-  projectId      String   @map("project_id") @db.Uuid
+  id             String                   @id @db.Uuid
+  organizationId String                   @map("organization_id") @db.Uuid
+  projectId      String                   @map("project_id") @db.Uuid
   name           String
   code           String
-  status         String   @default("active")
+  status         String                   @default("active")
   boundary       Unsupported("geometry")?
-  version        Int      @default(1)
-  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz
-  project        Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  version        Int                      @default(1)
+  createdAt      DateTime                 @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime                 @updatedAt @map("updated_at") @db.Timestamptz
+  project        Project                  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   locations      Location[]
   workOrders     WorkOrder[]
 
@@ -310,24 +313,24 @@ model Site {
 }
 
 model Location {
-  id             String   @id @db.Uuid
-  organizationId String   @map("organization_id") @db.Uuid
-  projectId      String   @map("project_id") @db.Uuid
-  siteId         String   @map("site_id") @db.Uuid
-  parentId       String?  @map("parent_id") @db.Uuid
+  id             String                   @id @db.Uuid
+  organizationId String                   @map("organization_id") @db.Uuid
+  projectId      String                   @map("project_id") @db.Uuid
+  siteId         String                   @map("site_id") @db.Uuid
+  parentId       String?                  @map("parent_id") @db.Uuid
   name           String
-  locationType   String   @map("location_type")
-  status         String   @default("active")
+  locationType   String                   @map("location_type")
+  status         String                   @default("active")
   geometry       Unsupported("geometry")?
-  chainageStart  Decimal? @map("chainage_start") @db.Decimal
-  chainageEnd    Decimal? @map("chainage_end") @db.Decimal
-  version        Int      @default(1)
-  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz
-  project        Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  site           Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
-  parent         Location? @relation("LocationHierarchy", fields: [parentId], references: [id], onDelete: Restrict)
-  children       Location[] @relation("LocationHierarchy")
+  chainageStart  Decimal?                 @map("chainage_start") @db.Decimal
+  chainageEnd    Decimal?                 @map("chainage_end") @db.Decimal
+  version        Int                      @default(1)
+  createdAt      DateTime                 @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime                 @updatedAt @map("updated_at") @db.Timestamptz
+  project        Project                  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  site           Site                     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  parent         Location?                @relation("LocationHierarchy", fields: [parentId], references: [id], onDelete: Restrict)
+  children       Location[]               @relation("LocationHierarchy")
   workOrders     WorkOrder[]
 
   @@index([organizationId, projectId, siteId])
@@ -336,32 +339,32 @@ model Location {
 }
 
 model WorkOrder {
-  id                   String   @id @db.Uuid
-  organizationId       String   @map("organization_id") @db.Uuid
-  projectId            String   @map("project_id") @db.Uuid
-  siteId               String?  @map("site_id") @db.Uuid
-  locationId           String?  @map("location_id") @db.Uuid
+  id                   String                @id @db.Uuid
+  organizationId       String                @map("organization_id") @db.Uuid
+  projectId            String                @map("project_id") @db.Uuid
+  siteId               String?               @map("site_id") @db.Uuid
+  locationId           String?               @map("location_id") @db.Uuid
   title                String
   description          String?
-  workType             String   @map("work_type")
+  workType             String                @map("work_type")
   priority             String
-  status               String   @default("draft")
-  plannedStart         DateTime? @map("planned_start") @db.Timestamptz
-  plannedEnd           DateTime? @map("planned_end") @db.Timestamptz
-  dueAt                DateTime? @map("due_at") @db.Timestamptz
-  estimatedMinutes     Int?      @map("estimated_minutes")
-  requiredSkills       String[]  @default([]) @map("required_skills")
-  evidenceRequirements Json      @default("[]") @map("evidence_requirements")
-  completionRules      Json      @default("{}") @map("completion_rules")
-  checklistId          String?   @map("checklist_id") @db.Uuid
-  version              Int       @default(1)
-  createdBy            String    @map("created_by") @db.Uuid
-  createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt            DateTime  @updatedAt @map("updated_at") @db.Timestamptz
-  archivedAt           DateTime? @map("archived_at") @db.Timestamptz
-  project              Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  site                 Site?     @relation(fields: [siteId], references: [id], onDelete: Restrict)
-  location             Location? @relation(fields: [locationId], references: [id], onDelete: Restrict)
+  status               String                @default("draft")
+  plannedStart         DateTime?             @map("planned_start") @db.Timestamptz
+  plannedEnd           DateTime?             @map("planned_end") @db.Timestamptz
+  dueAt                DateTime?             @map("due_at") @db.Timestamptz
+  estimatedMinutes     Int?                  @map("estimated_minutes")
+  requiredSkills       String[]              @default([]) @map("required_skills")
+  evidenceRequirements Json                  @default("[]") @map("evidence_requirements")
+  completionRules      Json                  @default("{}") @map("completion_rules")
+  checklistId          String?               @map("checklist_id") @db.Uuid
+  version              Int                   @default(1)
+  createdBy            String                @map("created_by") @db.Uuid
+  createdAt            DateTime              @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt            DateTime              @updatedAt @map("updated_at") @db.Timestamptz
+  archivedAt           DateTime?             @map("archived_at") @db.Timestamptz
+  project              Project               @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  site                 Site?                 @relation(fields: [siteId], references: [id], onDelete: Restrict)
+  location             Location?             @relation(fields: [locationId], references: [id], onDelete: Restrict)
   assignments          WorkOrderAssignment[]
   prerequisites        WorkOrderDependency[] @relation("DependentWorkOrder")
   dependents           WorkOrderDependency[] @relation("PrerequisiteWorkOrder")
@@ -373,21 +376,23 @@ model WorkOrder {
 }
 
 model Inspection {
-  id             String   @id @db.Uuid
-  organizationId String   @map("organization_id") @db.Uuid
-  projectId      String   @map("project_id") @db.Uuid
-  workOrderId    String?  @map("work_order_id") @db.Uuid
-  formVersionId  String   @map("form_version_id") @db.Uuid
-  inspectorId    String   @map("inspector_id") @db.Uuid
-  inspectionType String   @map("inspection_type")
-  status         String   @default("draft")
-  draftAnswers   Json     @default("{}") @map("draft_answers")
-  version        Int      @default(1)
-  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz
-  project        Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  workOrder      WorkOrder? @relation(fields: [workOrderId], references: [id], onDelete: Restrict)
-  formVersion    FormVersion @relation(fields: [formVersionId], references: [id], onDelete: Restrict)
+  id             String             @id @db.Uuid
+  organizationId String             @map("organization_id") @db.Uuid
+  projectId      String             @map("project_id") @db.Uuid
+  workOrderId    String?            @map("work_order_id") @db.Uuid
+  assetId        String?            @map("asset_id") @db.Uuid
+  formVersionId  String             @map("form_version_id") @db.Uuid
+  inspectorId    String             @map("inspector_id") @db.Uuid
+  inspectionType String             @map("inspection_type")
+  status         String             @default("draft")
+  draftAnswers   Json               @default("{}") @map("draft_answers")
+  version        Int                @default(1)
+  createdAt      DateTime           @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime           @updatedAt @map("updated_at") @db.Timestamptz
+  project        Project            @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  workOrder      WorkOrder?         @relation(fields: [workOrderId], references: [id], onDelete: Restrict)
+  asset          Asset?             @relation(fields: [assetId], references: [id], onDelete: Restrict)
+  formVersion    FormVersion        @relation(fields: [formVersionId], references: [id], onDelete: Restrict)
   submissions    FormSubmission[]
   reviews        InspectionReview[]
 
@@ -396,17 +401,17 @@ model Inspection {
 }
 
 model FormSubmission {
-  id             String   @id @db.Uuid
-  organizationId String   @map("organization_id") @db.Uuid
-  inspectionId   String   @map("inspection_id") @db.Uuid
-  formVersionId  String   @map("form_version_id") @db.Uuid
+  id             String             @id @db.Uuid
+  organizationId String             @map("organization_id") @db.Uuid
+  inspectionId   String             @map("inspection_id") @db.Uuid
+  formVersionId  String             @map("form_version_id") @db.Uuid
   revision       Int
   answers        Json
   outcome        String
-  submittedBy    String   @map("submitted_by") @db.Uuid
-  submittedAt    DateTime @default(now()) @map("submitted_at") @db.Timestamptz
-  inspection     Inspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
-  formVersion    FormVersion @relation(fields: [formVersionId], references: [id], onDelete: Restrict)
+  submittedBy    String             @map("submitted_by") @db.Uuid
+  submittedAt    DateTime           @default(now()) @map("submitted_at") @db.Timestamptz
+  inspection     Inspection         @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+  formVersion    FormVersion        @relation(fields: [formVersionId], references: [id], onDelete: Restrict)
   reviews        InspectionReview[]
 
   @@unique([inspectionId, revision])
@@ -415,15 +420,15 @@ model FormSubmission {
 }
 
 model InspectionReview {
-  id             String   @id @db.Uuid
-  organizationId String   @map("organization_id") @db.Uuid
-  inspectionId   String   @map("inspection_id") @db.Uuid
-  submissionId   String   @map("submission_id") @db.Uuid
-  reviewerId     String   @map("reviewer_id") @db.Uuid
+  id             String         @id @db.Uuid
+  organizationId String         @map("organization_id") @db.Uuid
+  inspectionId   String         @map("inspection_id") @db.Uuid
+  submissionId   String         @map("submission_id") @db.Uuid
+  reviewerId     String         @map("reviewer_id") @db.Uuid
   decision       String
   comment        String?
-  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
-  inspection     Inspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+  createdAt      DateTime       @default(now()) @map("created_at") @db.Timestamptz
+  inspection     Inspection     @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
   submission     FormSubmission @relation(fields: [submissionId], references: [id], onDelete: Restrict)
 
   @@index([organizationId, inspectionId, createdAt])
@@ -431,13 +436,13 @@ model InspectionReview {
 }
 
 model WorkOrderAssignment {
-  id             String   @id @db.Uuid
-  organizationId String   @map("organization_id") @db.Uuid
-  workOrderId    String   @map("work_order_id") @db.Uuid
-  assigneeType   String   @map("assignee_type")
-  assigneeId     String   @map("assignee_id") @db.Uuid
-  createdBy      String   @map("created_by") @db.Uuid
-  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  id             String    @id @db.Uuid
+  organizationId String    @map("organization_id") @db.Uuid
+  workOrderId    String    @map("work_order_id") @db.Uuid
+  assigneeType   String    @map("assignee_type")
+  assigneeId     String    @map("assignee_id") @db.Uuid
+  createdBy      String    @map("created_by") @db.Uuid
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz
   workOrder      WorkOrder @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
 
   @@unique([workOrderId, assigneeType, assigneeId])
@@ -445,12 +450,138 @@ model WorkOrderAssignment {
   @@map("work_order_assignments")
 }
 
+model ScheduleResource {
+  id             String   @id @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  resourceType   String   @map("resource_type")
+  resourceId     String   @map("resource_id") @db.Uuid
+  name           String
+  skills         String[] @default([])
+  projectIds     String[] @default([]) @map("project_ids") @db.Uuid
+  shifts         Json     @default("[]")
+  blackouts      Json     @default("[]")
+  travelSpeedKph Int      @default(40) @map("travel_speed_kph")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@unique([organizationId, resourceType, resourceId])
+  @@index([organizationId, resourceType])
+  @@map("schedule_resources")
+}
+
+model Notification {
+  id             String    @id @db.Uuid
+  organizationId String    @map("organization_id") @db.Uuid
+  userId         String    @map("user_id") @db.Uuid
+  sourceEventId  String    @map("source_event_id") @db.Uuid
+  kind           String
+  title          String
+  body           String
+  resourceType   String?   @map("resource_type")
+  resourceId     String?   @map("resource_id") @db.Uuid
+  readAt         DateTime? @map("read_at") @db.Timestamptz
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz
+
+  @@unique([sourceEventId, userId])
+  @@index([organizationId, userId, readAt, createdAt])
+  @@map("notifications")
+}
+
+model Defect {
+  id             String              @id @db.Uuid
+  organizationId String              @map("organization_id") @db.Uuid
+  projectId      String              @map("project_id") @db.Uuid
+  locationId     String?             @map("location_id") @db.Uuid
+  inspectionId   String?             @map("inspection_id") @db.Uuid
+  workOrderId    String?             @map("work_order_id") @db.Uuid
+  assetId        String?             @map("asset_id") @db.Uuid
+  category       String
+  severity       String
+  title          String
+  description    String?
+  dueAt          DateTime?           @map("due_at") @db.Timestamptz
+  status         String              @default("reported")
+  version        Int                 @default(1)
+  createdBy      String              @map("created_by") @db.Uuid
+  createdAt      DateTime            @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime            @updatedAt @map("updated_at") @db.Timestamptz
+  project        Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  asset          Asset?              @relation(fields: [assetId], references: [id], onDelete: Restrict)
+  assignments    DefectAssignment[]
+  corrections    DefectCorrection[]
+  statusEvents   DefectStatusEvent[]
+
+  @@index([organizationId, projectId, status])
+  @@index([organizationId, dueAt])
+  @@map("defects")
+}
+
+model DefectAssignment {
+  id             String   @id @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  defectId       String   @map("defect_id") @db.Uuid
+  assigneeType   String   @map("assignee_type")
+  assigneeId     String   @map("assignee_id") @db.Uuid
+  assignedBy     String   @map("assigned_by") @db.Uuid
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  defect         Defect   @relation(fields: [defectId], references: [id], onDelete: Cascade)
+
+  @@unique([defectId, assigneeType, assigneeId])
+  @@index([organizationId, assigneeId])
+  @@map("defect_assignments")
+}
+
+model DefectCorrection {
+  id               String               @id @db.Uuid
+  organizationId   String               @map("organization_id") @db.Uuid
+  defectId         String               @map("defect_id") @db.Uuid
+  rootCause        String               @map("root_cause")
+  correctiveAction String               @map("corrective_action")
+  evidenceIds      String[]             @map("evidence_ids") @db.Uuid
+  submittedBy      String               @map("submitted_by") @db.Uuid
+  submittedAt      DateTime             @default(now()) @map("submitted_at") @db.Timestamptz
+  defect           Defect               @relation(fields: [defectId], references: [id], onDelete: Cascade)
+  verifications    DefectVerification[]
+
+  @@index([organizationId, defectId])
+  @@map("defect_corrections")
+}
+
+model DefectVerification {
+  id             String           @id @db.Uuid
+  organizationId String           @map("organization_id") @db.Uuid
+  correctionId   String           @map("correction_id") @db.Uuid
+  verifierId     String           @map("verifier_id") @db.Uuid
+  decision       String
+  comment        String?
+  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz
+  correction     DefectCorrection @relation(fields: [correctionId], references: [id], onDelete: Restrict)
+
+  @@index([organizationId, correctionId])
+  @@map("defect_verifications")
+}
+
+model DefectStatusEvent {
+  id             String   @id @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  defectId       String   @map("defect_id") @db.Uuid
+  fromStatus     String?  @map("from_status")
+  toStatus       String   @map("to_status")
+  actorId        String   @map("actor_id") @db.Uuid
+  comment        String?
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  defect         Defect   @relation(fields: [defectId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, defectId, createdAt])
+  @@map("defect_status_events")
+}
+
 model WorkOrderDependency {
-  id                      String   @id @db.Uuid
-  organizationId          String   @map("organization_id") @db.Uuid
-  workOrderId             String   @map("work_order_id") @db.Uuid
-  prerequisiteWorkOrderId String   @map("prerequisite_work_order_id") @db.Uuid
-  createdAt               DateTime @default(now()) @map("created_at") @db.Timestamptz
+  id                      String    @id @db.Uuid
+  organizationId          String    @map("organization_id") @db.Uuid
+  workOrderId             String    @map("work_order_id") @db.Uuid
+  prerequisiteWorkOrderId String    @map("prerequisite_work_order_id") @db.Uuid
+  createdAt               DateTime  @default(now()) @map("created_at") @db.Timestamptz
   workOrder               WorkOrder @relation("DependentWorkOrder", fields: [workOrderId], references: [id], onDelete: Cascade)
   prerequisite            WorkOrder @relation("PrerequisiteWorkOrder", fields: [prerequisiteWorkOrderId], references: [id], onDelete: Cascade)
 
@@ -475,61 +606,61 @@ model AuditEvent {
 }
 
 model OutboxEvent {
-  id             String   @id @db.Uuid
-  organizationId String   @map("organization_id") @db.Uuid
-  eventType      String   @map("event_type")
-  aggregateId    String   @map("aggregate_id") @db.Uuid
+  id             String    @id @db.Uuid
+  organizationId String    @map("organization_id") @db.Uuid
+  eventType      String    @map("event_type")
+  aggregateId    String    @map("aggregate_id") @db.Uuid
   payload        Json
   publishedAt    DateTime? @map("published_at") @db.Timestamptz
-  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz
 
   @@index([organizationId, createdAt])
   @@map("outbox_events")
 }
 
 model SyncDevice {
-  id                    String    @id @db.Uuid
-  organizationId        String    @map("organization_id") @db.Uuid
-  userId                String    @map("user_id") @db.Uuid
-  name                  String
-  platform              String
-  appVersion            String    @map("app_version")
-  currentCheckpoint     String?   @map("current_checkpoint") @db.Uuid
-  packageExpiresAt      DateTime  @map("package_expires_at") @db.Timestamptz
-  lastSeenAt            DateTime  @default(now()) @map("last_seen_at") @db.Timestamptz
-  revokedAt             DateTime? @map("revoked_at") @db.Timestamptz
-  purgeRequestedAt      DateTime? @map("purge_requested_at") @db.Timestamptz
-  purgeReason           String?   @map("purge_reason")
-  purgeAcknowledgedAt   DateTime? @map("purge_acknowledged_at") @db.Timestamptz
-  createdAt             DateTime  @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt             DateTime  @updatedAt @map("updated_at") @db.Timestamptz
-  organization          Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  operations            SyncOperation[]
-  conflicts             SyncConflict[]
-  checkpoints           SyncCheckpoint[]
+  id                  String           @id @db.Uuid
+  organizationId      String           @map("organization_id") @db.Uuid
+  userId              String           @map("user_id") @db.Uuid
+  name                String
+  platform            String
+  appVersion          String           @map("app_version")
+  currentCheckpoint   String?          @map("current_checkpoint") @db.Uuid
+  packageExpiresAt    DateTime         @map("package_expires_at") @db.Timestamptz
+  lastSeenAt          DateTime         @default(now()) @map("last_seen_at") @db.Timestamptz
+  revokedAt           DateTime?        @map("revoked_at") @db.Timestamptz
+  purgeRequestedAt    DateTime?        @map("purge_requested_at") @db.Timestamptz
+  purgeReason         String?          @map("purge_reason")
+  purgeAcknowledgedAt DateTime?        @map("purge_acknowledged_at") @db.Timestamptz
+  createdAt           DateTime         @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt           DateTime         @updatedAt @map("updated_at") @db.Timestamptz
+  organization        Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user                User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  operations          SyncOperation[]
+  conflicts           SyncConflict[]
+  checkpoints         SyncCheckpoint[]
 
   @@index([organizationId, userId])
   @@map("sync_devices")
 }
 
 model SyncOperation {
-  id                String    @id @db.Uuid
-  organizationId    String    @map("organization_id") @db.Uuid
-  deviceId          String    @map("device_id") @db.Uuid
-  clientOperationId String    @map("client_operation_id") @db.Uuid
-  entityType        String    @map("entity_type")
-  entityId          String    @map("entity_id") @db.Uuid
-  operationType     String    @map("operation_type")
-  baseVersion       Int?      @map("base_version")
+  id                String        @id @db.Uuid
+  organizationId    String        @map("organization_id") @db.Uuid
+  deviceId          String        @map("device_id") @db.Uuid
+  clientOperationId String        @map("client_operation_id") @db.Uuid
+  entityType        String        @map("entity_type")
+  entityId          String        @map("entity_id") @db.Uuid
+  operationType     String        @map("operation_type")
+  baseVersion       Int?          @map("base_version")
   payload           Json
   status            String
-  rejectionCode     String?   @map("rejection_code")
-  conflictId        String?   @map("conflict_id") @db.Uuid
-  clientCreatedAt   DateTime  @map("client_created_at") @db.Timestamptz
-  receivedAt        DateTime  @default(now()) @map("received_at") @db.Timestamptz
-  appliedAt         DateTime? @map("applied_at") @db.Timestamptz
-  device            SyncDevice @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  rejectionCode     String?       @map("rejection_code")
+  conflictId        String?       @map("conflict_id") @db.Uuid
+  clientCreatedAt   DateTime      @map("client_created_at") @db.Timestamptz
+  receivedAt        DateTime      @default(now()) @map("received_at") @db.Timestamptz
+  appliedAt         DateTime?     @map("applied_at") @db.Timestamptz
+  device            SyncDevice    @relation(fields: [deviceId], references: [id], onDelete: Cascade)
   conflict          SyncConflict? @relation(fields: [conflictId], references: [id], onDelete: SetNull)
 
   @@unique([organizationId, deviceId, clientOperationId])
@@ -538,20 +669,20 @@ model SyncOperation {
 }
 
 model SyncConflict {
-  id             String    @id @db.Uuid
-  organizationId String    @map("organization_id") @db.Uuid
-  deviceId       String    @map("device_id") @db.Uuid
-  entityType     String    @map("entity_type")
-  entityId       String    @map("entity_id") @db.Uuid
-  operationType  String    @map("operation_type")
-  localValue     Json      @map("local_value")
-  serverValue    Json      @map("server_value")
-  status         String    @default("unresolved")
+  id             String          @id @db.Uuid
+  organizationId String          @map("organization_id") @db.Uuid
+  deviceId       String          @map("device_id") @db.Uuid
+  entityType     String          @map("entity_type")
+  entityId       String          @map("entity_id") @db.Uuid
+  operationType  String          @map("operation_type")
+  localValue     Json            @map("local_value")
+  serverValue    Json            @map("server_value")
+  status         String          @default("unresolved")
   resolution     Json?
-  resolvedBy     String?   @map("resolved_by") @db.Uuid
-  resolvedAt     DateTime? @map("resolved_at") @db.Timestamptz
-  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz
-  device         SyncDevice @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  resolvedBy     String?         @map("resolved_by") @db.Uuid
+  resolvedAt     DateTime?       @map("resolved_at") @db.Timestamptz
+  createdAt      DateTime        @default(now()) @map("created_at") @db.Timestamptz
+  device         SyncDevice      @relation(fields: [deviceId], references: [id], onDelete: Cascade)
   operations     SyncOperation[]
 
   @@index([organizationId, status, createdAt])
@@ -559,12 +690,12 @@ model SyncConflict {
 }
 
 model SyncCheckpoint {
-  token          String   @id @db.Uuid
-  organizationId String   @map("organization_id") @db.Uuid
-  deviceId       String   @map("device_id") @db.Uuid
+  token          String     @id @db.Uuid
+  organizationId String     @map("organization_id") @db.Uuid
+  deviceId       String     @map("device_id") @db.Uuid
   sequence       BigInt
-  projectIds     String[] @map("project_ids") @db.Uuid
-  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  projectIds     String[]   @map("project_ids") @db.Uuid
+  createdAt      DateTime   @default(now()) @map("created_at") @db.Timestamptz
   device         SyncDevice @relation(fields: [deviceId], references: [id], onDelete: Cascade)
 
   @@index([organizationId, deviceId, createdAt])
@@ -594,4 +725,122 @@ model JobExecution {
 
   @@unique([organizationId, jobKey])
   @@map("job_executions")
+}
+
+model AssetType {
+  id             String   @id @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  name           String
+  description    String?
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  assets         Asset[]
+
+  @@unique([organizationId, name])
+  @@map("asset_types")
+}
+
+model Asset {
+  id             String         @id @db.Uuid
+  organizationId String         @map("organization_id") @db.Uuid
+  projectId      String         @map("project_id") @db.Uuid
+  assetTypeId    String         @map("asset_type_id") @db.Uuid
+  locationId     String?        @map("location_id") @db.Uuid
+  name           String
+  qrCode         String         @map("qr_code")
+  serialNumber   String?        @map("serial_number")
+  model          String?
+  manufacturer   String?
+  status         String         @default("active")
+  createdAt      DateTime       @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime       @updatedAt @map("updated_at") @db.Timestamptz
+  project        Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assetType      AssetType      @relation(fields: [assetTypeId], references: [id], onDelete: Restrict)
+  inspections    Inspection[]
+  defects        Defect[]
+  meterReadings  MeterReading[]
+
+  @@unique([organizationId, qrCode])
+  @@index([organizationId, projectId, status])
+  @@map("assets")
+}
+
+model MeterReading {
+  id             String   @id @db.Uuid
+  organizationId String   @map("organization_id") @db.Uuid
+  assetId        String   @map("asset_id") @db.Uuid
+  meterType      String   @map("meter_type")
+  value          Decimal  @db.Decimal(18, 4)
+  unit           String
+  recordedAt     DateTime @map("recorded_at") @db.Timestamptz
+  recordedBy     String   @map("recorded_by") @db.Uuid
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  asset          Asset    @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, assetId, meterType, recordedAt])
+  @@map("meter_readings")
+}
+
+model DailyReport {
+  id              String               @id @db.Uuid
+  organizationId  String               @map("organization_id") @db.Uuid
+  projectId       String               @map("project_id") @db.Uuid
+  reportDate      DateTime             @map("report_date") @db.Date
+  status          String               @default("draft")
+  currentRevision Int                  @default(1) @map("current_revision")
+  createdBy       String               @map("created_by") @db.Uuid
+  createdAt       DateTime             @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime             @updatedAt @map("updated_at") @db.Timestamptz
+  project         Project              @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  versions        DailyReportVersion[]
+
+  @@unique([organizationId, projectId, reportDate])
+  @@index([organizationId, projectId, status])
+  @@map("daily_reports")
+}
+
+model DailyReportVersion {
+  id               String            @id @db.Uuid
+  organizationId   String            @map("organization_id") @db.Uuid
+  reportId         String            @map("report_id") @db.Uuid
+  revision         Int
+  content          Json
+  sourceReferences Json              @map("source_references")
+  createdBy        String            @map("created_by") @db.Uuid
+  createdAt        DateTime          @default(now()) @map("created_at") @db.Timestamptz
+  publishedAt      DateTime?         @map("published_at") @db.Timestamptz
+  report           DailyReport       @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  reviews          ReportReview[]
+  signatures       ReportSignature[]
+
+  @@unique([reportId, revision])
+  @@index([organizationId, reportId])
+  @@map("daily_report_versions")
+}
+
+model ReportReview {
+  id             String             @id @db.Uuid
+  organizationId String             @map("organization_id") @db.Uuid
+  versionId      String             @map("version_id") @db.Uuid
+  reviewerId     String             @map("reviewer_id") @db.Uuid
+  decision       String
+  comment        String?
+  createdAt      DateTime           @default(now()) @map("created_at") @db.Timestamptz
+  version        DailyReportVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, versionId])
+  @@map("report_reviews")
+}
+
+model ReportSignature {
+  id             String             @id @db.Uuid
+  organizationId String             @map("organization_id") @db.Uuid
+  versionId      String             @map("version_id") @db.Uuid
+  signerId       String             @map("signer_id") @db.Uuid
+  mediaId        String             @map("media_id") @db.Uuid
+  signedAt       DateTime           @default(now()) @map("signed_at") @db.Timestamptz
+  version        DailyReportVersion @relation(fields: [versionId], references: [id], onDelete: Restrict)
+
+  @@unique([versionId, signerId])
+  @@index([organizationId, versionId])
+  @@map("report_signatures")
 }

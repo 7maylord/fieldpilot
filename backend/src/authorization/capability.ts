@@ -9,7 +9,9 @@ export enum Capability {
   InspectionsPerform = 'inspections.perform',
   InspectionsApprove = 'inspections.approve',
   DefectsCreate = 'defects.create',
+  DefectsAssign = 'defects.assign',
   DefectsVerify = 'defects.verify',
+  AssetsManage = 'assets.manage',
   ReportsPublish = 'reports.publish',
   AuditView = 'audit.view',
 }
@@ -31,6 +33,8 @@ export const roleCapabilities: Record<string, readonly Capability[]> = {
     Capability.ProjectsManage,
     Capability.WorkOrdersCreate,
     Capability.WorkOrdersAssign,
+    Capability.DefectsAssign,
+    Capability.AssetsManage,
     ...memberCapabilities,
   ],
   member: memberCapabilities,
