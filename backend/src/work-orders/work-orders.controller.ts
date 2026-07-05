@@ -15,8 +15,10 @@ import { RequiresCapability } from '../authorization/capability.guard';
 import {
   AddDependencyDto,
   AssignWorkOrderDto,
+  CheckScheduleDto,
   CreateWorkOrderDto,
   TransitionWorkOrderDto,
+  UpsertScheduleResourceDto,
 } from './dto';
 import { WorkOrdersService } from './work-orders.service';
 
@@ -32,6 +34,15 @@ export class WorkOrdersController {
     @Query('projectId', ParseUUIDPipe) projectId: string,
   ) {
     return this.workOrders.list(organizationId, user.id, projectId);
+  }
+
+  @Get('dispatch')
+  dispatch(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('organizationId', ParseUUIDPipe) organizationId: string,
+    @Query('projectId', ParseUUIDPipe) projectId: string,
+  ) {
+    return this.workOrders.dispatch(organizationId, user.id, projectId);
   }
 
   @Post()
@@ -53,6 +64,36 @@ export class WorkOrdersController {
     @Body() body: AssignWorkOrderDto,
   ) {
     return this.workOrders.assign(organizationId, user.id, workOrderId, body);
+  }
+
+  @Post('schedule-resources')
+  @RequiresCapability(Capability.WorkOrdersAssign)
+  upsertScheduleResource(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('organizationId', ParseUUIDPipe) organizationId: string,
+    @Body() body: UpsertScheduleResourceDto,
+  ) {
+    return this.workOrders.upsertScheduleResource(
+      organizationId,
+      user.id,
+      body,
+    );
+  }
+
+  @Post(':workOrderId/schedule-checks')
+  @RequiresCapability(Capability.WorkOrdersAssign)
+  checkSchedule(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('organizationId', ParseUUIDPipe) organizationId: string,
+    @Param('workOrderId', ParseUUIDPipe) workOrderId: string,
+    @Body() body: CheckScheduleDto,
+  ) {
+    return this.workOrders.checkSchedule(
+      organizationId,
+      user.id,
+      workOrderId,
+      body,
+    );
   }
 
   @Post(':workOrderId/dependencies')
