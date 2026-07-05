@@ -65,12 +65,24 @@ export class InspectionsService {
           throw new BadRequestException(
             'Work order must belong to the project',
           );
+        if (
+          input.assetId &&
+          !(await tx.asset.findFirst({
+            where: {
+              id: input.assetId,
+              organizationId,
+              projectId: input.projectId,
+            },
+          }))
+        )
+          throw new BadRequestException('Asset must belong to the project');
         const inspection = await tx.inspection.create({
           data: {
             id: newId(),
             organizationId,
             projectId: input.projectId,
             workOrderId: input.workOrderId,
+            assetId: input.assetId,
             formVersionId: input.formVersionId,
             inspectorId: userId,
             inspectionType: input.inspectionType,

@@ -13,6 +13,7 @@ import {
 export class CreateInspectionDto {
   @ApiProperty() @IsUUID() projectId!: string;
   @ApiPropertyOptional() @IsOptional() @IsUUID() workOrderId?: string;
+  @ApiPropertyOptional() @IsOptional() @IsUUID() assetId?: string;
   @ApiProperty() @IsUUID() formVersionId!: string;
   @ApiProperty({
     enum: [
