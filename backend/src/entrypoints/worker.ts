@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from '../app.module';
 import { configSummary, loadConfig, loadLocalEnv } from '../config/app.config';
 import { OutboxPublisher } from '../queue/outbox-publisher.service';
+import { NotificationWorker } from '../notifications/notification-worker.service';
 
 async function bootstrap() {
   loadLocalEnv();
@@ -11,6 +12,7 @@ async function bootstrap() {
   const app = await NestFactory.createApplicationContext(AppModule);
   app.enableShutdownHooks();
   app.get(OutboxPublisher).start();
+  app.get(NotificationWorker).start();
 }
 
 void bootstrap();

@@ -44,14 +44,15 @@ export class QueueService implements OnModuleDestroy {
     });
   }
 
-  startWorker<T extends { organizationId: string }>(
+  startWorker<T extends { organizationId?: string }>(
     queueName: (typeof queueNames)[number],
     processor: Processor<T>,
   ) {
     const worker = new Worker<T>(
       queueName,
       async (job) => {
-        await this.enforceTenantRate(queueName, job.data.organizationId);
+        if (job.data.organizationId)
+          await this.enforceTenantRate(queueName, job.data.organizationId);
         return processor(job);
       },
       { connection: { url: this.redisUrl }, concurrency: 5 },
