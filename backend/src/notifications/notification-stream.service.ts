@@ -29,8 +29,6 @@ export class NotificationStream {
     let polling = false;
     let closed = false;
     let cleaned = false;
-    let updates: NodeJS.Timeout | undefined;
-    let heartbeat: NodeJS.Timeout | undefined;
     const close = () => {
       if (cleaned) return;
       cleaned = true;
@@ -74,15 +72,15 @@ export class NotificationStream {
         polling = false;
       }
     };
-    void poll();
-    updates = setInterval(() => void poll(), 1_000);
-    heartbeat = setInterval(
+    const updates = setInterval(() => void poll(), 1_000);
+    const heartbeat = setInterval(
       () =>
         response.write(
           formatSse('heartbeat', { at: new Date().toISOString() }),
         ),
       15_000,
     );
+    void poll();
     request.on('close', close);
   }
 }

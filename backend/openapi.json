@@ -367,6 +367,30 @@
         "tags": ["media"]
       }
     },
+    "/api/v1/metrics": {
+      "get": {
+        "operationId": "MetricsController_scrape",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["Metrics"]
+      }
+    },
+    "/api/v1/metrics/client-failures": {
+      "post": {
+        "operationId": "MetricsController_clientFailure",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["Metrics"]
+      }
+    },
     "/api/v1/organizations/{organizationId}/notifications/stream": {
       "get": {
         "operationId": "NotificationsController_openStream",
