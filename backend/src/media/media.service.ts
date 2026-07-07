@@ -12,6 +12,7 @@ import { TenantDatabase } from '../database/tenant-database.service';
 import type { CompleteUploadDto, CreateUploadSessionDto } from './dto';
 import { MalwareScanner } from './malware-scanner.service';
 import { S3Service } from './s3.service';
+import { MetricsService } from '../metrics/metrics.service';
 
 const partSize = 5 * 1024 * 1024;
 
@@ -22,6 +23,7 @@ export class MediaService {
     private readonly storage: S3Service,
     private readonly scanner: MalwareScanner,
     private readonly audit: AuditService,
+    private readonly metrics: MetricsService,
   ) {}
 
   createSession(
@@ -230,6 +232,7 @@ export class MediaService {
           resourceId: session.mediaId,
           summary: { sha256: session.media.sha256 },
         });
+        this.metrics.domain.inc({ area: 'media', outcome: result.status });
         return {
           mediaId: result.id,
           status: result.status,

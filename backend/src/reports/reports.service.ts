@@ -15,12 +15,14 @@ import type {
   SignReportDto,
 } from './dto';
 import { renderCsv, renderPdf } from './report-export';
+import { MetricsService } from '../metrics/metrics.service';
 
 @Injectable()
 export class ReportsService {
   constructor(
     private readonly tenants: TenantDatabase,
     private readonly audit: AuditService,
+    private readonly metrics: MetricsService,
   ) {}
   list(organizationId: string, userId: string, projectId: string) {
     return this.tenants.withMembership(
@@ -306,6 +308,7 @@ export class ReportsService {
           reportId,
           'daily_report.published',
         );
+        this.metrics.domain.inc({ area: 'reports', outcome: 'published' });
         return published;
       },
     );

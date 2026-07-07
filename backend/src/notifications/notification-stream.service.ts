@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { TenantDatabase } from '../database/tenant-database.service';
+import { MetricsService } from '../metrics/metrics.service';
 
 @Injectable()
 export class NotificationStream {
-  constructor(private readonly tenants: TenantDatabase) {}
+  constructor(
+    private readonly tenants: TenantDatabase,
+    private readonly metrics: MetricsService,
+  ) {}
 
   open(
     request: Request,
@@ -20,9 +24,21 @@ export class NotificationStream {
       'X-Accel-Buffering': 'no',
     });
     response.flushHeaders();
+    this.metrics.sseConnections.inc();
     let cursor = String(request.headers['last-event-id'] ?? '');
     let polling = false;
     let closed = false;
+    let cleaned = false;
+    let updates: NodeJS.Timeout | undefined;
+    let heartbeat: NodeJS.Timeout | undefined;
+    const close = () => {
+      if (cleaned) return;
+      cleaned = true;
+      closed = true;
+      this.metrics.sseConnections.dec();
+      if (updates) clearInterval(updates);
+      if (heartbeat) clearInterval(heartbeat);
+    };
     const poll = async () => {
       if (polling || closed) return;
       polling = true;
@@ -53,25 +69,20 @@ export class NotificationStream {
       } catch {
         response.write(formatSse('revoked', { organizationId }));
         response.end();
-        closed = true;
+        close();
       } finally {
         polling = false;
       }
     };
     void poll();
-    const updates = setInterval(() => void poll(), 2_000);
-    const heartbeat = setInterval(
+    updates = setInterval(() => void poll(), 1_000);
+    heartbeat = setInterval(
       () =>
         response.write(
           formatSse('heartbeat', { at: new Date().toISOString() }),
         ),
       15_000,
     );
-    const close = () => {
-      closed = true;
-      clearInterval(updates);
-      clearInterval(heartbeat);
-    };
     request.on('close', close);
   }
 }

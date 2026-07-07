@@ -16,6 +16,7 @@ import { FormsModule } from './forms/forms.module';
 import { HealthController } from './health/health.controller';
 import { InspectionsModule } from './inspections/inspections.module';
 import { MediaModule } from './media/media.module';
+import { MetricsModule } from './metrics/metrics.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { OrganizationsModule } from './organizations/organizations.module';
 import { ProjectsModule } from './projects/projects.module';
@@ -34,6 +35,7 @@ import { WorkOrdersModule } from './work-orders/work-orders.module';
     FormsModule,
     InspectionsModule,
     MediaModule,
+    MetricsModule,
     NotificationsModule,
     AuditModule,
     AssetsModule,
