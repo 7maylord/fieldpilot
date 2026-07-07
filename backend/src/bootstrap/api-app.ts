@@ -2,6 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 import { AppModule } from '../app.module';
 import { JsonLogger } from '../common/json-logger';
 import { ProblemDetailsFilter } from '../common/problem-details.filter';
@@ -10,6 +11,7 @@ import type { AppConfig } from '../config/app.config';
 export async function createApiApp(config: AppConfig) {
   const app = await NestFactory.create(AppModule, { logger: new JsonLogger() });
   app.setGlobalPrefix('api/v1');
+  app.use(helmet({ contentSecurityPolicy: false }));
   app.use(cookieParser());
   app.useGlobalPipes(
     new ValidationPipe({
