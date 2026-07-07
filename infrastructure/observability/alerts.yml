@@ -1,0 +1,28 @@
+groups:
+  - name: fieldpilot
+    rules:
+      - alert: FieldPilotHighHttpErrorRate
+        expr: sum(rate(fieldpilot_http_request_duration_seconds_count{status=~"5.."}[5m])) / clamp_min(sum(rate(fieldpilot_http_request_duration_seconds_count[5m])), 1) > 0.05
+        for: 5m
+      - alert: FieldPilotApiLatency
+        expr: histogram_quantile(0.95, sum by (le) (rate(fieldpilot_http_request_duration_seconds_bucket[5m]))) > 0.8
+        for: 5m
+      - alert: FieldPilotDependencyDown
+        expr: fieldpilot_dependency_up == 0
+        for: 2m
+      - alert: FieldPilotQueueBacklog
+        expr: sum(fieldpilot_queue_jobs{state=~"waiting|delayed|failed"}) > 100
+        for: 5m
+      - alert: FieldPilotSyncFailures
+        expr: increase(fieldpilot_domain_events_total{area="sync",outcome=~"rejected|error"}[10m]) > 10
+      - alert: FieldPilotConflictSpike
+        expr: increase(fieldpilot_domain_events_total{area="conflicts"}[10m]) > 20
+      - alert: FieldPilotMediaFailures
+        expr: increase(fieldpilot_domain_events_total{area="media",outcome=~"quarantined|rejected|error"}[10m]) > 5
+      - alert: FieldPilotReportFailures
+        expr: increase(fieldpilot_domain_events_total{area="reports",outcome="error"}[10m]) > 2
+      - alert: FieldPilotSseCapacity
+        expr: fieldpilot_sse_connections > 800
+        for: 5m
+      - alert: FieldPilotClientFailures
+        expr: increase(fieldpilot_client_failures_total[10m]) > 10

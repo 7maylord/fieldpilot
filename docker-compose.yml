@@ -2,6 +2,14 @@ services:
   postgres:
     image: postgis/postgis:16-3.4-alpine
     platform: linux/amd64
+    command:
+      - postgres
+      - -c
+      - wal_level=replica
+      - -c
+      - archive_mode=on
+      - -c
+      - archive_command=mkdir -p /var/lib/postgresql/data/wal_archive && test ! -f /var/lib/postgresql/data/wal_archive/%f && cp %p /var/lib/postgresql/data/wal_archive/%f
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-fieldpilot}
       POSTGRES_USER: ${POSTGRES_USER:-fieldpilot}
@@ -53,6 +61,22 @@ services:
     platform: linux/amd64
     ports:
       - '3310:3310'
+
+  prometheus:
+    image: prom/prometheus:latest
+    command: ['--config.file=/etc/prometheus/prometheus.yml']
+    ports:
+      - '9090:9090'
+    volumes:
+      - ./infrastructure/observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./infrastructure/observability/alerts.yml:/etc/prometheus/alerts.yml:ro
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - '3002:3000'
+    volumes:
+      - ./infrastructure/observability/grafana:/etc/grafana/provisioning:ro
 
 volumes:
   postgres-data:
