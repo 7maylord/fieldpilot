@@ -113,6 +113,14 @@ export class QueueService implements OnModuleDestroy {
     );
   }
 
+  async deadLetterCount(queueName: (typeof queueNames)[number]) {
+    const counts = await this.queue(`${queueName}-dead-letter`).getJobCounts(
+      'waiting',
+      'delayed',
+    );
+    return (counts.waiting ?? 0) + (counts.delayed ?? 0);
+  }
+
   async onModuleDestroy() {
     await Promise.all(this.workers.map((worker) => worker.close()));
     await Promise.all([...this.queues.values()].map((queue) => queue.close()));
@@ -146,7 +154,7 @@ export class QueueService implements OnModuleDestroy {
     error: Error,
   ) {
     if (!job || job.attemptsMade < (job.opts.attempts ?? 1)) return;
-    await this.queue(`${queueName}:dead-letter`).add(job.name, {
+    await this.queue(`${queueName}-dead-letter`).add(job.name, {
       originalJobId: job.id,
       data: job.data,
       error: error.message,
