@@ -85,6 +85,11 @@ export async function uploadMedia(
       uploadState: 'uploading',
     });
   }
+  if (record.thumbnail && !record.thumbnailUploaded) {
+    await uploadDerivative(record, record.thumbnail, 'thumbnail');
+    record.thumbnailUploaded = true;
+    await database.mediaRecords.update(mediaId, { thumbnailUploaded: true });
+  }
   const completed = [...(record.uploadedParts ?? [])];
   const size = session.partSize ?? 5 * 1024 * 1024;
   for (const part of session.partUrls) {
@@ -109,8 +114,6 @@ export async function uploadMedia(
   );
   if (record.file !== original)
     await uploadDerivative(record, record.file, 'compressed');
-  if (record.thumbnail)
-    await uploadDerivative(record, record.thumbnail, 'thumbnail');
   await database.mediaRecords.update(mediaId, {
     uploadState: 'uploaded',
     syncState: 'synced',

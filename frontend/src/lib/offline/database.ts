@@ -62,6 +62,7 @@ export interface MediaRecord extends OfflineEntity {
   mediaType?: 'photo' | 'signature' | 'video' | 'file';
   uploadSessionId?: string;
   uploadedParts?: { partNumber: number; etag: string }[];
+  thumbnailUploaded?: boolean;
   uploadState: 'local' | 'uploading' | 'uploaded' | 'failed';
 }
 
