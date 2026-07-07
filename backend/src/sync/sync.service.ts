@@ -15,7 +15,9 @@ import {
   type WorkOrderStatus,
 } from '../work-orders/work-order-state';
 import { syncOutcome } from './conflict-strategy';
+import { nextCheckpointSequence } from './checkpoint';
 import { evaluateForm, type FormSchema } from '../forms/form-schema';
+import { MetricsService } from '../metrics/metrics.service';
 import type {
   SyncBootstrapDto,
   SyncOperationDto,
@@ -40,6 +42,7 @@ export class SyncService {
   constructor(
     private readonly tenants: TenantDatabase,
     private readonly audit: AuditService,
+    private readonly metrics: MetricsService,
   ) {}
 
   bootstrap(organizationId: string, userId: string, input: SyncBootstrapDto) {
@@ -181,6 +184,11 @@ export class SyncService {
               operation,
             ),
           );
+        for (const result of results)
+          this.metrics.domain.inc({
+            area: result.status === 'conflict' ? 'conflicts' : 'sync',
+            outcome: result.status,
+          });
         return { batchId: idempotencyKey, serverTime: new Date(), results };
       },
     );
@@ -211,7 +219,10 @@ export class SyncService {
         });
         const hasMore = rows.length > input.limit;
         const changes = rows.slice(0, input.limit);
-        const nextSequence = changes.at(-1)?.sequence ?? checkpoint.sequence;
+        const nextSequence = nextCheckpointSequence(
+          checkpoint.sequence,
+          changes.map(({ sequence }) => sequence),
+        );
         const nextCheckpoint = newId();
         await tx.syncCheckpoint.create({
           data: {

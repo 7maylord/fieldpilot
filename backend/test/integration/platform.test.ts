@@ -718,6 +718,40 @@ describe('platform integration', () => {
           ),
         ).toBe(true),
       );
+    const syncPerformanceStartedAt = performance.now();
+    const performancePush = await agent
+      .post('/api/v1/sync/push')
+      .set('x-csrf-token', csrfToken)
+      .set('idempotency-key', uuidv7())
+      .send({
+        organizationId,
+        deviceId: syncDeviceId,
+        operations: Array.from({ length: 100 }, () => ({
+          operationId: uuidv7(),
+          entityType: 'comment',
+          entityId: uuidv7(),
+          operationType: 'comment_append',
+          baseVersion: null,
+          clientCreatedAt: new Date().toISOString(),
+          payload: { projectId: project.body.id, body: 'Performance note' },
+        })),
+      })
+      .expect(201);
+    expect(performancePush.body.results).toHaveLength(100);
+    expect(performance.now() - syncPerformanceStartedAt).toBeLessThan(5_000);
+    const apiReadDurations: number[] = [];
+    for (let sample = 0; sample < 20; sample += 1) {
+      const startedAt = performance.now();
+      await agent
+        .get(`/api/v1/organizations/${organizationId}/work-orders`)
+        .query({ projectId: project.body.id })
+        .expect(200);
+      apiReadDurations.push(performance.now() - startedAt);
+    }
+    apiReadDurations.sort((left, right) => left - right);
+    expect(
+      apiReadDurations[Math.ceil(apiReadDurations.length * 0.95) - 1],
+    ).toBeLessThan(500);
     await agent
       .post('/api/v1/sync/bootstrap')
       .set('x-csrf-token', csrfToken)
@@ -878,6 +912,7 @@ describe('platform integration', () => {
       .expect(400);
     const image = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 1, 2, 3]);
     const offlineMediaId = uuidv7();
+    const uploadSessionStartedAt = performance.now();
     const upload = await agent
       .post(`/api/v1/organizations/${organizationId}/media/upload-sessions`)
       .set('x-csrf-token', csrfToken)
@@ -891,6 +926,7 @@ describe('platform integration', () => {
         entityId: inspection.body.id,
       })
       .expect(201);
+    expect(performance.now() - uploadSessionStartedAt).toBeLessThan(1_000);
     expect(upload.body.mediaId).toBe(offlineMediaId);
     const uploadedPart = await fetch(upload.body.partUrls[0].url as string, {
       method: 'PUT',
@@ -1305,15 +1341,18 @@ describe('platform integration', () => {
         expect(body.defects).toHaveLength(1);
       });
 
+    const reportDate = new Date().toISOString().slice(0, 10);
+    const reportStartedAt = performance.now();
     const report = await agent
       .post(`/api/v1/organizations/${organizationId}/daily-reports`)
       .set('x-csrf-token', csrfToken)
       .send({
         projectId: project.body.id,
-        reportDate: '2026-07-05',
+        reportDate,
         weatherNotes: 'Clear',
       })
       .expect(201);
+    expect(performance.now() - reportStartedAt).toBeLessThan(30_000);
     const revision = await agent
       .patch(
         `/api/v1/organizations/${organizationId}/daily-reports/${report.body.id as string}/revisions`,
@@ -1415,6 +1454,8 @@ describe('platform integration', () => {
       });
 
     const viewerId = uuidv7();
+    const viewerSessionId = uuidv7();
+    const viewerMembershipId = uuidv7();
     const viewerToken = createToken();
     const viewerCsrf = createToken();
     await prisma.user.create({
@@ -1426,7 +1467,7 @@ describe('platform integration', () => {
     });
     await prisma.session.create({
       data: {
-        id: uuidv7(),
+        id: viewerSessionId,
         userId: viewerId,
         tokenHash: hashToken(viewerToken),
         refreshTokenHash: hashToken(createToken()),
@@ -1439,10 +1480,11 @@ describe('platform integration', () => {
       (tx) =>
         tx.membership.create({
           data: {
-            id: uuidv7(),
+            id: viewerMembershipId,
             organizationId,
             userId: viewerId,
             role: 'viewer',
+            isExternal: true,
           },
         }),
     );
@@ -1456,6 +1498,50 @@ describe('platform integration', () => {
       .send({ name: 'Forbidden', code: 'NO-ACCESS', timezone: 'UTC' })
       .expect(403)
       .expect(({ body }) => expect(body.code).toBe('AUTHORIZATION_DENIED'));
+    await request(app.getHttpServer())
+      .post(`/api/v1/organizations/${organizationId}/projects`)
+      .set('Cookie', [
+        `fieldpilot_session=${viewerToken}`,
+        `fieldpilot_csrf=${viewerCsrf}`,
+      ])
+      .send({ name: 'Missing CSRF', code: 'NO-CSRF', timezone: 'UTC' })
+      .expect(403)
+      .expect(({ body }) => expect(body.code).toBe('AUTHORIZATION_DENIED'));
+    await request(app.getHttpServer())
+      .get(`/api/v1/organizations/${organizationId}/assets/${uuidv7()}`)
+      .set('Cookie', `fieldpilot_session=${viewerToken}`)
+      .expect(404);
+    await request(app.getHttpServer())
+      .get(
+        `/api/v1/organizations/${organizationId}/media/${upload.body.mediaId as string}/url`,
+      )
+      .set('Cookie', `fieldpilot_session=${viewerToken}`)
+      .expect(403);
+    await request(app.getHttpServer())
+      .get(`/api/v1/organizations/${organizationId}/work-orders`)
+      .query({ projectId: "' OR 1=1 --" })
+      .set('Cookie', `fieldpilot_session=${viewerToken}`)
+      .expect(400);
+    await tenants.withTenant(
+      { organizationId, userId: registration.body.userId as string },
+      (tx) =>
+        tx.membership.update({
+          where: { id: viewerMembershipId },
+          data: { status: 'revoked' },
+        }),
+    );
+    await request(app.getHttpServer())
+      .get(`/api/v1/organizations/${organizationId}/notifications`)
+      .set('Cookie', `fieldpilot_session=${viewerToken}`)
+      .expect(403);
+    await prisma.session.update({
+      where: { id: viewerSessionId },
+      data: { revokedAt: new Date() },
+    });
+    await request(app.getHttpServer())
+      .get('/api/v1/auth/me')
+      .set('Cookie', `fieldpilot_session=${viewerToken}`)
+      .expect(401);
     const history = await tenants.withTenant(
       {
         organizationId,
@@ -1520,12 +1606,21 @@ describe('platform integration', () => {
       (tx) => tx.outboxEvent.count({ where: { publishedAt: null } }),
     );
     expect(unpublished).toBe(0);
-  }, 60_000);
+  }, 120_000);
 
   it('reports readiness and deduplicates queued jobs', async () => {
     await request(app.getHttpServer())
       .get('/api/v1/health/ready')
       .expect(200, { status: 'ready' });
+    await request(app.getHttpServer())
+      .get('/api/v1/metrics')
+      .expect('Content-Type', /text\/plain/)
+      .expect(200)
+      .expect(({ text }) => {
+        expect(text).toContain('fieldpilot_http_request_duration_seconds');
+        expect(text).toContain('fieldpilot_dependency_up');
+        expect(text).toContain('fieldpilot_queue_jobs');
+      });
     const queues = app.get(QueueService);
     const jobId = `integration-${uuidv7()}`;
     const first = await queues.add(
@@ -1544,6 +1639,33 @@ describe('platform integration', () => {
     expect((await queues.metrics()).notifications.waiting).toBeGreaterThan(0);
   });
 
+  it('retries failed jobs and moves terminal failures to dead letter', async () => {
+    const queues = app.get(QueueService);
+    let attempts = 0;
+    const initialDeadLetters = await queues.deadLetterCount('exports');
+    const worker = queues.startWorker('exports', () => {
+      attempts += 1;
+      throw new Error('failure drill');
+    });
+    await queues.add(
+      'exports',
+      'failure-drill',
+      { organizationId: uuidv7() },
+      `failure-${uuidv7()}`,
+    );
+    const deadline = Date.now() + 25_000;
+    while (
+      (await queues.deadLetterCount('exports')) === initialDeadLetters &&
+      Date.now() < deadline
+    )
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    expect(attempts).toBe(5);
+    expect(await queues.deadLetterCount('exports')).toBeGreaterThan(
+      initialDeadLetters,
+    );
+    await worker.close();
+  }, 30_000);
+
   it('returns request IDs and RFC 7807 errors', async () => {
     const response = await request(app.getHttpServer())
       .get('/api/v1/does-not-exist')
@@ -1551,5 +1673,18 @@ describe('platform integration', () => {
     expect(response.headers['x-request-id']).toBeTruthy();
     expect(response.type).toBe('application/problem+json');
     expect(response.body.code).toBe('RESOURCE_NOT_FOUND');
+  });
+
+  it('sets security headers and rate limits repeated requests', async () => {
+    const first = await request(app.getHttpServer())
+      .get('/api/v1/health')
+      .expect(200);
+    expect(first.headers['x-content-type-options']).toBe('nosniff');
+    let limited = false;
+    for (let attempt = 0; attempt < 110 && !limited; attempt += 1) {
+      const response = await request(app.getHttpServer()).get('/api/v1/health');
+      limited = response.status === 429;
+    }
+    expect(limited).toBe(true);
   });
 });
