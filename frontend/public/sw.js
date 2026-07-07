@@ -1,4 +1,4 @@
-const CACHE = 'fieldpilot-shell-v2';
+const CACHE = 'fieldpilot-shell-v3';
 const SHELL = [
   '/',
   '/sign-in',
@@ -33,11 +33,11 @@ self.addEventListener('fetch', (event) => {
     return;
   event.respondWith(
     fetch(event.request)
-      .then((response) => {
-        if (response.ok)
-          caches
-            .open(CACHE)
-            .then((cache) => cache.put(event.request, response.clone()));
+      .then(async (response) => {
+        if (response.ok) {
+          const cache = await caches.open(CACHE);
+          await cache.put(event.request, response.clone());
+        }
         return response;
       })
       .catch(async () => {

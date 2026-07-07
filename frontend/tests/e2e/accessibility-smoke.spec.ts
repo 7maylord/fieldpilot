@@ -127,10 +127,31 @@ test('field shell reloads from the service-worker cache while offline', async ({
   await page.getByRole('link', { name: 'My work' }).click();
   await expect(page.getByRole('heading', { name: 'My Work' })).toBeVisible();
   await context.setOffline(true);
+  const startedAt = performance.now();
   await page.reload();
+  expect(performance.now() - startedAt).toBeLessThan(1_500);
   await expect(page.getByRole('heading', { name: 'My Work' })).toBeVisible();
   await expect(
     page.getByText('No downloaded work matches this view'),
+  ).toBeVisible();
+  await context.setOffline(false);
+});
+
+test('failed service-worker update keeps the active offline shell', async ({
+  page,
+  context,
+}) => {
+  await page.goto('/field/today');
+  await page.evaluate(() => navigator.serviceWorker.ready);
+  await page.route('**/sw.js', (route) => route.abort());
+  await page.evaluate(async () => {
+    const registration = await navigator.serviceWorker.getRegistration();
+    await registration?.update().catch(() => undefined);
+  });
+  await context.setOffline(true);
+  await page.reload();
+  await expect(
+    page.getByRole('heading', { name: 'Today', exact: true }),
   ).toBeVisible();
   await context.setOffline(false);
 });
