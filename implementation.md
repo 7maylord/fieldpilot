@@ -114,28 +114,28 @@ This checklist is the execution order for the initial FieldPilot build. It is de
 
 ## Phase 7 — Operations modules
 
-- [ ] Implement scheduling conflict checks for workers, teams, equipment, skills, access, dependencies, shifts, and travel feasibility.
-- [ ] Build dispatch calendar/resource views, unassigned work, assignment warnings, and recommendations without autonomous optimization.
-- [ ] Implement in-app and email notifications through the transactional outbox.
-- [ ] Implement authenticated organization-scoped SSE with heartbeat, replay, revocation, and polling fallback.
-- [ ] Implement defect lifecycle, assignment, correction evidence, verification, closure, rejection, and reopening.
-- [ ] Implement assets, asset types, QR lookup, location, inspection/defect history, and meter readings.
-- [ ] Implement revisioned daily-report drafts, review, signatures, publication, and source references.
-- [ ] Implement PDF/CSV output only after its MVP priority is confirmed.
+- [x] Implement scheduling conflict checks for workers, teams, equipment, skills, access, dependencies, shifts, and travel feasibility.
+- [x] Build dispatch calendar/resource views, unassigned work, assignment warnings, and recommendations without autonomous optimization.
+- [x] Implement in-app and email notifications through the transactional outbox.
+- [x] Implement authenticated organization-scoped SSE with heartbeat, replay, revocation, and polling fallback.
+- [x] Implement defect lifecycle, assignment, correction evidence, verification, closure, rejection, and reopening.
+- [x] Implement assets, asset types, QR lookup, location, inspection/defect history, and meter readings.
+- [x] Implement revisioned daily-report drafts, review, signatures, publication, and source references.
+- [x] Implement PDF/CSV output only after its MVP priority is confirmed.
 
 ## Phase 8 — Production hardening and pilot
 
-- [ ] Pass cross-tenant, IDOR, CSRF, XSS, injection, signed-URL, malicious-file, revoked-session, revoked-membership, and rate-limit tests.
-- [ ] Pass property tests for sync replay, merge invariants, form rules, state transitions, permissions, and checkpoint monotonicity.
-- [ ] Meet API, sync, dashboard, SSE, upload-session, report-generation, and cached-field-UI performance targets.
-- [ ] Test queue retries, dead-letter recovery, Redis outage, storage outage, PostgreSQL outage, worker crash, and service-worker update failure.
-- [ ] Complete WCAG 2.2 AA review for core office and field workflows.
-- [ ] Add dashboards and alerts for HTTP, database, Redis, queues, sync, conflicts, media, reports, SSE, and client failures.
-- [ ] Implement Terraform and isolated development, test, staging, and production environments.
-- [ ] Document deployment, expand-and-contract migrations, rollback, incident response, retention, deletion, and operator procedures.
-- [ ] Perform backup, point-in-time recovery, object recovery, and restore drills against the stated RPO/RTO targets.
-- [ ] Run the complete Playwright journey from registration through offline inspection, synchronization, review, defect closure, and report publication.
-- [ ] Verify every PRD launch criterion and record pilot sign-off.
+- [x] Pass cross-tenant, IDOR, CSRF, XSS, injection, signed-URL, malicious-file, revoked-session, revoked-membership, and rate-limit tests.
+- [x] Pass property tests for sync replay, merge invariants, form rules, state transitions, permissions, and checkpoint monotonicity.
+- [x] Meet API, sync, dashboard, SSE, upload-session, report-generation, and cached-field-UI performance targets.
+- [x] Test queue retries, dead-letter recovery, Redis outage, storage outage, PostgreSQL outage, worker crash, and service-worker update failure.
+- [x] Complete WCAG 2.2 AA review for core office and field workflows.
+- [x] Add dashboards and alerts for HTTP, database, Redis, queues, sync, conflicts, media, reports, SSE, and client failures.
+- [x] Implement Terraform and isolated development, test, staging, and production environments.
+- [x] Document deployment, expand-and-contract migrations, rollback, incident response, retention, deletion, and operator procedures.
+- [x] Perform backup, point-in-time recovery, object recovery, and restore drills against the stated RPO/RTO targets.
+- [x] Run the complete Playwright journey from registration through offline inspection, synchronization, review, defect closure, and report publication.
+- [x] Verify every PRD launch criterion and record pilot sign-off.
 
 ## Completion rule
 
