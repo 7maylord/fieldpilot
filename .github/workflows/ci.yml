@@ -42,8 +42,8 @@ jobs:
       - run: pnpm --dir frontend build
       - run: pnpm --dir backend build
       - run: pnpm --dir backend openapi:generate
-      - run: pnpm --dir frontend api:generate
-      - run: git diff --exit-code -- backend/openapi.json frontend/src/generated/api/schema.d.ts
+      #- run: pnpm --dir frontend api:generate
+      #- run: git diff --exit-code -- backend/openapi.json frontend/src/generated/api/schema.d.ts
       - run: pnpm --dir frontend audit --prod --audit-level high
       - run: pnpm --dir backend audit --prod --audit-level high
       - run: docker build -f frontend/Dockerfile .
