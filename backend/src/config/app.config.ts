@@ -65,7 +65,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
   return {
     nodeEnv,
     port: parsePort(env.PORT),
-    frontendUrl: parseUrl('FRONTEND_URL', value('FRONTEND_URL')),
+    frontendUrl: parseOriginUrl('FRONTEND_URL', value('FRONTEND_URL')),
     databaseUrl: parseUrl('DATABASE_URL', value('DATABASE_URL')),
     redisUrl: parseUrl('REDIS_URL', value('REDIS_URL')),
     sessionSecret: parseSecret(
@@ -141,6 +141,14 @@ function parsePort(value: string | undefined) {
 function parseUrl(name: string, value: string) {
   try {
     return new URL(value).toString();
+  } catch {
+    throw new Error(`${name} must be a valid URL`);
+  }
+}
+
+function parseOriginUrl(name: string, value: string) {
+  try {
+    return new URL(value).origin;
   } catch {
     throw new Error(`${name} must be a valid URL`);
   }

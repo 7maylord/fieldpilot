@@ -1,90 +1,175 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
-import { expect, test, type APIRequestContext } from '@playwright/test';
+import {
+  expect,
+  request as playwrightRequest,
+  test,
+  type APIRequestContext,
+  type APIResponse,
+} from '@playwright/test';
 
-const API = 'http://localhost:3011/api/v1';
+const API_ORIGIN = 'http://localhost:3011';
+const API = `${API_ORIGIN}/api/v1`;
 
-test('pilot journey: registration to offline inspection, review, defect closure, and report publication', async ({
+test('Nigerian QA journey: company setup, work orders, offline field sync, defect closure, and report publication', async ({
   context,
   page,
   request,
 }) => {
   test.setTimeout(120_000);
-  const csrfResponse = await request.get(`${API}/auth/csrf`);
-  expect(csrfResponse.ok()).toBe(true);
-  const csrf = (await csrfResponse.json()).csrfToken as string;
-  const post = endpoint(request, 'POST', csrf);
-  const patch = endpoint(request, 'PATCH', csrf);
-  const email = `pilot-${randomUUID()}@example.test`;
+  const runId = randomUUID().slice(0, 8);
   const password = 'correct-horse-battery-staple';
+  const ownerEmail = `amina.balogun.${runId}@ekoqa.example.test`;
+  const fieldEmail = `chinedu.okafor.${runId}@ekoqa.example.test`;
 
-  const registration = await post('/auth/register', { email, password });
-  const verificationToken = execFileSync(
-    'docker',
-    [
-      'compose',
-      'exec',
-      '-T',
-      'postgres',
-      'psql',
-      '-U',
-      'fieldpilot',
-      '-d',
-      'fieldpilot',
-      '-Atc',
-      `SELECT payload->>'verificationToken' FROM identity_outbox_events WHERE user_id = '${registration.userId}' ORDER BY created_at DESC LIMIT 1`,
-    ],
-    { cwd: path.resolve(process.cwd(), '..'), encoding: 'utf8' },
-  ).trim();
-  expect(verificationToken).not.toBe('');
-  await post('/auth/verify-email', { token: verificationToken });
-  await post('/auth/login', { email, password });
+  const owner = await signUp(request, ownerEmail, password);
+  const post = owner.post;
+  const patch = owner.patch;
 
   const organization = await post('/organizations', {
-    name: 'Pilot Team',
-    slug: `pilot-${randomUUID()}`,
+    name: 'Eko Bridge Inspection Ltd',
+    slug: `eko-bridge-${runId}`,
   });
+  await post(`/organizations/${organization.id}/invitations`, {
+    email: fieldEmail,
+    role: 'member',
+  });
+  const fieldApi = await playwrightRequest.newContext();
+  let fieldUserId = '';
+  try {
+    const field = await signUp(fieldApi, fieldEmail, password);
+    fieldUserId = field.registration.userId;
+    await field.post('/invitations/accept', {
+      token: invitationToken(fieldEmail),
+    });
+  } finally {
+    await fieldApi.dispose();
+  }
+  expect(fieldUserId).not.toBe('');
   const team = await post(`/organizations/${organization.id}/teams`, {
-    name: 'Field crew',
+    name: 'Lagos QA Crew',
   });
   await post(`/organizations/${organization.id}/teams/${team.id}/members`, {
-    userId: registration.userId,
+    userId: fieldUserId,
   });
   const project = await post(`/organizations/${organization.id}/projects`, {
-    name: 'Pilot bridge',
-    code: `PILOT-${randomUUID().slice(0, 8).toUpperCase()}`,
+    name: 'Third Mainland Bridge expansion',
+    code: `LAGOS-${runId.toUpperCase()}`,
     timezone: 'Africa/Lagos',
   });
   const site = await post(
     `/organizations/${organization.id}/projects/${project.id}/sites`,
-    { name: 'Main bridge', code: 'SITE-01' },
+    { name: 'Oworonshoki yard', code: 'OWOR-01' },
   );
   const location = await post(
     `/organizations/${organization.id}/projects/${project.id}/sites/${site.id}/locations`,
     {
-      name: 'Pier one',
+      name: 'Ikoyi Pier 4',
       locationType: 'gps_point',
       latitude: 6.5,
       longitude: 3.4,
     },
   );
+  const shiftStartsAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+  const shiftEndsAt = new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString();
   const workOrder = await post(
     `/organizations/${organization.id}/work-orders`,
     {
       projectId: project.id,
       siteId: site.id,
       locationId: location.id,
-      title: 'Inspect pier',
+      title: 'Inspect Ikoyi expansion joint',
       workType: 'inspection',
       priority: 'high',
+      plannedStart: shiftStartsAt,
+      plannedEnd: shiftEndsAt,
       evidenceRequirements: [],
     },
   );
+  await post(
+    `/organizations/${organization.id}/work-orders/schedule-resources`,
+    {
+      resourceType: 'team',
+      resourceId: team.id,
+      name: 'Lagos QA Crew',
+      skills: ['concrete', 'safety'],
+      projectIds: [project.id],
+      shifts: [
+        {
+          startsAt: shiftStartsAt,
+          endsAt: shiftEndsAt,
+        },
+      ],
+    },
+  );
+  await post(
+    `/organizations/${organization.id}/work-orders/${workOrder.id}/assignments`,
+    {
+      version: 1,
+      assigneeType: 'team',
+      assigneeId: team.id,
+    },
+  );
+  const assetType = await post(
+    `/organizations/${organization.id}/assets/types`,
+    {
+      name: 'Batching plant',
+    },
+  );
+  const asset = await post(`/organizations/${organization.id}/assets`, {
+    projectId: project.id,
+    assetTypeId: assetType.id,
+    locationId: location.id,
+    name: 'Dangote concrete pump',
+    qrCode: `EKO-PUMP-${runId.toUpperCase()}`,
+    serialNumber: `LAG-${runId.toUpperCase()}`,
+    manufacturer: 'Innoson Works',
+  });
+
+  expect(owner.cookies.some(({ name }) => name === 'fieldpilot_session')).toBe(
+    true,
+  );
+  await context.addCookies(owner.cookies);
+  await page.goto('/');
+  await expect(
+    page.evaluate(
+      async ({ api, slug }) => {
+        const response = await fetch(`${api}/organizations`, {
+          credentials: 'include',
+        });
+        return response.ok
+          ? (await response.json()).some(
+              (organization: { slug: string }) => organization.slug === slug,
+            )
+          : response.status;
+      },
+      { api: API, slug: organization.slug },
+    ),
+  ).resolves.toBe(true);
+  await page.goto(`/${organization.slug}/projects`);
+  await expect(page.getByText('Third Mainland Bridge expansion')).toBeVisible();
+  await page.goto(`/${organization.slug}/sites`);
+  await expect(page.getByText('Oworonshoki yard')).toBeVisible();
+  await expect(page.getByText('Ikoyi Pier 4')).toBeVisible();
+  await page.goto(`/${organization.slug}/work`);
+  await expect(page.getByText('Inspect Ikoyi expansion joint')).toBeVisible();
+  const uiWorkOrder = 'Repair Apapa scaffold access';
+  await page.getByLabel('Title').fill(uiWorkOrder);
+  await page.getByLabel('Type').fill('repair');
+  await page.getByLabel('Priority').selectOption('critical');
+  await page.getByLabel('Photo').check();
+  await page.getByRole('button', { name: 'Create work order' }).click();
+  await expect(page.getByText(uiWorkOrder)).toBeVisible();
+  await page.goto(`/${organization.slug}/dispatch`);
+  await expect(page.getByText('Lagos QA Crew')).toBeVisible();
+  await page.goto(`/${organization.slug}/assets`);
+  await expect(page.getByText('Dangote concrete pump')).toBeVisible();
+  await expect(page.getByText(asset.qrCode)).toBeVisible();
 
   const schema = {
     schemaVersion: 1,
-    title: 'Pilot inspection',
+    title: 'Lagos concrete QA',
     fields: [
       {
         id: 'temperature',
@@ -96,7 +181,7 @@ test('pilot journey: registration to offline inspection, review, defect closure,
   };
   const template = await post(
     `/organizations/${organization.id}/form-templates`,
-    { name: 'Pilot inspection', schema },
+    { name: 'Lagos concrete QA', schema },
   );
   const formVersionId = template.versions[0].id as string;
   await post(
@@ -114,7 +199,7 @@ test('pilot journey: registration to offline inspection, review, defect closure,
   const deviceId = randomUUID();
   await post(`/organizations/${organization.id}/devices`, {
     deviceId,
-    name: 'Pilot tablet',
+    name: 'Lagos field tablet',
     platform: 'web',
     appVersion: '1.0.0',
   });
@@ -243,7 +328,7 @@ test('pilot journey: registration to offline inspection, review, defect closure,
     inspectionId: inspection.id,
     category: 'quality',
     severity: 'high',
-    title: 'Temperature variance',
+    title: 'Ikoyi pier temperature variance',
   });
   await post(
     `/organizations/${organization.id}/defects/${defect.id}/transitions`,
@@ -269,7 +354,7 @@ test('pilot journey: registration to offline inspection, review, defect closure,
   );
   const evidence = await uploadEvidence(
     request,
-    csrf,
+    owner.csrf,
     organization.id,
     project.id,
     'defect',
@@ -279,8 +364,8 @@ test('pilot journey: registration to offline inspection, review, defect closure,
     `/organizations/${organization.id}/defects/${defect.id}/corrections`,
     {
       version: 4,
-      rootCause: 'Cooling delay',
-      correctiveAction: 'Reworked pour',
+      rootCause: 'Lekki aggregate delivery delay',
+      correctiveAction: 'Reworked pour and verified concrete temperature',
       evidenceIds: [evidence],
     },
   );
@@ -300,12 +385,17 @@ test('pilot journey: registration to offline inspection, review, defect closure,
 
   const report = await post(`/organizations/${organization.id}/daily-reports`, {
     projectId: project.id,
-    reportDate: '2026-07-05',
-    weatherNotes: 'Clear',
+    reportDate: new Date().toISOString().slice(0, 10),
+    weatherNotes: 'Clear Lagos morning',
   });
   await patch(
     `/organizations/${organization.id}/daily-reports/${report.id}/revisions`,
-    { content: { weatherNotes: 'Clear', supervisorNotes: 'Pilot complete' } },
+    {
+      content: {
+        weatherNotes: 'Clear Lagos morning',
+        supervisorNotes: 'Amina Balogun signed off QA checks',
+      },
+    },
   );
   await post(
     `/organizations/${organization.id}/daily-reports/${report.id}/reviews`,
@@ -315,7 +405,7 @@ test('pilot journey: registration to offline inspection, review, defect closure,
   );
   const signature = await uploadEvidence(
     request,
-    csrf,
+    owner.csrf,
     organization.id,
     project.id,
     'daily_report',
@@ -330,6 +420,82 @@ test('pilot journey: registration to offline inspection, review, defect closure,
   );
   expect(published.status).toBe('published');
 });
+
+async function signUp(
+  request: APIRequestContext,
+  email: string,
+  password: string,
+) {
+  const csrfResponse = await request.get(`${API}/auth/csrf`);
+  expect(csrfResponse.ok()).toBe(true);
+  const csrf = (await csrfResponse.json()).csrfToken as string;
+  const post = endpoint(request, 'POST', csrf);
+  const patch = endpoint(request, 'PATCH', csrf);
+  const registration = await post('/auth/register', { email, password });
+  const verificationToken = emailVerificationToken(registration.userId);
+  expect(verificationToken).not.toBe('');
+  await post('/auth/verify-email', { token: verificationToken });
+  const login = await request.fetch(`${API}/auth/login`, {
+    method: 'POST',
+    data: { email, password },
+    headers: { 'x-csrf-token': csrf },
+  });
+  const text = await login.text();
+  expect(login.status(), `POST /auth/login: ${text}`).toBe(201);
+  return { csrf, cookies: responseCookies(login), post, patch, registration };
+}
+
+function responseCookies(response: APIResponse) {
+  return response
+    .headersArray()
+    .filter(({ name }) => name.toLowerCase() === 'set-cookie')
+    .flatMap(({ value }) => {
+      const pair = value.split(';')[0] ?? '';
+      const separator = pair.indexOf('=');
+      return separator > 0
+        ? [
+            {
+              name: pair.slice(0, separator),
+              value: pair.slice(separator + 1),
+              domain: 'localhost',
+              path: '/',
+            },
+          ]
+        : [];
+    });
+}
+
+function emailVerificationToken(userId: string) {
+  return postgresValue(
+    `SELECT payload->>'verificationToken' FROM identity_outbox_events WHERE user_id = '${userId}' ORDER BY created_at DESC LIMIT 1`,
+  );
+}
+
+function invitationToken(email: string) {
+  return postgresValue(
+    `SELECT payload->>'token' FROM outbox_events WHERE event_type = 'membership.invited' AND payload->>'email' = '${email}' ORDER BY created_at DESC LIMIT 1`,
+  );
+}
+
+function postgresValue(sql: string) {
+  return execFileSync(
+    'docker',
+    [
+      'compose',
+      'exec',
+      '-T',
+      'postgres',
+      'psql',
+      '-U',
+      'fieldpilot',
+      '-d',
+      'fieldpilot',
+      '-Atc',
+      sql,
+    ],
+    { cwd: path.resolve(process.cwd(), '..'), encoding: 'utf8' },
+  ).trim();
+}
 
 function endpoint(
   request: APIRequestContext,

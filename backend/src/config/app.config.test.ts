@@ -47,6 +47,14 @@ describe('loadConfig', () => {
     );
   });
 
+  it('normalizes the frontend URL to a browser origin', () => {
+    const config = loadConfig({
+      NODE_ENV: 'development',
+      FRONTEND_URL: 'http://localhost:3100/app',
+    });
+    expect(config.frontendUrl).toBe('http://localhost:3100');
+  });
+
   it('produces a log summary without secrets', () => {
     const config = loadConfig(productionEnv);
     const summary = JSON.stringify(configSummary(config));
