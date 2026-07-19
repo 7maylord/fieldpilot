@@ -184,9 +184,14 @@ export class FormsService {
         const versions = await tx.formVersion.findMany({
           where: { organizationId, id: { in: [leftId, rightId] } },
         });
-        if (versions.length !== 2)
+        const versionsById = new Map(
+          versions.map((version) => [version.id, version]),
+        );
+        const leftVersion = versionsById.get(leftId);
+        const rightVersion = versionsById.get(rightId);
+        if (!leftVersion || !rightVersion)
           throw new NotFoundException('Form version not found');
-        const fields = versions.map(
+        const fields = [leftVersion, rightVersion].map(
           ({ schema }) =>
             new Map(
               ((schema as { fields: { id: string }[] }).fields ?? []).map(

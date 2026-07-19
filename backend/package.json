@@ -19,8 +19,8 @@
     "prisma:generate": "prisma generate",
     "prisma:validate": "DATABASE_URL=postgresql://validation:validation@localhost:5432/validation prisma validate",
     "prisma:migrate": "prisma migrate deploy",
-    "openapi:generate": "tsx scripts/generate-openapi.ts && prettier --write openapi.json",
-    "openapi:check": "pnpm openapi:generate && git diff --exit-code -- openapi.json"
+    "openapi:generate": "pnpm build && node scripts/generate-openapi.mjs && prettier --write openapi.json",
+    "openapi:check": "pnpm openapi:generate && node scripts/check-openapi.mjs && git diff --exit-code -- openapi.json"
   },
   "dependencies": {
     "@nestjs/common": "11.1.27",

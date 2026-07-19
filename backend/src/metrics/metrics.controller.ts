@@ -1,13 +1,18 @@
 import { Body, Controller, Get, Header, Post } from '@nestjs/common';
+import { ApiProperty, ApiTags } from '@nestjs/swagger';
 import { IsIn } from 'class-validator';
 import { Public } from '../auth/auth.decorators';
 import { MetricsService } from './metrics.service';
 
 class ClientFailureDto {
+  @ApiProperty({
+    enum: ['crash', 'sync', 'storage', 'service_worker', 'network'],
+  })
   @IsIn(['crash', 'sync', 'storage', 'service_worker', 'network'])
   kind!: string;
 }
 
+@ApiTags('metrics')
 @Controller('metrics')
 export class MetricsController {
   constructor(private readonly metrics: MetricsService) {}

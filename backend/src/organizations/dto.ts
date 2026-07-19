@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsBoolean,
   IsEmail,
@@ -32,42 +32,51 @@ export class CreateOrganizationDto {
 }
 
 export class InviteMemberDto {
+  @ApiProperty({ example: 'chinedu.okafor@example.test' })
   @IsEmail()
   email!: string;
 
+  @ApiProperty({ enum: roles })
   @IsIn(roles)
   role!: string;
 }
 
 export class AcceptInvitationDto {
+  @ApiProperty()
   @IsString()
   token!: string;
 }
 
 export class UpdateMembershipDto {
+  @ApiProperty({ enum: roles })
   @IsIn(roles)
   role!: string;
 
+  @ApiPropertyOptional()
   @IsOptional()
   @IsBoolean()
   isExternal?: boolean;
 }
 
 export class CreateTeamDto {
+  @ApiProperty()
   @IsString()
   @MinLength(2)
   name!: string;
 }
 
 export class AddTeamMemberDto {
+  @ApiProperty()
   @IsUUID()
   userId!: string;
 }
 
 export class GrantProjectAccessDto {
+  @ApiProperty()
   @IsUUID()
   projectId!: string;
 
+  @ApiProperty()
   @IsUUID()
   userId!: string;
 }

@@ -24,6 +24,7 @@ Local services:
 
 - Frontend: http://localhost:3000
 - API health: http://localhost:3001/api/v1/health
+- API Swagger docs: http://localhost:3001/api/docs
 - PostgreSQL/PostGIS: localhost:5433
 - Redis: localhost:6379
 - MinIO API/console: http://localhost:9000 / http://localhost:9001
@@ -53,8 +54,8 @@ pnpm --dir backend typecheck
 pnpm --dir backend test
 pnpm --dir backend test:integration
 pnpm --dir backend build
-pnpm --dir backend openapi:generate
-pnpm --dir frontend api:generate
+pnpm --dir backend openapi:check
+pnpm --dir frontend api:check
 ```
 
 ## Stop local services

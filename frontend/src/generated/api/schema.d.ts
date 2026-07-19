@@ -11,6 +11,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * Check API health
+     * @description Check API health. This endpoint is public.
+     */
     get: operations['HealthController_check'];
     put?: never;
     post?: never;
@@ -27,6 +31,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * Check API readiness
+     * @description Check API readiness. This endpoint is public.
+     */
     get: operations['HealthController_readiness'];
     put?: never;
     post?: never;
@@ -43,8 +51,16 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * List devices
+     * @description List devices. Requires a valid FieldPilot session cookie.
+     */
     get: operations['DevicesController_list'];
     put?: never;
+    /**
+     * Register device
+     * @description Register device. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['DevicesController_register'];
     delete?: never;
     options?: never;
@@ -61,6 +77,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Update device heartbeat
+     * @description Update device heartbeat. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['DevicesController_heartbeat'];
     delete?: never;
     options?: never;
@@ -77,6 +97,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Renew offline device package
+     * @description Renew offline device package. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['DevicesController_renewPackage'];
     delete?: never;
     options?: never;
@@ -91,6 +115,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * Get device status
+     * @description Get device status. Requires a valid FieldPilot session cookie.
+     */
     get: operations['DevicesController_status'];
     put?: never;
     post?: never;
@@ -109,6 +137,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Revoke device
+     * @description Revoke device. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['DevicesController_revoke'];
     delete?: never;
     options?: never;
@@ -125,6 +157,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Request device purge
+     * @description Request device purge. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['DevicesController_requestPurge'];
     delete?: never;
     options?: never;
@@ -141,6 +177,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Acknowledge device purge
+     * @description Acknowledge device purge. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['DevicesController_acknowledgePurge'];
     delete?: never;
     options?: never;
@@ -155,8 +195,16 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * List defects
+     * @description List defects. Requires a valid FieldPilot session cookie.
+     */
     get: operations['DefectsController_list'];
     put?: never;
+    /**
+     * Create defect
+     * @description Create defect. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['DefectsController_create'];
     delete?: never;
     options?: never;
@@ -173,6 +221,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Assign defect
+     * @description Assign defect. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['DefectsController_assign'];
     delete?: never;
     options?: never;
@@ -189,6 +241,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Transition defect
+     * @description Transition defect. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['DefectsController_transition'];
     delete?: never;
     options?: never;
@@ -205,6 +261,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Record defect correction
+     * @description Record defect correction. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['DefectsController_correct'];
     delete?: never;
     options?: never;
@@ -221,6 +281,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Verify defect correction
+     * @description Verify defect correction. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['DefectsController_verify'];
     delete?: never;
     options?: never;
@@ -235,8 +299,16 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * List form templates
+     * @description List form templates. Requires a valid FieldPilot session cookie.
+     */
     get: operations['FormsController_list'];
     put?: never;
+    /**
+     * Create form template
+     * @description Create form template. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['FormsController_create'];
     delete?: never;
     options?: never;
@@ -257,6 +329,10 @@ export interface paths {
     delete?: never;
     options?: never;
     head?: never;
+    /**
+     * Update form template
+     * @description Update form template. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     patch: operations['FormsController_update'];
     trace?: never;
   };
@@ -269,6 +345,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Publish form template
+     * @description Publish form template. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['FormsController_publish'];
     delete?: never;
     options?: never;
@@ -285,6 +365,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Duplicate form template
+     * @description Duplicate form template. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['FormsController_duplicate'];
     delete?: never;
     options?: never;
@@ -299,6 +383,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * Compare form versions
+     * @description Compare form versions. Requires a valid FieldPilot session cookie.
+     */
     get: operations['FormsController_compare'];
     put?: never;
     post?: never;
@@ -317,6 +405,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Create inspection
+     * @description Create inspection. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['InspectionsController_create'];
     delete?: never;
     options?: never;
@@ -331,6 +423,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * Get inspection
+     * @description Get inspection. Requires a valid FieldPilot session cookie.
+     */
     get: operations['InspectionsController_get'];
     put?: never;
     post?: never;
@@ -353,6 +449,10 @@ export interface paths {
     delete?: never;
     options?: never;
     head?: never;
+    /**
+     * Save inspection draft
+     * @description Save inspection draft. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     patch: operations['InspectionsController_save'];
     trace?: never;
   };
@@ -365,6 +465,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Submit inspection
+     * @description Submit inspection. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['InspectionsController_submit'];
     delete?: never;
     options?: never;
@@ -381,6 +485,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Review inspection
+     * @description Review inspection. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['InspectionsController_review'];
     delete?: never;
     options?: never;
@@ -397,6 +505,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Create media upload session
+     * @description Create media upload session. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['MediaController_create'];
     delete?: never;
     options?: never;
@@ -411,6 +523,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * Resume media upload
+     * @description Resume media upload. Requires a valid FieldPilot session cookie.
+     */
     get: operations['MediaController_resume'];
     put?: never;
     post?: never;
@@ -429,6 +545,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Complete media upload
+     * @description Complete media upload. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['MediaController_complete'];
     delete?: never;
     options?: never;
@@ -443,6 +563,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * Get signed media URL
+     * @description Get signed media URL. Requires a valid FieldPilot session cookie.
+     */
     get: operations['MediaController_url'];
     put?: never;
     post?: never;
@@ -459,6 +583,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * Scrape Prometheus metrics
+     * @description Scrape Prometheus metrics. This endpoint is public.
+     */
     get: operations['MetricsController_scrape'];
     put?: never;
     post?: never;
@@ -477,6 +605,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Record client failure
+     * @description Record client failure. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['MetricsController_clientFailure'];
     delete?: never;
     options?: never;
@@ -491,6 +623,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * Open notification stream
+     * @description Open notification stream. Requires a valid FieldPilot session cookie.
+     */
     get: operations['NotificationsController_openStream'];
     put?: never;
     post?: never;
@@ -507,6 +643,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * List notifications
+     * @description List notifications. Requires a valid FieldPilot session cookie.
+     */
     get: operations['NotificationsController_list'];
     put?: never;
     post?: never;
@@ -529,6 +669,10 @@ export interface paths {
     delete?: never;
     options?: never;
     head?: never;
+    /**
+     * Mark notification as read
+     * @description Mark notification as read. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     patch: operations['NotificationsController_markRead'];
     trace?: never;
   };
@@ -539,8 +683,16 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * List asset types
+     * @description List asset types. Requires a valid FieldPilot session cookie.
+     */
     get: operations['AssetsController_types'];
     put?: never;
+    /**
+     * Create asset type
+     * @description Create asset type. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['AssetsController_createType'];
     delete?: never;
     options?: never;
@@ -555,6 +707,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * Look up asset by QR code
+     * @description Look up asset by QR code. Requires a valid FieldPilot session cookie.
+     */
     get: operations['AssetsController_lookup'];
     put?: never;
     post?: never;
@@ -571,8 +727,16 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * List assets
+     * @description List assets. Requires a valid FieldPilot session cookie.
+     */
     get: operations['AssetsController_list'];
     put?: never;
+    /**
+     * Create asset
+     * @description Create asset. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['AssetsController_create'];
     delete?: never;
     options?: never;
@@ -587,6 +751,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * Get asset
+     * @description Get asset. Requires a valid FieldPilot session cookie.
+     */
     get: operations['AssetsController_get'];
     put?: never;
     post?: never;
@@ -605,6 +773,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Add asset meter reading
+     * @description Add asset meter reading. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['AssetsController_reading'];
     delete?: never;
     options?: never;
@@ -619,6 +791,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * Issue CSRF token
+     * @description Issue CSRF token. This endpoint is public.
+     */
     get: operations['AuthController_csrf'];
     put?: never;
     post?: never;
@@ -637,6 +813,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Register user
+     * @description Register user. This endpoint is public. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['AuthController_register'];
     delete?: never;
     options?: never;
@@ -653,6 +833,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Verify email address
+     * @description Verify email address. This endpoint is public. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['AuthController_verifyEmail'];
     delete?: never;
     options?: never;
@@ -669,6 +853,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Log in
+     * @description Log in. This endpoint is public. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['AuthController_login'];
     delete?: never;
     options?: never;
@@ -685,6 +873,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Refresh auth session
+     * @description Refresh auth session. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['AuthController_refresh'];
     delete?: never;
     options?: never;
@@ -701,6 +893,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Request password reset
+     * @description Request password reset. This endpoint is public. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['AuthController_requestPasswordReset'];
     delete?: never;
     options?: never;
@@ -717,6 +913,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Complete password reset
+     * @description Complete password reset. This endpoint is public. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['AuthController_resetPassword'];
     delete?: never;
     options?: never;
@@ -733,6 +933,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Log out
+     * @description Log out. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['AuthController_logout'];
     delete?: never;
     options?: never;
@@ -747,6 +951,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * List auth sessions
+     * @description List auth sessions. Requires a valid FieldPilot session cookie.
+     */
     get: operations['AuthController_sessions'];
     put?: never;
     post?: never;
@@ -763,6 +971,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * Get current user
+     * @description Get current user. Requires a valid FieldPilot session cookie.
+     */
     get: operations['AuthController_me'];
     put?: never;
     post?: never;
@@ -782,6 +994,10 @@ export interface paths {
     get?: never;
     put?: never;
     post?: never;
+    /**
+     * Revoke auth session
+     * @description Revoke auth session. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     delete: operations['AuthController_revoke'];
     options?: never;
     head?: never;
@@ -795,8 +1011,16 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * List organizations
+     * @description List organizations. Requires a valid FieldPilot session cookie.
+     */
     get: operations['OrganizationsController_list'];
     put?: never;
+    /**
+     * Create organization
+     * @description Create organization. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['OrganizationsController_create'];
     delete?: never;
     options?: never;
@@ -813,6 +1037,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Accept organization invitation
+     * @description Accept organization invitation. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['OrganizationsController_accept'];
     delete?: never;
     options?: never;
@@ -827,6 +1055,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * List organization members
+     * @description List organization members. Requires a valid FieldPilot session cookie.
+     */
     get: operations['OrganizationsController_members'];
     put?: never;
     post?: never;
@@ -843,6 +1075,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * List organization audit events
+     * @description List organization audit events. Requires a valid FieldPilot session cookie.
+     */
     get: operations['OrganizationsController_audit'];
     put?: never;
     post?: never;
@@ -861,6 +1097,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Invite organization member
+     * @description Invite organization member. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['OrganizationsController_invite'];
     delete?: never;
     options?: never;
@@ -881,6 +1121,10 @@ export interface paths {
     delete?: never;
     options?: never;
     head?: never;
+    /**
+     * Update organization membership
+     * @description Update organization membership. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     patch: operations['OrganizationsController_updateMembership'];
     trace?: never;
   };
@@ -893,6 +1137,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Create team
+     * @description Create team. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['OrganizationsController_createTeam'];
     delete?: never;
     options?: never;
@@ -909,6 +1157,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Add team member
+     * @description Add team member. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['OrganizationsController_addTeamMember'];
     delete?: never;
     options?: never;
@@ -925,6 +1177,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Grant project access
+     * @description Grant project access. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['OrganizationsController_grantProjectAccess'];
     delete?: never;
     options?: never;
@@ -939,8 +1195,16 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * List projects
+     * @description List projects. Requires a valid FieldPilot session cookie.
+     */
     get: operations['ProjectsController_list'];
     put?: never;
+    /**
+     * Create project
+     * @description Create project. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['ProjectsController_create'];
     delete?: never;
     options?: never;
@@ -955,12 +1219,20 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * Get project
+     * @description Get project. Requires a valid FieldPilot session cookie.
+     */
     get: operations['ProjectsController_get'];
     put?: never;
     post?: never;
     delete?: never;
     options?: never;
     head?: never;
+    /**
+     * Update project
+     * @description Update project. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     patch: operations['ProjectsController_update'];
     trace?: never;
   };
@@ -973,6 +1245,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Archive project
+     * @description Archive project. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['ProjectsController_archive'];
     delete?: never;
     options?: never;
@@ -987,8 +1263,16 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * List daily reports
+     * @description List daily reports. Requires a valid FieldPilot session cookie.
+     */
     get: operations['ReportsController_list'];
     put?: never;
+    /**
+     * Create daily report
+     * @description Create daily report. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['ReportsController_create'];
     delete?: never;
     options?: never;
@@ -1009,6 +1293,10 @@ export interface paths {
     delete?: never;
     options?: never;
     head?: never;
+    /**
+     * Revise daily report
+     * @description Revise daily report. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     patch: operations['ReportsController_revise'];
     trace?: never;
   };
@@ -1021,6 +1309,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Review daily report
+     * @description Review daily report. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['ReportsController_review'];
     delete?: never;
     options?: never;
@@ -1037,6 +1329,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Sign daily report
+     * @description Sign daily report. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['ReportsController_sign'];
     delete?: never;
     options?: never;
@@ -1053,6 +1349,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Publish daily report
+     * @description Publish daily report. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['ReportsController_publish'];
     delete?: never;
     options?: never;
@@ -1067,6 +1367,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * Export daily report PDF
+     * @description Export daily report PDF. Requires a valid FieldPilot session cookie.
+     */
     get: operations['ReportsController_pdf'];
     put?: never;
     post?: never;
@@ -1083,6 +1387,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * Export daily report CSV
+     * @description Export daily report CSV. Requires a valid FieldPilot session cookie.
+     */
     get: operations['ReportsController_csv'];
     put?: never;
     post?: never;
@@ -1099,8 +1407,16 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * List sites
+     * @description List sites. Requires a valid FieldPilot session cookie.
+     */
     get: operations['SitesController_listSites'];
     put?: never;
+    /**
+     * Create site
+     * @description Create site. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['SitesController_createSite'];
     delete?: never;
     options?: never;
@@ -1115,8 +1431,16 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * List locations
+     * @description List locations. Requires a valid FieldPilot session cookie.
+     */
     get: operations['SitesController_listLocations'];
     put?: never;
+    /**
+     * Create location
+     * @description Create location. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['SitesController_createLocation'];
     delete?: never;
     options?: never;
@@ -1131,6 +1455,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * List locations in viewport
+     * @description List locations in viewport. Requires a valid FieldPilot session cookie.
+     */
     get: operations['SitesController_viewport'];
     put?: never;
     post?: never;
@@ -1149,6 +1477,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Bootstrap offline sync package
+     * @description Bootstrap offline sync package. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['SyncController_bootstrap'];
     delete?: never;
     options?: never;
@@ -1165,6 +1497,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Push sync changes
+     * @description Push sync changes. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['SyncController_push'];
     delete?: never;
     options?: never;
@@ -1181,6 +1517,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Pull sync changes
+     * @description Pull sync changes. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['SyncController_pull'];
     delete?: never;
     options?: never;
@@ -1195,6 +1535,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * List sync conflicts
+     * @description List sync conflicts. Requires a valid FieldPilot session cookie.
+     */
     get: operations['SyncController_conflicts'];
     put?: never;
     post?: never;
@@ -1213,6 +1557,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Resolve sync conflict
+     * @description Resolve sync conflict. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['SyncController_resolve'];
     delete?: never;
     options?: never;
@@ -1227,8 +1575,16 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * List work orders
+     * @description List work orders. Requires a valid FieldPilot session cookie.
+     */
     get: operations['WorkOrdersController_list'];
     put?: never;
+    /**
+     * Create work order
+     * @description Create work order. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['WorkOrdersController_create'];
     delete?: never;
     options?: never;
@@ -1243,6 +1599,10 @@ export interface paths {
       path?: never;
       cookie?: never;
     };
+    /**
+     * Get dispatch board
+     * @description Get dispatch board. Requires a valid FieldPilot session cookie.
+     */
     get: operations['WorkOrdersController_dispatch'];
     put?: never;
     post?: never;
@@ -1261,6 +1621,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Assign work order
+     * @description Assign work order. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['WorkOrdersController_assign'];
     delete?: never;
     options?: never;
@@ -1277,6 +1641,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Upsert schedule resource
+     * @description Upsert schedule resource. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['WorkOrdersController_upsertScheduleResource'];
     delete?: never;
     options?: never;
@@ -1293,6 +1661,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Check work-order schedule
+     * @description Check work-order schedule. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['WorkOrdersController_checkSchedule'];
     delete?: never;
     options?: never;
@@ -1309,6 +1681,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Add work-order dependency
+     * @description Add work-order dependency. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['WorkOrdersController_dependency'];
     delete?: never;
     options?: never;
@@ -1325,6 +1701,10 @@ export interface paths {
     };
     get?: never;
     put?: never;
+    /**
+     * Transition work order
+     * @description Transition work order. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.
+     */
     post: operations['WorkOrdersController_transition'];
     delete?: never;
     options?: never;
@@ -1335,7 +1715,413 @@ export interface paths {
 }
 export type webhooks = Record<string, never>;
 export interface components {
-  schemas: never;
+  schemas: {
+    RegisterDeviceDto: {
+      deviceId: string;
+      name: string;
+      /** @enum {string} */
+      platform: 'web' | 'ios' | 'android';
+      /** @example 1.2.3 */
+      appVersion: string;
+    };
+    UpdateDeviceVersionDto: {
+      /** @example 1.2.3 */
+      appVersion: string;
+    };
+    CreateDefectDto: {
+      projectId: string;
+      locationId?: string;
+      inspectionId?: string;
+      workOrderId?: string;
+      assetId?: string;
+      category: string;
+      /** @enum {string} */
+      severity: 'low' | 'medium' | 'high' | 'critical';
+      title: string;
+      description?: string;
+      dueAt?: string;
+    };
+    AssignDefectDto: {
+      version: number;
+      /** @enum {string} */
+      assigneeType: 'user' | 'team' | 'external';
+      assigneeId: string;
+    };
+    TransitionDefectDto: {
+      version: number;
+      /** @enum {string} */
+      status:
+        | 'reported'
+        | 'triaged'
+        | 'assigned'
+        | 'correction_in_progress'
+        | 'ready_for_verification'
+        | 'verified'
+        | 'closed'
+        | 'reopened'
+        | 'deferred'
+        | 'cancelled';
+      comment?: string;
+    };
+    SubmitCorrectionDto: {
+      version: number;
+      rootCause: string;
+      correctiveAction: string;
+      evidenceIds: string[];
+    };
+    VerifyCorrectionDto: {
+      version: number;
+      correctionId: string;
+      /** @enum {string} */
+      decision: 'verified' | 'rejected';
+      comment?: string;
+    };
+    CreateFormTemplateDto: {
+      name: string;
+      description?: string;
+      schema: Record<string, never>;
+    };
+    UpdateFormDraftDto: {
+      name?: string;
+      description?: string;
+      schema: Record<string, never>;
+    };
+    DuplicateFormTemplateDto: {
+      name: string;
+    };
+    CreateInspectionDto: {
+      projectId: string;
+      workOrderId?: string;
+      assetId?: string;
+      formVersionId: string;
+      /** @enum {string} */
+      inspectionType:
+        | 'quality'
+        | 'safety'
+        | 'asset'
+        | 'pre_work'
+        | 'completion'
+        | 'reinspection'
+        | 'hold_point'
+        | 'witness_point';
+    };
+    SaveInspectionDraftDto: {
+      version: number;
+      answers: Record<string, never>;
+    };
+    SubmitInspectionDto: {
+      version: number;
+      answers: Record<string, never>;
+      /** @enum {string} */
+      outcome:
+        | 'passed'
+        | 'passed_with_observations'
+        | 'failed'
+        | 'incomplete'
+        | 'not_applicable';
+    };
+    ReviewInspectionDto: {
+      /** @enum {string} */
+      decision: 'approve' | 'reject' | 'clarification';
+      comment?: string;
+    };
+    CreateUploadSessionDto: {
+      mediaId?: string;
+      projectId: string;
+      /** @enum {string} */
+      mimeType: 'image/jpeg' | 'image/png' | 'application/pdf' | 'video/mp4';
+      byteSize: number;
+      sha256: string;
+      entityType: string;
+      entityId: string;
+      sourceMediaId?: string;
+      /** @enum {string} */
+      derivativeType?: 'thumbnail' | 'compressed';
+    };
+    UploadedPartDto: {
+      partNumber: number;
+      etag: string;
+    };
+    CompleteUploadDto: {
+      parts: components['schemas']['UploadedPartDto'][];
+    };
+    ClientFailureDto: {
+      /** @enum {string} */
+      kind: 'crash' | 'sync' | 'storage' | 'service_worker' | 'network';
+    };
+    CreateAssetTypeDto: {
+      name: string;
+      description?: string;
+    };
+    CreateAssetDto: {
+      projectId: string;
+      assetTypeId: string;
+      locationId?: string;
+      name: string;
+      qrCode: string;
+      serialNumber?: string;
+      model?: string;
+      manufacturer?: string;
+      /** @enum {string} */
+      status?: 'active' | 'inactive' | 'maintenance' | 'retired';
+    };
+    CreateMeterReadingDto: {
+      meterType: string;
+      value: number;
+      unit: string;
+      recordedAt: string;
+    };
+    RegisterDto: {
+      /** @example worker@example.com */
+      email: string;
+      password: string;
+    };
+    TokenDto: {
+      token: string;
+    };
+    LoginDto: {
+      /** @example worker@example.com */
+      email: string;
+      password: string;
+    };
+    RequestPasswordResetDto: {
+      email: string;
+    };
+    ResetPasswordDto: {
+      token: string;
+      password: string;
+    };
+    CreateOrganizationDto: {
+      name: string;
+      /** @example north-site */
+      slug: string;
+    };
+    AcceptInvitationDto: {
+      token: string;
+    };
+    InviteMemberDto: {
+      /** @example chinedu.okafor@example.test */
+      email: string;
+      /** @enum {string} */
+      role:
+        | 'owner'
+        | 'admin'
+        | 'manager'
+        | 'coordinator'
+        | 'member'
+        | 'viewer'
+        | 'external';
+    };
+    UpdateMembershipDto: {
+      /** @enum {string} */
+      role:
+        | 'owner'
+        | 'admin'
+        | 'manager'
+        | 'coordinator'
+        | 'member'
+        | 'viewer'
+        | 'external';
+      isExternal?: boolean;
+    };
+    CreateTeamDto: {
+      name: string;
+    };
+    AddTeamMemberDto: {
+      userId: string;
+    };
+    GrantProjectAccessDto: {
+      projectId: string;
+      userId: string;
+    };
+    CreateProjectDto: {
+      name: string;
+      code: string;
+      /** @example Africa/Lagos */
+      timezone: string;
+      description?: string;
+      client?: string;
+      startDate?: string;
+      endDate?: string;
+      address?: string;
+    };
+    UpdateProjectDto: {
+      version: number;
+      name?: string;
+      /** @enum {string} */
+      status?: 'draft' | 'active' | 'paused' | 'completed' | 'archived';
+      timezone?: string;
+      description?: string;
+      client?: string;
+      startDate?: string;
+      endDate?: string;
+      address?: string;
+    };
+    ArchiveProjectDto: {
+      version: number;
+    };
+    CreateDailyReportDto: {
+      projectId: string;
+      reportDate: string;
+      weatherNotes?: string;
+      supervisorNotes?: string;
+    };
+    CreateReportRevisionDto: {
+      content: Record<string, never>;
+    };
+    ReviewReportDto: {
+      /** @enum {string} */
+      decision: 'approved' | 'rejected';
+      comment?: string;
+    };
+    SignReportDto: {
+      mediaId: string;
+    };
+    CreateSiteDto: {
+      name: string;
+      code: string;
+    };
+    CreateLocationDto: {
+      name: string;
+      /** @enum {string} */
+      locationType:
+        | 'site'
+        | 'zone'
+        | 'building'
+        | 'floor'
+        | 'room'
+        | 'road_segment'
+        | 'chainage_section'
+        | 'structure'
+        | 'pipeline_segment'
+        | 'asset_location'
+        | 'gps_point'
+        | 'polygon';
+      parentId?: string;
+      latitude?: number;
+      longitude?: number;
+      chainageStart?: number;
+      chainageEnd?: number;
+    };
+    Object: Record<string, never>;
+    SyncBootstrapDto: {
+      deviceId: string;
+      organizationId: string;
+      projectIds: string[];
+      lastCheckpoint?: Record<string, never> | null;
+    };
+    SyncOperationDto: {
+      operationId: string;
+      entityType: string;
+      entityId: string;
+      operationType: string;
+      baseVersion?: Record<string, never> | null;
+      clientCreatedAt: string;
+      payload: Record<string, never>;
+    };
+    SyncPushDto: {
+      organizationId: string;
+      deviceId: string;
+      operations: components['schemas']['SyncOperationDto'][];
+    };
+    SyncPullDto: {
+      organizationId: string;
+      deviceId: string;
+      checkpoint: string;
+      /** @default 500 */
+      limit: Record<string, never>;
+    };
+    ResolveConflictDto: {
+      organizationId: string;
+      resolution: Record<string, never>;
+    };
+    CreateWorkOrderDto: {
+      projectId: string;
+      siteId?: string;
+      locationId?: string;
+      title: string;
+      description?: string;
+      workType: string;
+      /** @enum {string} */
+      priority: 'low' | 'medium' | 'high' | 'critical';
+      plannedStart?: string;
+      plannedEnd?: string;
+      dueAt?: string;
+      estimatedMinutes?: number;
+      requiredSkills?: string[];
+      evidenceRequirements?: string[];
+      completionRules?: Record<string, never>;
+      checklistId?: string;
+    };
+    AssignWorkOrderDto: {
+      version: number;
+      /** @enum {string} */
+      assigneeType: 'user' | 'team' | 'equipment';
+      assigneeId: string;
+    };
+    ScheduleWindowDto: {
+      startsAt: string;
+      endsAt: string;
+    };
+    UpsertScheduleResourceDto: {
+      /** @enum {string} */
+      resourceType: 'user' | 'team' | 'equipment';
+      resourceId: string;
+      name: string;
+      skills?: string[];
+      projectIds?: string[];
+      shifts?: components['schemas']['ScheduleWindowDto'][];
+      blackouts?: components['schemas']['ScheduleWindowDto'][];
+      travelSpeedKph?: Record<string, never>;
+    };
+    CheckScheduleDto: {
+      /** @enum {string} */
+      assigneeType: 'user' | 'team' | 'equipment';
+      assigneeId: string;
+    };
+    AddDependencyDto: {
+      version: number;
+      prerequisiteWorkOrderId: string;
+    };
+    TransitionWorkOrderDto: {
+      version: number;
+      /** @enum {string} */
+      status:
+        | 'draft'
+        | 'scheduled'
+        | 'assigned'
+        | 'accepted'
+        | 'in_progress'
+        | 'blocked'
+        | 'submitted'
+        | 'under_review'
+        | 'completed'
+        | 'cancelled';
+    };
+    ProblemDetails: {
+      /**
+       * Format: uri
+       * @example https://fieldpilot.dev/problems/validation-error
+       */
+      type: string;
+      /** @example BAD_REQUEST */
+      title: string;
+      /** @example 400 */
+      status: number;
+      /** @example VALIDATION_ERROR */
+      code: string;
+      /** @example Request failed. */
+      detail: string;
+      /** @example /api/v1/organizations */
+      instance: string;
+      /** @example 019f7653-09e4-73ec-ac65 */
+      requestId?: string;
+    };
+    JsonObject: {
+      [key: string]: unknown;
+    };
+    JsonArray: components['schemas']['JsonObject'][];
+  };
   responses: never;
   parameters: never;
   requestBodies: never;
@@ -1353,11 +2139,14 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
+      /** @description Request succeeded. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonArray'];
+        };
       };
     };
   };
@@ -1370,11 +2159,14 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
+      /** @description Request succeeded. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
       };
     };
   };
@@ -1382,67 +2174,364 @@ export interface operations {
     parameters: {
       query?: never;
       header?: never;
-      path?: never;
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Request succeeded. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonArray'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   DevicesController_register: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RegisterDeviceDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   DevicesController_heartbeat: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Device UUID. */
+        deviceId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateDeviceVersionDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   DevicesController_renewPackage: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Device UUID. */
+        deviceId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
@@ -1450,169 +2539,922 @@ export interface operations {
     parameters: {
       query?: never;
       header?: never;
-      path?: never;
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Device UUID. */
+        deviceId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Request succeeded. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   DevicesController_revoke: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Device UUID. */
+        deviceId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   DevicesController_requestPurge: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Device UUID. */
+        deviceId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   DevicesController_acknowledgePurge: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Device UUID. */
+        deviceId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   DefectsController_list: {
     parameters: {
-      query?: never;
+      query: {
+        /** @description Project UUID. */
+        projectId: string;
+      };
       header?: never;
-      path?: never;
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Request succeeded. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonArray'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   DefectsController_create: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateDefectDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   DefectsController_assign: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description defect id */
+        defectId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AssignDefectDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   DefectsController_transition: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description defect id */
+        defectId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TransitionDefectDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   DefectsController_correct: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description defect id */
+        defectId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SubmitCorrectionDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   DefectsController_verify: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description defect id */
+        defectId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['VerifyCorrectionDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
@@ -1620,118 +3462,643 @@ export interface operations {
     parameters: {
       query?: never;
       header?: never;
-      path?: never;
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Request succeeded. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonArray'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   FormsController_create: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateFormTemplateDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   FormsController_update: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Form-template UUID. */
+        templateId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateFormDraftDto'];
+      };
+    };
     responses: {
+      /** @description Resource updated. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   FormsController_publish: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Form-template UUID. */
+        templateId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   FormsController_duplicate: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Form-template UUID. */
+        templateId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['DuplicateFormTemplateDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   FormsController_compare: {
     parameters: {
-      query?: never;
+      query: {
+        /** @description Comparison form-version UUID. */
+        otherVersionId: string;
+      };
       header?: never;
-      path?: never;
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Form-version UUID. */
+        versionId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Request succeeded. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   InspectionsController_create: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateInspectionDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
@@ -1739,84 +4106,465 @@ export interface operations {
     parameters: {
       query?: never;
       header?: never;
-      path?: never;
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description inspection id */
+        inspectionId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Request succeeded. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   InspectionsController_save: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description inspection id */
+        inspectionId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SaveInspectionDraftDto'];
+      };
+    };
     responses: {
+      /** @description Resource updated. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   InspectionsController_submit: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description inspection id */
+        inspectionId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SubmitInspectionDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   InspectionsController_review: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description inspection id */
+        inspectionId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ReviewInspectionDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   MediaController_create: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateUploadSessionDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
@@ -1824,33 +4572,182 @@ export interface operations {
     parameters: {
       query?: never;
       header?: never;
-      path?: never;
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Session or upload-session UUID. */
+        sessionId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Request succeeded. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   MediaController_complete: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Session or upload-session UUID. */
+        sessionId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CompleteUploadDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
@@ -1858,16 +4755,87 @@ export interface operations {
     parameters: {
       query?: never;
       header?: never;
-      path?: never;
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Media object UUID. */
+        mediaId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Request succeeded. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
@@ -1880,28 +4848,149 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
+      /** @description Prometheus metrics text. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'text/plain; version=0.0.4; charset=utf-8': string;
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   MetricsController_clientFailure: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
       path?: never;
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ClientFailureDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
@@ -1909,16 +4998,85 @@ export interface operations {
     parameters: {
       query?: never;
       header?: never;
-      path?: never;
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Server-sent event stream opened. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'text/event-stream': string;
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
@@ -1926,33 +5084,176 @@ export interface operations {
     parameters: {
       query?: never;
       header?: never;
-      path?: never;
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Request succeeded. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonArray'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   NotificationsController_markRead: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Notification UUID. */
+        notificationId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Resource updated. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
@@ -1960,33 +5261,178 @@ export interface operations {
     parameters: {
       query?: never;
       header?: never;
-      path?: never;
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Request succeeded. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonArray'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   AssetsController_createType: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateAssetTypeDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
@@ -1994,50 +5440,269 @@ export interface operations {
     parameters: {
       query?: never;
       header?: never;
-      path?: never;
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Asset QR code. */
+        qrCode: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Request succeeded. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   AssetsController_list: {
     parameters: {
-      query?: never;
+      query: {
+        /** @description Project UUID. */
+        projectId: string;
+      };
       header?: never;
-      path?: never;
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Request succeeded. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonArray'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   AssetsController_create: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateAssetDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
@@ -2045,33 +5710,182 @@ export interface operations {
     parameters: {
       query?: never;
       header?: never;
-      path?: never;
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Asset UUID. */
+        assetId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Request succeeded. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   AssetsController_reading: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Asset UUID. */
+        assetId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateMeterReadingDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
@@ -2084,130 +5898,591 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
+      /** @description Request succeeded. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   AuthController_register: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
       path?: never;
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RegisterDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   AuthController_verifyEmail: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
       path?: never;
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TokenDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   AuthController_login: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
       path?: never;
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['LoginDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   AuthController_refresh: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
       path?: never;
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   AuthController_requestPasswordReset: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
       path?: never;
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RequestPasswordResetDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   AuthController_resetPassword: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
       path?: never;
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ResetPasswordDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   AuthController_logout: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
       path?: never;
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
@@ -2220,11 +6495,77 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
+      /** @description Request succeeded. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonArray'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
@@ -2237,28 +6578,166 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
+      /** @description Request succeeded. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   AuthController_revoke: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Session or upload-session UUID. */
+        sessionId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Resource revoked or removed. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
@@ -2271,45 +6750,257 @@ export interface operations {
     };
     requestBody?: never;
     responses: {
+      /** @description Request succeeded. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonArray'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   OrganizationsController_create: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
       path?: never;
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateOrganizationDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   OrganizationsController_accept: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
       path?: never;
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AcceptInvitationDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
@@ -2317,16 +7008,85 @@ export interface operations {
     parameters: {
       query?: never;
       header?: never;
-      path?: never;
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Request succeeded. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonArray'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
@@ -2334,101 +7094,554 @@ export interface operations {
     parameters: {
       query?: never;
       header?: never;
-      path?: never;
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Request succeeded. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonArray'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   OrganizationsController_invite: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['InviteMemberDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   OrganizationsController_updateMembership: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Membership UUID. */
+        membershipId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateMembershipDto'];
+      };
+    };
     responses: {
+      /** @description Resource updated. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   OrganizationsController_createTeam: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateTeamDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   OrganizationsController_addTeamMember: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description team id */
+        teamId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AddTeamMemberDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   OrganizationsController_grantProjectAccess: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['GrantProjectAccessDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
@@ -2436,33 +7649,178 @@ export interface operations {
     parameters: {
       query?: never;
       header?: never;
-      path?: never;
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Request succeeded. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonArray'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   ProjectsController_create: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateProjectDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
@@ -2470,152 +7828,835 @@ export interface operations {
     parameters: {
       query?: never;
       header?: never;
-      path?: never;
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Project UUID. */
+        projectId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Request succeeded. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   ProjectsController_update: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Project UUID. */
+        projectId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateProjectDto'];
+      };
+    };
     responses: {
+      /** @description Resource updated. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   ProjectsController_archive: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Project UUID. */
+        projectId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ArchiveProjectDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   ReportsController_list: {
     parameters: {
-      query?: never;
+      query: {
+        /** @description Project UUID. */
+        projectId: string;
+      };
       header?: never;
-      path?: never;
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Request succeeded. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonArray'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   ReportsController_create: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateDailyReportDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   ReportsController_revise: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Daily report UUID. */
+        reportId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateReportRevisionDto'];
+      };
+    };
     responses: {
+      /** @description Resource updated. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   ReportsController_review: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Daily report UUID. */
+        reportId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ReviewReportDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   ReportsController_sign: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Daily report UUID. */
+        reportId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SignReportDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   ReportsController_publish: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Daily report UUID. */
+        reportId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
@@ -2623,16 +8664,87 @@ export interface operations {
     parameters: {
       query?: never;
       header?: never;
-      path?: never;
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Daily report UUID. */
+        reportId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description PDF report bytes. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/pdf': string;
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
@@ -2640,16 +8752,87 @@ export interface operations {
     parameters: {
       query?: never;
       header?: never;
-      path?: never;
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Daily report UUID. */
+        reportId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description CSV report bytes. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'text/csv': string;
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
@@ -2657,33 +8840,182 @@ export interface operations {
     parameters: {
       query?: never;
       header?: never;
-      path?: never;
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Project UUID. */
+        projectId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Request succeeded. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonArray'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   SitesController_createSite: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Project UUID. */
+        projectId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateSiteDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
@@ -2691,271 +9023,1478 @@ export interface operations {
     parameters: {
       query?: never;
       header?: never;
-      path?: never;
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Project UUID. */
+        projectId: string;
+        /** @description Site UUID. */
+        siteId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Request succeeded. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonArray'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   SitesController_createLocation: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Project UUID. */
+        projectId: string;
+        /** @description Site UUID. */
+        siteId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateLocationDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   SitesController_viewport: {
     parameters: {
-      query?: never;
+      query: {
+        /** @description west */
+        west: number;
+        /** @description south */
+        south: number;
+        /** @description east */
+        east: number;
+        /** @description north */
+        north: number;
+        /** @description limit */
+        limit?: components['schemas']['Object'];
+      };
       header?: never;
-      path?: never;
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Project UUID. */
+        projectId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Request succeeded. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonArray'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   SyncController_bootstrap: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
       path?: never;
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SyncBootstrapDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   SyncController_push: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
       path?: never;
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SyncPushDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   SyncController_pull: {
     parameters: {
       query?: never;
-      header?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
       path?: never;
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SyncPullDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   SyncController_conflicts: {
     parameters: {
-      query?: never;
+      query: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+      };
       header?: never;
       path?: never;
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Request succeeded. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonArray'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   SyncController_resolve: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Sync conflict UUID. */
+        conflictId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ResolveConflictDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   WorkOrdersController_list: {
     parameters: {
-      query?: never;
+      query: {
+        /** @description Project UUID. */
+        projectId: string;
+      };
       header?: never;
-      path?: never;
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Request succeeded. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonArray'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   WorkOrdersController_create: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateWorkOrderDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   WorkOrdersController_dispatch: {
     parameters: {
-      query?: never;
+      query: {
+        /** @description Project UUID. */
+        projectId: string;
+      };
       header?: never;
-      path?: never;
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+      };
       cookie?: never;
     };
     requestBody?: never;
     responses: {
+      /** @description Request succeeded. */
       200: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   WorkOrdersController_assign: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Work-order UUID. */
+        workOrderId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AssignWorkOrderDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   WorkOrdersController_upsertScheduleResource: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpsertScheduleResourceDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   WorkOrdersController_checkSchedule: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Work-order UUID. */
+        workOrderId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CheckScheduleDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   WorkOrdersController_dependency: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Work-order UUID. */
+        workOrderId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AddDependencyDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
   WorkOrdersController_transition: {
     parameters: {
       query?: never;
-      header?: never;
-      path?: never;
+      header: {
+        /** @description Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie. */
+        'x-csrf-token': string;
+      };
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+        /** @description Work-order UUID. */
+        workOrderId: string;
+      };
       cookie?: never;
     };
-    requestBody?: never;
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TransitionWorkOrderDto'];
+      };
+    };
     responses: {
+      /** @description Resource created or workflow action applied. */
       201: {
         headers: {
           [name: string]: unknown;
         };
-        content?: never;
+        content: {
+          'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
       };
     };
   };
