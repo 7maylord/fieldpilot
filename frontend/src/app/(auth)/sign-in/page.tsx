@@ -3,17 +3,20 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { apiRequest } from '../../../lib/api';
 
 const signInSchema = z.object({
   email: z.email('Enter a valid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
+  password: z.string().min(12, 'Password must be at least 12 characters'),
 });
 type SignInInput = z.infer<typeof signInSchema>;
 
 export default function SignInPage() {
   const router = useRouter();
+  const [error, setError] = useState('');
   const {
     register,
     handleSubmit,
@@ -25,7 +28,21 @@ export default function SignInPage() {
         <h1>Welcome back</h1>
         <p>Sign in to your FieldPilot workspace.</p>
         <form
-          onSubmit={handleSubmit(async () => router.push('/organizations'))}
+          onSubmit={handleSubmit(async (input) => {
+            setError('');
+            try {
+              await apiRequest('/auth/login', {
+                method: 'POST',
+                body: JSON.stringify(input),
+              });
+              router.push('/organizations');
+              router.refresh();
+            } catch (caught) {
+              setError(
+                caught instanceof Error ? caught.message : 'Sign in failed',
+              );
+            }
+          })}
           noValidate
         >
           <label>
@@ -55,9 +72,16 @@ export default function SignInPage() {
           <button type="submit" disabled={isSubmitting}>
             {isSubmitting ? 'Signing in…' : 'Sign in'}
           </button>
+          {error && (
+            <p className="field-error" role="alert">
+              {error}
+            </p>
+          )}
         </form>
         <p>
-          <Link href="#">Forgot your password?</Link>
+          <Link href="/reset-password">Forgot your password?</Link>
+          {' · '}
+          <Link href="/sign-up">Create an account</Link>
         </p>
       </section>
     </main>

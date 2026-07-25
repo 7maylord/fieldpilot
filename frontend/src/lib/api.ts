@@ -14,15 +14,31 @@ export async function apiRequest<T>(
     if (!csrf.ok) throw new Error(`CSRF request failed (${csrf.status})`);
     csrfToken = ((await csrf.json()) as { csrfToken: string }).csrfToken;
   }
+  const headers = new Headers(init?.headers);
+  if (
+    init?.body &&
+    !(init.body instanceof FormData) &&
+    !headers.has('content-type')
+  )
+    headers.set('content-type', 'application/json');
   const response = await fetch(`${apiBase}${path}`, {
+    ...init,
     credentials: 'include',
     headers: {
-      'content-type': 'application/json',
       ...(csrfToken ? { 'x-csrf-token': csrfToken } : {}),
-      ...init?.headers,
+      ...Object.fromEntries(headers.entries()),
     },
-    ...init,
   });
-  if (!response.ok) throw new Error(`API request failed (${response.status})`);
-  return response.json() as Promise<T>;
+  const text = await response.text();
+  if (!response.ok) throw new Error(errorMessage(response.status, text));
+  return (text ? JSON.parse(text) : undefined) as T;
+}
+
+function errorMessage(status: number, text: string) {
+  try {
+    const body = JSON.parse(text) as { detail?: string; message?: string };
+    return body.detail ?? body.message ?? `API request failed (${status})`;
+  } catch {
+    return text || `API request failed (${status})`;
+  }
 }

@@ -38,7 +38,7 @@ export function LandingPage() {
             and bring every update safely back into sync.
           </p>
           <div className="hero-actions">
-            <Link className="primary" href="/sign-in">
+            <Link className="primary" href="/sign-up">
               Get started
             </Link>
             <a className="secondary" href="#workflow">
@@ -121,7 +121,7 @@ export function LandingPage() {
           Coordinate teams, dispatch work, capture inspections, and review
           results through one dependable office-and-field experience.
         </p>
-        <Link className="primary" href="/sign-in">
+        <Link className="primary" href="/sign-up">
           Open FieldPilot
         </Link>
       </section>
