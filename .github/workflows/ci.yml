@@ -61,10 +61,19 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-          cache-dependency-path: frontend/pnpm-lock.yaml
+          cache-dependency-path: |
+            frontend/pnpm-lock.yaml
+            backend/pnpm-lock.yaml
       - run: pnpm --dir frontend install --frozen-lockfile
+      - run: pnpm --dir backend install --frozen-lockfile
+      - run: docker compose up -d --wait postgres redis minio mailpit clamav
+      - run: pnpm --dir backend prisma:migrate
+        env:
+          DATABASE_URL: postgresql://fieldpilot:fieldpilot@localhost:5433/fieldpilot
       - run: pnpm --dir frontend exec playwright install --with-deps chromium
       - run: pnpm --dir frontend test:e2e
+      - if: always()
+        run: docker compose down -v
 
   secret-scan:
     runs-on: ubuntu-latest

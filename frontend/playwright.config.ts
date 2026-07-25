@@ -13,7 +13,7 @@ export default defineConfig({
     },
     {
       command:
-        'NEXT_PUBLIC_API_URL=http://localhost:3011/api/v1 pnpm build && NEXT_PUBLIC_API_URL=http://localhost:3011/api/v1 pnpm start --port 3100',
+        'NEXT_PUBLIC_API_URL=http://localhost:3011/api/v1 pnpm build && cp -R public .next/standalone/public && cp -R .next/static .next/standalone/.next/static && PORT=3100 HOSTNAME=0.0.0.0 NEXT_PUBLIC_API_URL=http://localhost:3011/api/v1 node .next/standalone/server.js',
       url: 'http://localhost:3100',
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,
