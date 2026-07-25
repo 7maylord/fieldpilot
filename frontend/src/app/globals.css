@@ -113,6 +113,12 @@ a:focus-visible {
   border-radius: 999px;
   text-transform: capitalize;
 }
+.project-list select {
+  min-height: 38px;
+  border: 1px solid #afbed1;
+  border-radius: 10px;
+  background: #fff;
+}
 .project-form {
   display: grid;
   gap: 14px;
@@ -629,6 +635,9 @@ a:focus-visible {
   border-radius: 18px;
   backdrop-filter: blur(30px);
 }
+.organization-card {
+  width: min(100%, 760px);
+}
 .auth-card h1 {
   font-size: 34px;
   margin: 0 0 8px;
@@ -662,6 +671,12 @@ a:focus-visible {
 }
 .auth-card a {
   color: #076dd2;
+}
+.wide-card {
+  width: min(100%, 860px);
+}
+.compact-state {
+  min-height: 160px;
 }
 .state-page {
   padding: 48px;

@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState, type ReactNode } from 'react';
+import { apiRequest } from '../lib/api';
 import { OfflineStatus } from './offline-status';
 
 const officeLinks = [
@@ -13,7 +14,7 @@ const officeLinks = [
   'Assignments',
   'Dispatch',
   'Assets',
-  'Teams',
+  'Members',
   'Maps',
   'Forms',
   'Reports',
@@ -31,12 +32,19 @@ export function AppShell({
   const [menuOpen, setMenuOpen] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const organizationSlug = pathname.split('/')[1] || 'horizon';
   const links = mode === 'office' ? officeLinks : fieldLinks;
 
   function sync() {
     setSyncing(true);
     window.setTimeout(() => setSyncing(false), 900);
+  }
+
+  async function logout() {
+    await apiRequest('/auth/logout', { method: 'POST' }).catch(() => undefined);
+    router.push('/sign-in');
+    router.refresh();
   }
 
   return (
@@ -51,11 +59,14 @@ export function AppShell({
           onClick={() => setMenuOpen(!menuOpen)}
           aria-expanded={menuOpen}
         >
-          Horizon Infrastructure <span>Pacific South</span>
+          {titleize(organizationSlug)} <span>Workspace</span>
         </button>
         {menuOpen && (
           <div className="organization-menu">
             <Link href="/organizations">Switch organization</Link>
+            <button type="button" onClick={() => void logout()}>
+              Sign out
+            </button>
             <button type="button" onClick={() => setMenuOpen(false)}>
               Close
             </button>
@@ -64,7 +75,7 @@ export function AppShell({
         <nav className="mode-switch" aria-label="Workspace mode">
           <Link
             className={mode === 'office' ? 'active' : ''}
-            href="/horizon/dashboard"
+            href={`/${organizationSlug}/dashboard`}
           >
             Office
           </Link>
@@ -109,13 +120,15 @@ export function AppShell({
                             ? `/${organizationSlug}/dispatch`
                             : label === 'Assets'
                               ? `/${organizationSlug}/assets`
-                              : label === 'Forms'
-                                ? `/${organizationSlug}/forms`
-                                : label === 'Reports'
-                                  ? `/${organizationSlug}/reports`
-                                  : label === 'Notifications'
-                                    ? `/${organizationSlug}/notifications`
-                                    : '#';
+                              : label === 'Members'
+                                ? `/${organizationSlug}/members`
+                                : label === 'Forms'
+                                  ? `/${organizationSlug}/forms`
+                                  : label === 'Reports'
+                                    ? `/${organizationSlug}/reports`
+                                    : label === 'Notifications'
+                                      ? `/${organizationSlug}/notifications`
+                                      : '#';
             return (
               <Link
                 className={pathname === href ? 'active' : ''}
@@ -138,4 +151,12 @@ export function AppShell({
       </main>
     </div>
   );
+}
+
+function titleize(value: string) {
+  return value
+    .split('-')
+    .filter(Boolean)
+    .map((part) => part[0]!.toUpperCase() + part.slice(1))
+    .join(' ');
 }
