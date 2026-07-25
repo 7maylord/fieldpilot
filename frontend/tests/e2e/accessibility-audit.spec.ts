@@ -4,7 +4,10 @@ import { expect, test } from '@playwright/test';
 for (const path of [
   '/',
   '/sign-in',
+  '/sign-up',
+  '/reset-password',
   '/horizon/dashboard',
+  '/horizon/members',
   '/horizon/projects',
   '/horizon/forms',
   '/horizon/dispatch',

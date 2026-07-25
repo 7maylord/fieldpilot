@@ -45,7 +45,7 @@ test('sign-in validates locally before authentication', async ({ page }) => {
   await page.getByRole('button', { name: 'Sign in' }).click();
   await expect(page.getByText('Enter a valid email address')).toBeVisible();
   await expect(
-    page.getByText('Password must be at least 8 characters'),
+    page.getByText('Password must be at least 12 characters'),
   ).toBeVisible();
 });
 
