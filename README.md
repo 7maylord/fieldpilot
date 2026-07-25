@@ -35,6 +35,7 @@ Local services:
 ```bash
 pnpm --dir frontend dev
 pnpm --dir backend dev
+pnpm --dir backend dev:worker
 ```
 
 ## Verify
