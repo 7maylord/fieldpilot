@@ -67,6 +67,15 @@ export class OrganizationsController {
     return this.organizations.listAudit(organizationId, user.id);
   }
 
+  @Get('organizations/:organizationId/teams')
+  @RequiresCapability(Capability.TeamsManage)
+  teams(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('organizationId', ParseUUIDPipe) organizationId: string,
+  ) {
+    return this.organizations.listTeams(organizationId, user.id);
+  }
+
   @Post('organizations/:organizationId/invitations')
   @RequiresCapability(Capability.MembersInvite)
   invite(

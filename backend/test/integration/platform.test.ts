@@ -292,6 +292,17 @@ describe('platform integration', () => {
       .set('x-csrf-token', csrfToken)
       .send({ userId: registration.body.userId })
       .expect(201);
+    await agent
+      .get(`/api/v1/organizations/${organizationId}/members`)
+      .expect(200)
+      .expect(({ body }) => expect(body[0].user.email).toBe(email));
+    await agent
+      .get(`/api/v1/organizations/${organizationId}/teams`)
+      .expect(200)
+      .expect(({ body }) => {
+        expect(body[0].name).toBe('Inspectors');
+        expect(body[0].members[0].user.email).toBe(email);
+      });
     const deviceId = uuidv7();
     const device = await agent
       .post(`/api/v1/organizations/${organizationId}/devices`)

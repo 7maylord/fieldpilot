@@ -73,6 +73,7 @@ export class OrganizationsService {
           status: true,
           isExternal: true,
           createdAt: true,
+          user: { select: { email: true } },
         },
       }),
     );
@@ -85,6 +86,35 @@ export class OrganizationsService {
         orderBy: { occurredAt: 'desc' },
         take: 100,
       }),
+    );
+  }
+
+  listTeams(organizationId: string, userId: string) {
+    return this.tenants.withMembership(
+      { organizationId, userId },
+      async (tx) => {
+        const teams = await tx.team.findMany({
+          where: { organizationId },
+          orderBy: { name: 'asc' },
+        });
+        const memberships = await tx.teamMembership.findMany({
+          where: { organizationId },
+        });
+        const users = await tx.user.findMany({
+          where: { id: { in: memberships.map((member) => member.userId) } },
+          select: { id: true, email: true },
+        });
+        const usersById = new Map(users.map((user) => [user.id, user]));
+        return teams.map((team) => ({
+          ...team,
+          members: memberships
+            .filter((member) => member.teamId === team.id)
+            .map((member) => ({
+              ...member,
+              user: usersById.get(member.userId),
+            })),
+        }));
+      },
     );
   }
 

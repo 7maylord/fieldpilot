@@ -230,6 +230,7 @@ function summarize(operation: OperationObject, method: string, path: string) {
     sign: 'Sign daily report',
     status: 'Get device status',
     submit: 'Submit inspection',
+    teams: 'List teams',
     transition: `Transition ${resource}`,
     types: 'List asset types',
     update: `Update ${resource}`,
@@ -247,6 +248,7 @@ function resourceName(tag: string | undefined, path: string) {
   if (path.includes('/work-orders')) return 'work order';
   if (path.includes('/daily-reports')) return 'daily report';
   if (path.includes('/form-templates')) return 'form template';
+  if (path.includes('/teams')) return 'team';
   if (path.includes('/upload-sessions')) return 'media upload session';
   if (path.includes('/media/')) return 'media object';
   if (path.includes('/locations')) return 'location';
@@ -273,6 +275,7 @@ function pluralResourceName(tag: string | undefined, path: string) {
   if (path.includes('/work-orders')) return 'work orders';
   if (path.includes('/daily-reports')) return 'daily reports';
   if (path.includes('/form-templates')) return 'form templates';
+  if (path.includes('/teams')) return 'teams';
   if (path.includes('/upload-sessions')) return 'media upload sessions';
   if (path.includes('/media/')) return 'media objects';
   if (path.includes('/locations')) return 'locations';

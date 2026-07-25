@@ -6682,6 +6682,237 @@
         ]
       }
     },
+    "/api/v1/organizations/{organizationId}/teams": {
+      "get": {
+        "operationId": "OrganizationsController_teams",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Organization UUID tenant scope."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Request succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JsonArray"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed, malformed input, or an invalid route/query parameter.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication cookie is missing, expired, or revoked.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Capability, tenant access, CSRF, or membership check failed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested tenant-scoped resource was not found.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Optimistic version, state-machine, idempotency, or sync conflict.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["organizations"],
+        "summary": "List teams",
+        "description": "List teams. Requires a valid FieldPilot session cookie.",
+        "security": [
+          {
+            "fieldpilot_session": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "OrganizationsController_createTeam",
+        "parameters": [
+          {
+            "name": "organizationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Organization UUID tenant scope."
+          },
+          {
+            "name": "x-csrf-token",
+            "in": "header",
+            "required": true,
+            "description": "Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTeamDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Resource created or workflow action applied.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JsonObject"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed, malformed input, or an invalid route/query parameter.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication cookie is missing, expired, or revoked.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Capability, tenant access, CSRF, or membership check failed.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Requested tenant-scoped resource was not found.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Optimistic version, state-machine, idempotency, or sync conflict.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["organizations"],
+        "summary": "Create team",
+        "description": "Create team. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.",
+        "security": [
+          {
+            "fieldpilot_session": []
+          }
+        ]
+      }
+    },
     "/api/v1/organizations/{organizationId}/invitations": {
       "post": {
         "operationId": "OrganizationsController_invite",
@@ -6937,132 +7168,6 @@
         "tags": ["organizations"],
         "summary": "Update organization membership",
         "description": "Update organization membership. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.",
-        "security": [
-          {
-            "fieldpilot_session": []
-          }
-        ]
-      }
-    },
-    "/api/v1/organizations/{organizationId}/teams": {
-      "post": {
-        "operationId": "OrganizationsController_createTeam",
-        "parameters": [
-          {
-            "name": "organizationId",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            },
-            "description": "Organization UUID tenant scope."
-          },
-          {
-            "name": "x-csrf-token",
-            "in": "header",
-            "required": true,
-            "description": "Double-submit CSRF token from GET /api/v1/auth/csrf and the fieldpilot_csrf cookie.",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateTeamDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Resource created or workflow action applied.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/JsonObject"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Validation failed, malformed input, or an invalid route/query parameter.",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Authentication cookie is missing, expired, or revoked.",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Capability, tenant access, CSRF, or membership check failed.",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Requested tenant-scoped resource was not found.",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Optimistic version, state-machine, idempotency, or sync conflict.",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Rate limit exceeded.",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Unexpected server error.",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        },
-        "tags": ["organizations"],
-        "summary": "Create team",
-        "description": "Create team. Requires a valid FieldPilot session cookie. Unsafe methods also require the matching x-csrf-token header.",
         "security": [
           {
             "fieldpilot_session": []

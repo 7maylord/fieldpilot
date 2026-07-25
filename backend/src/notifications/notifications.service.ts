@@ -48,6 +48,10 @@ export class NotificationsService {
       if (email) await this.sendIdentityEmail(eventType, email, data);
       return;
     }
+    if (eventType === 'membership.invited') {
+      if (email) await this.sendInvitationEmail(email, data);
+      return;
+    }
     if (eventType !== 'work_order.assigned') return;
     const organizationId = String(data.organizationId);
     const assigneeId = String(data.assigneeId);
@@ -118,6 +122,17 @@ export class NotificationsService {
         ? 'Verify your FieldPilot email'
         : 'Reset your FieldPilot password',
       text: `${this.config.frontendUrl}/${action}?token=${encodeURIComponent(token)}`,
+    });
+  }
+
+  private sendInvitationEmail(email: string, data: Record<string, unknown>) {
+    const token = String(data.token ?? '');
+    if (!token) return;
+    return this.mail.sendMail({
+      from: this.config.email.from,
+      to: email,
+      subject: 'Join your FieldPilot organization',
+      text: `${this.config.frontendUrl}/accept-invitation?token=${encodeURIComponent(token)}`,
     });
   }
 }
