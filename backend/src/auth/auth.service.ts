@@ -60,6 +60,12 @@ export class AuthService {
       }
       throw error;
     }
+    // REMOVE BEFORE PRODUCTION //TODO
+    if (this.config.nodeEnv !== 'production') {
+      console.info(
+        `FieldPilot verification token for ${email}: ${verificationToken}`,
+      );
+    }
     return { userId, verificationRequired: true };
   }
 
