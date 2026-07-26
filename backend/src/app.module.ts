@@ -52,10 +52,12 @@ import { WorkOrdersModule } from './work-orders/work-orders.module';
   providers: [
     RequestIdMiddleware,
     RequestTelemetryMiddleware,
+    SessionAuthGuard,
+    CsrfGuard,
     CapabilityGuard,
     { provide: APP_GUARD, useClass: ThrottlerGuard },
-    { provide: APP_GUARD, useClass: SessionAuthGuard },
-    { provide: APP_GUARD, useClass: CsrfGuard },
+    { provide: APP_GUARD, useExisting: SessionAuthGuard },
+    { provide: APP_GUARD, useExisting: CsrfGuard },
     { provide: APP_GUARD, useExisting: CapabilityGuard },
   ],
 })

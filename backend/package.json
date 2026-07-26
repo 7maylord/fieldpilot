@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "packageManager": "pnpm@10.25.0",
   "scripts": {
-    "dev": "tsx watch src/entrypoints/api.ts",
-    "dev:worker": "tsx watch src/entrypoints/worker.ts",
+    "dev": "tsc -p tsconfig.build.json && node dist/entrypoints/api.js",
+    "dev:worker": "tsc -p tsconfig.build.json && node dist/entrypoints/worker.js",
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/entrypoints/api.js",
     "start:worker": "node dist/entrypoints/worker.js",

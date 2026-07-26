@@ -18,7 +18,8 @@ import { ProblemDetailsFilter } from '../common/problem-details.filter';
 import type { AppConfig } from '../config/app.config';
 
 export async function createApiApp(config: AppConfig) {
-  const app = await NestFactory.create(AppModule, { logger: new JsonLogger() });
+  const logger = new JsonLogger();
+  const app = await NestFactory.create(AppModule, { logger });
   app.setGlobalPrefix('api/v1');
   app.use(helmet({ contentSecurityPolicy: false }));
   app.use(cookieParser());
@@ -29,7 +30,7 @@ export async function createApiApp(config: AppConfig) {
       forbidNonWhitelisted: true,
     }),
   );
-  app.useGlobalFilters(new ProblemDetailsFilter());
+  app.useGlobalFilters(new ProblemDetailsFilter(logger));
   app.enableCors({ origin: config.frontendUrl, credentials: true });
   app.enableShutdownHooks();
   return app;

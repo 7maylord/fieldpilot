@@ -4,12 +4,15 @@ import {
   HttpException,
   HttpStatus,
   type ExceptionFilter,
+  type LoggerService,
 } from '@nestjs/common';
 import type { Response } from 'express';
 import type { RequestWithId } from './request-id.middleware';
 
 @Catch()
 export class ProblemDetailsFilter implements ExceptionFilter {
+  constructor(private readonly logger?: Pick<LoggerService, 'error'>) {}
+
   catch(exception: unknown, host: ArgumentsHost) {
     const context = host.switchToHttp();
     const request = context.getRequest<RequestWithId>();
@@ -21,6 +24,7 @@ export class ProblemDetailsFilter implements ExceptionFilter {
     const body =
       exception instanceof HttpException ? exception.getResponse() : undefined;
     const detail = typeof body === 'string' ? body : readMessage(body);
+    if (status >= 500) this.logServerError(exception, request, status);
 
     response
       .status(status)
@@ -34,6 +38,27 @@ export class ProblemDetailsFilter implements ExceptionFilter {
         instance: request.originalUrl,
         requestId: request.requestId,
       });
+  }
+
+  private logServerError(
+    exception: unknown,
+    request: RequestWithId,
+    status: number,
+  ) {
+    this.logger?.error('Unhandled request exception', {
+      status,
+      method: request.method,
+      path: request.originalUrl,
+      requestId: request.requestId,
+      error:
+        exception instanceof Error
+          ? {
+              name: exception.name,
+              message: exception.message,
+              stack: exception.stack,
+            }
+          : exception,
+    });
   }
 }
 
