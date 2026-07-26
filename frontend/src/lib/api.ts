@@ -30,11 +30,16 @@ export async function apiRequest<T>(
     },
   });
   const text = await response.text();
-  if (!response.ok) throw new Error(errorMessage(response.status, text));
+  if (!response.ok)
+    throw new Error(responseErrorMessage(response.status, text));
   return (text ? JSON.parse(text) : undefined) as T;
 }
 
-function errorMessage(status: number, text: string) {
+export function errorMessage(error: unknown, fallback = 'Request failed') {
+  return error instanceof Error ? error.message : fallback;
+}
+
+function responseErrorMessage(status: number, text: string) {
   try {
     const body = JSON.parse(text) as { detail?: string; message?: string };
     return body.detail ?? body.message ?? `API request failed (${status})`;

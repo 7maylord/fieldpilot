@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
-import { apiRequest } from '../../../lib/api';
+import { toast } from 'sonner';
+import { apiRequest, errorMessage } from '../../../lib/api';
 
 type Organization = { id: string; slug: string };
 
@@ -31,6 +32,7 @@ function AcceptInvitationForm() {
     const organization = organizations.find(
       ({ id }) => id === membership.organizationId,
     );
+    toast.success('Invitation accepted.');
     router.push(
       organization ? `/${organization.slug}/dashboard` : '/organizations',
     );
@@ -44,13 +46,14 @@ function AcceptInvitationForm() {
         <form
           onSubmit={(event) => {
             event.preventDefault();
-            void accept().catch((caught) =>
-              setMessage(
-                caught instanceof Error
-                  ? caught.message
-                  : 'Invitation could not be accepted',
-              ),
-            );
+            void accept().catch((caught) => {
+              const message = errorMessage(
+                caught,
+                'Invitation could not be accepted',
+              );
+              setMessage(message);
+              toast.error(message);
+            });
           }}
         >
           <label>

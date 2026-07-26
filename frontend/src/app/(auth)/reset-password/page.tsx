@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
-import { apiRequest } from '../../../lib/api';
+import { toast } from 'sonner';
+import { apiRequest, errorMessage } from '../../../lib/api';
 
 export default function ResetPasswordPage() {
   return (
@@ -27,6 +28,7 @@ function ResetPasswordForm() {
       body: JSON.stringify({ email }),
     });
     setMessage('If the account exists, a reset link was sent.');
+    toast.success('Password reset email sent.');
   }
 
   async function completeReset() {
@@ -36,6 +38,7 @@ function ResetPasswordForm() {
       body: JSON.stringify({ token, password }),
     });
     setMessage('Password reset. You can sign in now.');
+    toast.success('Password reset.');
   }
 
   return (
@@ -45,11 +48,11 @@ function ResetPasswordForm() {
         <form
           onSubmit={(event) => {
             event.preventDefault();
-            void (token ? completeReset() : requestReset()).catch((caught) =>
-              setMessage(
-                caught instanceof Error ? caught.message : 'Reset failed',
-              ),
-            );
+            void (token ? completeReset() : requestReset()).catch((caught) => {
+              const message = errorMessage(caught, 'Reset failed');
+              setMessage(message);
+              toast.error(message);
+            });
           }}
         >
           {!token && (

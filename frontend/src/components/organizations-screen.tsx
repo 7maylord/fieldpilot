@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
 import { apiRequest } from '../lib/api';
 
@@ -42,6 +43,7 @@ export function OrganizationsScreen() {
       }),
     onSuccess: async (organization) => {
       await client.invalidateQueries({ queryKey: ['organizations'] });
+      toast.success('Company created.');
       router.push(`/${organization.slug}/dashboard`);
     },
   });

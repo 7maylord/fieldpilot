@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
-import { apiRequest } from '../../../lib/api';
+import { toast } from 'sonner';
+import { apiRequest, errorMessage } from '../../../lib/api';
 
 export default function VerifyEmailPage() {
   return (
@@ -26,10 +27,11 @@ function VerifyEmailForm() {
         body: JSON.stringify({ token }),
       });
       setMessage('Email verified. You can sign in now.');
+      toast.success('Email verified.');
     } catch (caught) {
-      setMessage(
-        caught instanceof Error ? caught.message : 'Verification failed',
-      );
+      const message = errorMessage(caught, 'Verification failed');
+      setMessage(message);
+      toast.error(message);
     }
   }
 

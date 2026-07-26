@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, type ReactNode } from 'react';
+import { toast } from 'sonner';
 import { apiRequest } from '../lib/api';
 import { OfflineStatus } from './offline-status';
 
@@ -43,6 +44,7 @@ export function AppShell({
 
   async function logout() {
     await apiRequest('/auth/logout', { method: 'POST' }).catch(() => undefined);
+    toast.success('Signed out.');
     router.push('/sign-in');
     router.refresh();
   }

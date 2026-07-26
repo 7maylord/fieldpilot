@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
 import { apiRequest } from '../lib/api';
 
@@ -117,6 +118,7 @@ export function MembersScreen({
     onSuccess: async () => {
       inviteForm.reset({ role: 'member', email: '' });
       await refresh();
+      toast.success('Invite queued.');
     },
   });
   const updateRole = useMutation({
@@ -128,7 +130,10 @@ export function MembersScreen({
           body: JSON.stringify({ role: input.role }),
         },
       ),
-    onSuccess: refresh,
+    onSuccess: async () => {
+      await refresh();
+      toast.success('Role updated.');
+    },
   });
   const createTeam = useMutation({
     mutationFn: (input: z.infer<typeof teamSchema>) =>
@@ -139,6 +144,7 @@ export function MembersScreen({
     onSuccess: async () => {
       teamForm.reset();
       await refresh();
+      toast.success('Team created.');
     },
   });
   const addTeamMember = useMutation({
@@ -150,7 +156,10 @@ export function MembersScreen({
           body: JSON.stringify({ userId: input.userId }),
         },
       ),
-    onSuccess: refresh,
+    onSuccess: async () => {
+      await refresh();
+      toast.success('Team membership saved.');
+    },
   });
   const grantAccess = useMutation({
     mutationFn: (input: z.infer<typeof accessSchema>) =>
@@ -158,7 +167,10 @@ export function MembersScreen({
         method: 'POST',
         body: JSON.stringify(input),
       }),
-    onSuccess: refresh,
+    onSuccess: async () => {
+      await refresh();
+      toast.success('Project access saved.');
+    },
   });
 
   if (organizations.isLoading) return <p>Loading organization…</p>;

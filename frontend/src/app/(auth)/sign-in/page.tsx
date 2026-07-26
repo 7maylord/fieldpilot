@@ -5,8 +5,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
-import { apiRequest } from '../../../lib/api';
+import { apiRequest, errorMessage } from '../../../lib/api';
 
 const signInSchema = z.object({
   email: z.email('Enter a valid email address'),
@@ -35,12 +36,13 @@ export default function SignInPage() {
                 method: 'POST',
                 body: JSON.stringify(input),
               });
+              toast.success('Signed in.');
               router.push('/organizations');
               router.refresh();
             } catch (caught) {
-              setError(
-                caught instanceof Error ? caught.message : 'Sign in failed',
-              );
+              const message = errorMessage(caught, 'Sign in failed');
+              setError(message);
+              toast.error(message);
             }
           })}
           noValidate

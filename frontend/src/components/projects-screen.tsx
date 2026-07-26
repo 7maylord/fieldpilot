@@ -3,6 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
 import { apiRequest } from '../lib/api';
 import { db, type OfflineEntity } from '../lib/offline/database';
@@ -95,6 +96,7 @@ export function ProjectsScreen({
       await client.invalidateQueries({
         queryKey: ['projects', organizationSlug],
       });
+      toast.success('Project created.');
     },
   });
 

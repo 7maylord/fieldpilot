@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState, type FormEvent } from 'react';
+import { toast } from 'sonner';
 import { apiBase, apiRequest } from '../lib/api';
 
 type Report = {
@@ -56,7 +57,10 @@ export function ReportsScreen({
         method: 'POST',
         body: JSON.stringify({ projectId, ...body }),
       }),
-    onSuccess: refresh,
+    onSuccess: async () => {
+      await refresh();
+      toast.success('Report draft generated.');
+    },
   });
   const action = useMutation({
     mutationFn: ({
@@ -72,7 +76,10 @@ export function ReportsScreen({
         `/organizations/${organization.data!.id}/daily-reports/${id}/${path}`,
         { method: 'POST', body: body ? JSON.stringify(body) : undefined },
       ),
-    onSuccess: refresh,
+    onSuccess: async () => {
+      await refresh();
+      toast.success('Report updated.');
+    },
   });
   function generate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

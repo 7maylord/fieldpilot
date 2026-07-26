@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
+import { toast } from 'sonner';
 import { apiRequest } from '../lib/api';
 
 type Organization = { id: string; slug: string };
@@ -119,7 +120,10 @@ export function SitesScreen({
         `/organizations/${workspace.organizationId}/projects/${workspace.projectId}/sites`,
         { method: 'POST', body: JSON.stringify(input) },
       ),
-    onSuccess: () => client.invalidateQueries({ queryKey: ['sites'] }),
+    onSuccess: async () => {
+      await client.invalidateQueries({ queryKey: ['sites'] });
+      toast.success('Site created.');
+    },
   });
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -231,7 +235,10 @@ export function WorkOrdersScreen({
         method: 'POST',
         body: JSON.stringify({ projectId: workspace.projectId, ...input }),
       }),
-    onSuccess: () => client.invalidateQueries({ queryKey: ['work-orders'] }),
+    onSuccess: async () => {
+      await client.invalidateQueries({ queryKey: ['work-orders'] });
+      toast.success('Work order created.');
+    },
   });
   const assign = useMutation({
     mutationFn: ({
@@ -252,7 +259,10 @@ export function WorkOrdersScreen({
           body: JSON.stringify({ version, assigneeType, assigneeId }),
         },
       ),
-    onSuccess: () => client.invalidateQueries({ queryKey: ['work-orders'] }),
+    onSuccess: async () => {
+      await client.invalidateQueries({ queryKey: ['work-orders'] });
+      toast.success('Work order assigned.');
+    },
   });
   function createWork(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

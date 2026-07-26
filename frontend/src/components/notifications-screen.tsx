@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
+import { toast } from 'sonner';
 import { apiBase, apiRequest } from '../lib/api';
 
 type Notification = {
@@ -56,7 +57,10 @@ export function NotificationsScreen({
           method: 'PATCH',
         },
       ),
-    onSuccess: () => client.invalidateQueries({ queryKey: ['notifications'] }),
+    onSuccess: async () => {
+      await client.invalidateQueries({ queryKey: ['notifications'] });
+      toast.success('Notification marked read.');
+    },
   });
   return (
     <>

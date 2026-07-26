@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState, type FormEvent } from 'react';
+import { toast } from 'sonner';
 import { apiRequest } from '../lib/api';
 
 export function AssetsScreen({
@@ -62,7 +63,10 @@ export function AssetsScreen({
         method: 'POST',
         body: JSON.stringify({ projectId, ...body }),
       }),
-    onSuccess: () => client.invalidateQueries({ queryKey: ['assets'] }),
+    onSuccess: async () => {
+      await client.invalidateQueries({ queryKey: ['assets'] });
+      toast.success('Asset created.');
+    },
   });
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
