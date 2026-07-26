@@ -1,5 +1,6 @@
 'use client';
 
+import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, type ReactNode } from 'react';
@@ -22,6 +23,7 @@ const officeLinks = [
   'Notifications',
 ];
 const fieldLinks = ['Today', 'My work', 'Downloads', 'Conflicts'];
+type CurrentUser = { email: string };
 
 export function AppShell({
   mode,
@@ -30,12 +32,17 @@ export function AppShell({
   mode: 'office' | 'field';
   children: ReactNode;
 }) {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const organizationSlug = pathname.split('/')[1] || 'horizon';
   const links = mode === 'office' ? officeLinks : fieldLinks;
+  const profile = useQuery({
+    queryKey: ['current-user'],
+    queryFn: () => apiRequest<CurrentUser>('/auth/me'),
+    retry: false,
+  });
 
   function sync() {
     setSyncing(true);
@@ -55,25 +62,6 @@ export function AppShell({
         <Link className="brand" href="/">
           FieldPilot
         </Link>
-        <button
-          className="organization"
-          type="button"
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-expanded={menuOpen}
-        >
-          {titleize(organizationSlug)} <span>Workspace</span>
-        </button>
-        {menuOpen && (
-          <div className="organization-menu">
-            <Link href="/organizations">Switch organization</Link>
-            <button type="button" onClick={() => void logout()}>
-              Sign out
-            </button>
-            <button type="button" onClick={() => setMenuOpen(false)}>
-              Close
-            </button>
-          </div>
-        )}
         <nav className="mode-switch" aria-label="Workspace mode">
           <Link
             className={mode === 'office' ? 'active' : ''}
@@ -97,6 +85,31 @@ export function AppShell({
           {syncing ? 'Syncing…' : 'Synced 2m ago'}
         </button>
         <span className="online">Online</span>
+        <div className="profile-area">
+          <button
+            className="profile-button"
+            type="button"
+            aria-label="Profile menu"
+            aria-haspopup="dialog"
+            aria-expanded={profileOpen}
+            onClick={() => setProfileOpen(!profileOpen)}
+          >
+            <span className="profile-avatar" aria-hidden="true">
+              {initials(profile.data?.email)}
+            </span>
+            <span>{profile.data?.email ?? 'Profile'}</span>
+          </button>
+          {profileOpen && (
+            <div className="profile-menu" role="dialog" aria-label="Profile">
+              <strong>Signed in</strong>
+              <span>{profile.data?.email ?? 'Current account'}</span>
+              <Link href="/organizations">Switch organization</Link>
+              <button type="button" onClick={() => void logout()}>
+                Sign out
+              </button>
+            </div>
+          )}
+        </div>
       </header>
       <aside className="glass sidebar">
         <nav aria-label={`${mode} navigation`}>
@@ -155,10 +168,6 @@ export function AppShell({
   );
 }
 
-function titleize(value: string) {
-  return value
-    .split('-')
-    .filter(Boolean)
-    .map((part) => part[0]!.toUpperCase() + part.slice(1))
-    .join(' ');
+function initials(email?: string) {
+  return (email?.trim()[0] ?? 'P').toUpperCase();
 }
