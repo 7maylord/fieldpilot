@@ -30,10 +30,6 @@ test('office and field shells expose working controls', async ({ page }) => {
   ).toBeVisible();
   await expect(page.getByRole('button', { name: 'Sign out' })).toBeVisible();
   await page.getByRole('button', { name: 'Profile menu' }).click();
-  await page.getByRole('button', { name: 'Download package' }).click();
-  await expect(page.getByText('Offline package downloaded.')).toBeVisible();
-  await page.getByRole('button', { name: 'Synced 2m ago' }).click();
-  await expect(page.getByRole('button', { name: 'Syncing…' })).toBeVisible();
   await page.getByRole('button', { name: 'Overdue' }).click();
   await expect(page.getByRole('button', { name: 'Overdue' })).toHaveClass(
     /active/,

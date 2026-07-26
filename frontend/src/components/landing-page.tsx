@@ -64,29 +64,29 @@ export function LandingPage() {
           </div>
           <div className="preview-stats">
             <div>
-              <strong>18</strong>
+              <strong>Plan</strong>
               <span>Work orders</span>
             </div>
             <div>
-              <strong>12</strong>
-              <span>Completed</span>
+              <strong>Capture</strong>
+              <span>Evidence</span>
             </div>
             <div>
-              <strong>2</strong>
+              <strong>Sync</strong>
               <span>Conflicts</span>
             </div>
           </div>
           <div className="preview-row">
-            <span>Rebar inspection</span>
-            <b>10:00 AM</b>
+            <span>Live work queue</span>
+            <b>Office</b>
           </div>
           <div className="preview-row">
-            <span>Storm drain installation</span>
-            <b>1:00 PM</b>
+            <span>Offline field updates</span>
+            <b>Field</b>
           </div>
           <div className="preview-sync">
             <span>Offline package ready</span>
-            <strong>100%</strong>
+            <strong>Synced</strong>
           </div>
         </div>
       </section>

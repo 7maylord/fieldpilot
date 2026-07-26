@@ -24,6 +24,7 @@ const officeLinks = [
 ];
 const fieldLinks = ['Today', 'My work', 'Downloads', 'Conflicts'];
 type CurrentUser = { email: string };
+type Organization = { id: string; slug: string };
 
 export function AppShell({
   mode,
@@ -33,21 +34,25 @@ export function AppShell({
   children: ReactNode;
 }) {
   const [profileOpen, setProfileOpen] = useState(false);
-  const [syncing, setSyncing] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
-  const organizationSlug = pathname.split('/')[1] || 'horizon';
+  const pathSlug = mode === 'office' ? pathname.split('/')[1] : '';
+  const organizations = useQuery({
+    queryKey: ['organizations'],
+    queryFn: () => apiRequest<Organization[]>('/organizations'),
+    retry: false,
+  });
+  const organization =
+    mode === 'office'
+      ? organizations.data?.find(({ slug }) => slug === pathSlug)
+      : organizations.data?.[0];
+  const organizationSlug = organization?.slug ?? pathSlug;
   const links = mode === 'office' ? officeLinks : fieldLinks;
   const profile = useQuery({
     queryKey: ['current-user'],
     queryFn: () => apiRequest<CurrentUser>('/auth/me'),
     retry: false,
   });
-
-  function sync() {
-    setSyncing(true);
-    window.setTimeout(() => setSyncing(false), 900);
-  }
 
   async function logout() {
     await apiRequest('/auth/logout', { method: 'POST' }).catch(() => undefined);
@@ -65,7 +70,11 @@ export function AppShell({
         <nav className="mode-switch" aria-label="Workspace mode">
           <Link
             className={mode === 'office' ? 'active' : ''}
-            href={`/${organizationSlug}/dashboard`}
+            href={
+              organizationSlug
+                ? `/${organizationSlug}/dashboard`
+                : '/organizations'
+            }
           >
             Office
           </Link>
@@ -76,15 +85,6 @@ export function AppShell({
             Field
           </Link>
         </nav>
-        <button
-          className="sync-button"
-          type="button"
-          onClick={sync}
-          disabled={syncing}
-        >
-          {syncing ? 'Syncing…' : 'Synced 2m ago'}
-        </button>
-        <span className="online">Online</span>
         <div className="profile-area">
           <button
             className="profile-button"
@@ -155,13 +155,9 @@ export function AppShell({
             );
           })}
         </nav>
-        <div className="offline-note">
-          <strong>Offline-first active</strong>
-          <span>All work is available offline</span>
-        </div>
       </aside>
       <main className="workspace">
-        <OfflineStatus />
+        <OfflineStatus organizationId={organization?.id} />
         {children}
       </main>
     </div>

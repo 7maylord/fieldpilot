@@ -103,6 +103,7 @@ export class SyncService {
           }),
           tx.workOrder.findMany({
             where: { organizationId, projectId: { in: projectIds } },
+            include: { assignments: true },
           }),
           tx.formVersion.findMany({
             where: { organizationId, status: 'published' },

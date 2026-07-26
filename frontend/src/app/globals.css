@@ -344,20 +344,6 @@ a:focus-visible {
     inset 0 3px 3px #ffffff75,
     0 3px 10px #087ff55c;
 }
-.sync-button {
-  border: 1px solid #c9dcf2;
-  background: #fff8;
-  border-radius: 12px;
-  padding: 12px 16px;
-  color: #1268bf;
-}
-.sync-button:disabled {
-  opacity: 0.65;
-}
-.online {
-  color: #087b3c;
-  font-weight: 700;
-}
 .profile-area {
   position: relative;
 }
@@ -431,18 +417,6 @@ a:focus-visible {
   background: #e5f2ff;
   color: #075cae;
   border-left: 3px solid var(--blue);
-}
-.offline-note {
-  margin-top: auto;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 14px;
-  display: grid;
-  gap: 4px;
-  font-size: 13px;
-}
-.offline-note span {
-  color: var(--muted);
 }
 .workspace {
   padding: 20px;
@@ -554,6 +528,7 @@ a:focus-visible {
   background: #fff;
   padding: 17px 4px;
   color: #15253d;
+  text-decoration: none;
 }
 .work-row:hover {
   background: #f7fbff;
@@ -930,9 +905,6 @@ a:focus-visible {
     flex: 1;
     text-align: center;
   }
-  .sync-button {
-    margin-left: auto;
-  }
   .sidebar {
     margin: 10px 0;
     overflow: auto;
@@ -942,9 +914,6 @@ a:focus-visible {
   }
   .sidebar nav a {
     white-space: nowrap;
-  }
-  .offline-note {
-    display: none;
   }
   .workspace {
     padding: 18px 6px;
@@ -986,12 +955,6 @@ a:focus-visible {
 @media (max-width: 560px) {
   .brand {
     font-size: 20px;
-  }
-  .online {
-    display: none;
-  }
-  .sync-button {
-    padding: 10px;
   }
   .page-heading {
     align-items: flex-start;
