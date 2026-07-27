@@ -24,6 +24,10 @@ import {
 } from './dto';
 import { createToken } from './token';
 
+const authThrottleLimit = Number(
+  process.env.AUTH_THROTTLE_LIMIT_PER_MINUTE ?? 5,
+);
+
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
@@ -46,7 +50,7 @@ export class AuthController {
 
   @Public()
   @Post('register')
-  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  @Throttle({ default: { limit: authThrottleLimit, ttl: 60_000 } })
   register(@Body() body: RegisterDto) {
     return this.auth.register(body.email, body.password);
   }
@@ -59,7 +63,7 @@ export class AuthController {
 
   @Public()
   @Post('login')
-  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  @Throttle({ default: { limit: authThrottleLimit, ttl: 60_000 } })
   async login(
     @Body() body: LoginDto,
     @Res({ passthrough: true }) response: Response,

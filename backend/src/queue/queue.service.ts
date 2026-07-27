@@ -23,6 +23,9 @@ export const queueNames = [
 @Injectable()
 export class QueueService implements OnModuleDestroy {
   private readonly redisUrl = loadConfig().redisUrl;
+  private readonly tenantRateLimit = Number(
+    process.env.QUEUE_TENANT_RATE_PER_MINUTE ?? 100,
+  );
   private readonly queues = new Map<string, Queue>();
   private readonly workers: Worker[] = [];
   private redis?: IORedis;
@@ -145,7 +148,8 @@ export class QueueService implements OnModuleDestroy {
     const key = `queue-rate:${queueName}:${organizationId}:${Math.floor(Date.now() / 60_000)}`;
     const count = await this.redis.incr(key);
     if (count === 1) await this.redis.expire(key, 60);
-    if (count > 100) throw new Error('Tenant queue rate exceeded');
+    if (count > this.tenantRateLimit)
+      throw new Error('Tenant queue rate exceeded');
   }
 
   private async deadLetter(

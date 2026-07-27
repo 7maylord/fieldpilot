@@ -26,9 +26,13 @@ import { SitesModule } from './sites/sites.module';
 import { SyncModule } from './sync/sync.module';
 import { WorkOrdersModule } from './work-orders/work-orders.module';
 
+const defaultThrottleLimit = Number(
+  process.env.DEFAULT_THROTTLE_LIMIT_PER_MINUTE ?? 100,
+);
+
 @Module({
   imports: [
-    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
+    ThrottlerModule.forRoot([{ ttl: 60_000, limit: defaultThrottleLimit }]),
     DatabaseModule,
     DevicesModule,
     DefectsModule,
