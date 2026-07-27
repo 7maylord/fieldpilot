@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import type { Prisma } from '@prisma/client';
 import { createTransport } from 'nodemailer';
 import { newId } from '../common/id';
 import { loadConfig } from '../config/app.config';
@@ -52,8 +53,11 @@ export class NotificationsService {
       if (email) await this.sendInvitationEmail(email, data);
       return;
     }
-    if (eventType !== 'work_order.assigned') return;
     const organizationId = String(data.organizationId);
+    if (eventType !== 'work_order.assigned') {
+      await this.deliverBroadcast(eventType, organizationId, data, eventId);
+      return;
+    }
     const assigneeId = String(data.assigneeId);
     const recipients = await this.tenants.withTenant(
       { organizationId, userId: organizationId },
@@ -106,6 +110,71 @@ export class NotificationsService {
     );
   }
 
+  private async deliverBroadcast(
+    eventType: string,
+    organizationId: string,
+    data: Record<string, unknown>,
+    eventId: string,
+  ) {
+    const copy = notificationCopy(eventType, data);
+    if (!copy) return;
+    await this.tenants.withTenant(
+      { organizationId, userId: organizationId },
+      async (tx) => {
+        const recipients = await tx.membership.findMany({
+          where: {
+            organizationId,
+            status: 'active',
+            role: { in: ['owner', 'admin', 'manager', 'coordinator'] },
+          },
+          select: { userId: true },
+        });
+        await this.notifyUsers(
+          tx,
+          organizationId,
+          recipients.map(({ userId }) => userId),
+          eventId,
+          eventType,
+          copy.title,
+          copy.body,
+          copy.resourceType,
+          copy.resourceId,
+        );
+      },
+    );
+  }
+
+  private async notifyUsers(
+    tx: Prisma.TransactionClient,
+    organizationId: string,
+    userIds: string[],
+    eventId: string,
+    kind: string,
+    title: string,
+    body: string,
+    resourceType: string,
+    resourceId: string,
+  ) {
+    for (const userId of new Set(userIds))
+      await tx.notification.upsert({
+        where: {
+          sourceEventId_userId: { sourceEventId: eventId, userId },
+        },
+        create: {
+          id: newId(),
+          organizationId,
+          userId,
+          sourceEventId: eventId,
+          kind,
+          title,
+          body,
+          resourceType,
+          resourceId,
+        },
+        update: {},
+      });
+  }
+
   private sendIdentityEmail(
     eventType: string,
     email: string,
@@ -135,4 +204,72 @@ export class NotificationsService {
       text: `${this.config.frontendUrl}/accept-invitation?token=${encodeURIComponent(token)}`,
     });
   }
+}
+
+function notificationCopy(eventType: string, data: Record<string, unknown>) {
+  const projectId = uuidValue(data.projectId);
+  const siteId = uuidValue(data.siteId);
+  const workOrderId = uuidValue(data.workOrderId);
+  const reportId = uuidValue(data.reportId);
+  if (eventType === 'project.created' && projectId)
+    return {
+      title: 'Project opened',
+      body: 'A project workspace was created.',
+      resourceType: 'project',
+      resourceId: projectId,
+    };
+  if (eventType === 'project.archived' && projectId)
+    return {
+      title: 'Project closed',
+      body: 'A project workspace was archived.',
+      resourceType: 'project',
+      resourceId: projectId,
+    };
+  if (eventType === 'site.created' && siteId)
+    return {
+      title: 'Site opened',
+      body: 'A project site was opened for daily field tracking.',
+      resourceType: 'site',
+      resourceId: siteId,
+    };
+  if (eventType === 'work_order.created' && workOrderId)
+    return {
+      title: 'Dispatch review needed',
+      body: 'A work order is ready for dispatch planning.',
+      resourceType: 'work_order',
+      resourceId: workOrderId,
+    };
+  if (eventType === 'work_order.transitioned' && workOrderId)
+    return {
+      title: 'Work status changed',
+      body: 'A work order moved to a new operational status.',
+      resourceType: 'work_order',
+      resourceId: workOrderId,
+    };
+  if (eventType === 'daily_report.draft_created' && reportId)
+    return {
+      title: 'Daily report created',
+      body: 'A project daily report was created for review.',
+      resourceType: 'daily_report',
+      resourceId: reportId,
+    };
+  if (eventType === 'daily_report.revised' && reportId)
+    return {
+      title: 'Daily report revised',
+      body: 'A project daily report revision was created.',
+      resourceType: 'daily_report',
+      resourceId: reportId,
+    };
+  if (eventType === 'daily_report.published' && reportId)
+    return {
+      title: 'Daily report published',
+      body: 'A project daily report was published.',
+      resourceType: 'daily_report',
+      resourceId: reportId,
+    };
+  return null;
+}
+
+function uuidValue(value: unknown) {
+  return typeof value === 'string' ? value : undefined;
 }

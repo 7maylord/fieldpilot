@@ -89,6 +89,12 @@ export class SitesService {
           resourceId: site.id,
           summary: { projectId, code: site.code },
         });
+        await this.audit.enqueue(tx, {
+          organizationId,
+          eventType: 'site.created',
+          aggregateId: site.id,
+          payload: { siteId: site.id, projectId, code: site.code },
+        });
         return site;
       },
     );
