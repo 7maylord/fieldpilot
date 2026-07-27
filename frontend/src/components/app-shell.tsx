@@ -47,6 +47,12 @@ export function AppShell({
       ? organizations.data?.find(({ slug }) => slug === pathSlug)
       : organizations.data?.[0];
   const organizationSlug = organization?.slug ?? pathSlug;
+  const brandHref =
+    mode === 'field'
+      ? '/field/today'
+      : organizationSlug
+        ? `/${organizationSlug}/dashboard`
+        : '/organizations';
   const links = mode === 'office' ? officeLinks : fieldLinks;
   const profile = useQuery({
     queryKey: ['current-user'],
@@ -64,7 +70,7 @@ export function AppShell({
   return (
     <div className="app-frame">
       <header className="glass topbar">
-        <Link className="brand" href="/">
+        <Link className="brand" href={brandHref}>
           FieldPilot
         </Link>
         <nav className="mode-switch" aria-label="Workspace mode">
@@ -137,13 +143,15 @@ export function AppShell({
                               ? `/${organizationSlug}/assets`
                               : label === 'Members'
                                 ? `/${organizationSlug}/members`
-                                : label === 'Forms'
-                                  ? `/${organizationSlug}/forms`
-                                  : label === 'Reports'
-                                    ? `/${organizationSlug}/reports`
-                                    : label === 'Notifications'
-                                      ? `/${organizationSlug}/notifications`
-                                      : '#';
+                                : label === 'Maps'
+                                  ? `/${organizationSlug}/maps`
+                                  : label === 'Forms'
+                                    ? `/${organizationSlug}/forms`
+                                    : label === 'Reports'
+                                      ? `/${organizationSlug}/reports`
+                                      : label === 'Notifications'
+                                        ? `/${organizationSlug}/notifications`
+                                        : '#';
             return (
               <Link
                 className={pathname === href ? 'active' : ''}

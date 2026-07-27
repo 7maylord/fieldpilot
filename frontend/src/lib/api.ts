@@ -2,6 +2,16 @@ export const apiBase =
   process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001/api/v1';
 let csrfToken: string | undefined;
 
+export class ApiError extends Error {
+  constructor(
+    readonly status: number,
+    message: string,
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
+
 export async function apiRequest<T>(
   path: string,
   init?: RequestInit,
@@ -31,7 +41,10 @@ export async function apiRequest<T>(
   });
   const text = await response.text();
   if (!response.ok)
-    throw new Error(responseErrorMessage(response.status, text));
+    throw new ApiError(
+      response.status,
+      responseErrorMessage(response.status, text),
+    );
   return (text ? JSON.parse(text) : undefined) as T;
 }
 

@@ -17,12 +17,34 @@ test('owner signup, company creation, invite, and member acceptance work through
   await signUpAndVerify(page, ownerEmail);
   await signIn(page, ownerEmail);
 
+  await page.goto('/unknown-workspace/dashboard');
+  await expect(
+    page.getByRole('heading', { name: 'Page not found' }),
+  ).toBeVisible();
+  await page.goto('/organizations');
+
   await page
     .getByLabel('Company name')
     .fill('Lagos Mainland Infrastructure Ltd');
   await page.getByLabel('Slug').fill(slug);
   await page.getByRole('button', { name: 'Create company' }).click();
   await expect(page).toHaveURL(new RegExp(`/${slug}/dashboard`));
+  await expect(page.getByText('No projects yet')).toBeVisible();
+  await expect(
+    page.getByText('Unable to load live dashboard data'),
+  ).toHaveCount(0);
+  await page.getByRole('link', { name: 'FieldPilot' }).click();
+  await expect(page).toHaveURL(new RegExp(`/${slug}/dashboard`));
+
+  await page.goto('/');
+  await page.getByRole('link', { name: 'Open workspace' }).first().click();
+  await expect(page).toHaveURL(new RegExp(`/${slug}/dashboard`));
+
+  await page.getByRole('link', { name: 'Maps' }).click();
+  await expect(page).toHaveURL(new RegExp(`/${slug}/maps`));
+  await expect(
+    page.getByRole('heading', { name: 'Maps', exact: true }),
+  ).toBeVisible();
 
   await page.getByRole('link', { name: 'Members' }).click();
   await expect(

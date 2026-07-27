@@ -9,7 +9,14 @@ export default async function DashboardPage({
   const { organizationSlug } = await params;
   return (
     <AppShell mode="office">
-      <OperationsDashboard organizationSlug={organizationSlug} />
+      <OperationsDashboard
+        organizationSlug={organizationSlug}
+        todayLabel={new Intl.DateTimeFormat('en-US', {
+          weekday: 'long',
+          month: 'long',
+          day: 'numeric',
+        }).format(new Date())}
+      />
     </AppShell>
   );
 }

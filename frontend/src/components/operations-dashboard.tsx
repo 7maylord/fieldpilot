@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useState } from 'react';
-import { apiRequest } from '../lib/api';
+import { ApiError, apiRequest } from '../lib/api';
 import { SyncConflicts } from './sync-conflicts';
 
 type Organization = { id: string; slug: string };
@@ -20,8 +20,10 @@ type WorkOrder = {
 
 export function OperationsDashboard({
   organizationSlug,
+  todayLabel,
 }: {
   organizationSlug: string;
+  todayLabel: string;
 }) {
   const [filter, setFilter] = useState('All');
   const organization = useQuery({
@@ -60,27 +62,25 @@ export function OperationsDashboard({
   const overdueCount = filteredWork(workOrders, 'Overdue').length;
   const assignedCount = filteredWork(workOrders, 'Assigned').length;
   const error = organization.error ?? projects.error ?? work.error;
+  const isLoading =
+    organization.isLoading || projects.isLoading || work.isLoading;
+  const noProjects = projects.isSuccess && projects.data.length === 0;
+  const errorCopy = dashboardError(error);
 
   return (
     <>
       <section className="page-heading">
         <div>
-          <p className="eyebrow">
-            {new Date().toLocaleDateString(undefined, {
-              weekday: 'long',
-              month: 'long',
-              day: 'numeric',
-            })}
-          </p>
+          <p className="eyebrow">{todayLabel}</p>
           <h1>Today’s Operations</h1>
         </div>
         <Link className="primary" href={`/${organizationSlug}/work`}>
           New work order
         </Link>
       </section>
-      {error && (
-        <div className="notice" role="status">
-          Unable to load live dashboard data. Sign in or check your workspace.
+      {errorCopy && (
+        <div className="notice" role="alert">
+          {errorCopy}
         </div>
       )}
       <div className="dashboard-grid">
@@ -103,27 +103,33 @@ export function OperationsDashboard({
             ))}
           </div>
           <div className="work-list">
-            {visibleWork.map((item) => (
-              <Link
-                className="work-row"
-                href={`/${organizationSlug}/work`}
-                key={item.id}
-              >
-                <span className="status-dot" />
-                <span>
-                  <strong>{item.title}</strong>
-                  <small>{item.status.replaceAll('_', ' ')}</small>
-                </span>
-                <span className={`priority ${item.priority.toLowerCase()}`}>
-                  {item.priority}
-                </span>
-                <time>{workTime(item)}</time>
-              </Link>
-            ))}
-            {visibleWork.length === 0 && (
+            {!error &&
+              !isLoading &&
+              visibleWork.map((item) => (
+                <Link
+                  className="work-row"
+                  href={`/${organizationSlug}/work`}
+                  key={item.id}
+                >
+                  <span className="status-dot" />
+                  <span>
+                    <strong>{item.title}</strong>
+                    <small>{item.status.replaceAll('_', ' ')}</small>
+                  </span>
+                  <span className={`priority ${item.priority.toLowerCase()}`}>
+                    {item.priority}
+                  </span>
+                  <time>{workTime(item)}</time>
+                </Link>
+              ))}
+            {(error || isLoading || visibleWork.length === 0) && (
               <div className="empty-state">
-                <strong>{emptyTitle(filter)}</strong>
-                <span>Live work orders will appear here.</span>
+                <strong>
+                  {emptyTitle(filter, { error, isLoading, noProjects })}
+                </strong>
+                <span>
+                  {emptyText(filter, { error, isLoading, noProjects })}
+                </span>
               </div>
             )}
           </div>
@@ -191,9 +197,42 @@ function workTime(workOrder: WorkOrder) {
   return value ? new Date(value).toLocaleString() : 'Unscheduled';
 }
 
-function emptyTitle(filter: string) {
+function dashboardError(error: unknown) {
+  if (!error) return '';
+  if (error instanceof ApiError) {
+    if (error.status === 401)
+      return 'Your session has expired. Sign in again to load dashboard data.';
+    if (error.status === 403)
+      return 'You do not have access to this workspace.';
+    if (error.status >= 500)
+      return 'Live dashboard data is unavailable because the API server returned an error.';
+  }
+  if (error instanceof Error && error.message === 'Organization not found')
+    return 'Workspace not found for this account.';
+  return 'Live dashboard data is unavailable. Check the API server or your network connection.';
+}
+
+function emptyTitle(
+  filter: string,
+  state: { error: unknown; isLoading: boolean; noProjects: boolean },
+) {
+  if (state.error) return 'Dashboard data unavailable';
+  if (state.isLoading) return 'Loading dashboard data…';
+  if (state.noProjects) return 'No projects yet';
   if (filter === 'Review') return 'No work is waiting for review';
   if (filter === 'Overdue') return 'No overdue work orders';
   if (filter === 'Assigned') return 'No assigned work orders';
   return 'No work orders yet';
+}
+
+function emptyText(
+  filter: string,
+  state: { error: unknown; isLoading: boolean; noProjects: boolean },
+) {
+  if (state.error)
+    return 'Refresh after the connection or API server recovers.';
+  if (state.isLoading) return 'Live dashboard data is loading.';
+  if (state.noProjects) return 'Create a project before raising work orders.';
+  if (filter === 'All') return 'Raise the first work order when work is ready.';
+  return 'Try another filter or update the matching work orders.';
 }

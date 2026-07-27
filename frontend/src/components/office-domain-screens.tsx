@@ -13,6 +13,7 @@ type Location = {
   parentId: string | null;
   name: string;
   locationType: string;
+  geometry?: string | null;
 };
 type WorkOrder = {
   id: string;
@@ -396,6 +397,105 @@ export function WorkOrdersScreen({
   );
 }
 
+export function MapsScreen({ organizationSlug }: { organizationSlug: string }) {
+  const workspace = useWorkspace(organizationSlug);
+  const [siteId, setSiteId] = useState('');
+  const sites = useQuery({
+    queryKey: ['sites', workspace.organizationId, workspace.projectId],
+    enabled: Boolean(workspace.organizationId && workspace.projectId),
+    queryFn: () =>
+      apiRequest<Site[]>(
+        `/organizations/${workspace.organizationId}/projects/${workspace.projectId}/sites`,
+      ),
+  });
+  useEffect(() => {
+    if (!siteId && sites.data?.[0]) setSiteId(sites.data[0].id);
+  }, [siteId, sites.data]);
+  const locations = useQuery({
+    queryKey: [
+      'locations',
+      workspace.organizationId,
+      workspace.projectId,
+      siteId,
+    ],
+    enabled: Boolean(siteId),
+    queryFn: () =>
+      apiRequest<Location[]>(
+        `/organizations/${workspace.organizationId}/projects/${workspace.projectId}/sites/${siteId}/locations`,
+      ),
+  });
+  const mapped = (locations.data ?? [])
+    .map((location) => ({ location, coordinates: point(location.geometry) }))
+    .filter(({ coordinates }) => coordinates);
+
+  return (
+    <DomainPage title="Maps" eyebrow="Project geography">
+      <ProjectPicker
+        projects={workspace.projects.data ?? []}
+        value={workspace.projectId}
+        onChange={(id) => {
+          workspace.setProjectId(id);
+          setSiteId('');
+        }}
+      />
+      <div className="domain-grid">
+        <section className="panel">
+          <h2>Sites</h2>
+          {sites.data?.length ? (
+            <ul className="domain-list">
+              {sites.data.map((site) => (
+                <li key={site.id}>
+                  <button
+                    className={site.id === siteId ? 'selected' : ''}
+                    onClick={() => setSiteId(site.id)}
+                    type="button"
+                  >
+                    <strong>{site.name}</strong>
+                    <span>
+                      {site.code} · {site.status}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <Empty text="No sites to map in this project" />
+          )}
+        </section>
+        <section className="panel domain-wide">
+          <h2>Mapped locations</h2>
+          {mapped.length ? (
+            <ul className="domain-list">
+              {mapped.map(({ location, coordinates }) => (
+                <li key={location.id}>
+                  <div>
+                    <strong>{location.name}</strong>
+                    <span>
+                      {location.locationType.replaceAll('_', ' ')} ·{' '}
+                      {coordinates!.latitude.toFixed(5)},{' '}
+                      {coordinates!.longitude.toFixed(5)}
+                    </span>
+                  </div>
+                  <a
+                    className="secondary small-button"
+                    href={`https://www.google.com/maps?q=${coordinates!.latitude},${coordinates!.longitude}`}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    Open map
+                  </a>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <Empty text="No mapped coordinates in this site" />
+          )}
+        </section>
+      </div>
+    </DomainPage>
+  );
+}
+
 type DispatchData = {
   workOrders: WorkOrder[];
   unassigned: WorkOrder[];
@@ -522,6 +622,28 @@ export function DispatchScreen({
       </div>
     </DomainPage>
   );
+}
+
+function point(geometry?: string | null) {
+  if (!geometry) return null;
+  try {
+    const parsed = JSON.parse(geometry) as {
+      type?: string;
+      coordinates?: unknown;
+    };
+    if (
+      parsed.type !== 'Point' ||
+      !Array.isArray(parsed.coordinates) ||
+      parsed.coordinates.length < 2
+    )
+      return null;
+    const [longitude, latitude] = parsed.coordinates;
+    return typeof latitude === 'number' && typeof longitude === 'number'
+      ? { latitude, longitude }
+      : null;
+  } catch {
+    return null;
+  }
 }
 
 function DomainPage({

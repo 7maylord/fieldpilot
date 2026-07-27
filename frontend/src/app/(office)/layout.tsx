@@ -1,11 +1,5 @@
 import type { ReactNode } from 'react';
-import { requireSession } from '../../lib/server-auth';
 
-export default async function OfficeLayout({
-  children,
-}: {
-  children: ReactNode;
-}) {
-  await requireSession();
+export default function OfficeLayout({ children }: { children: ReactNode }) {
   return children;
 }

@@ -3,8 +3,9 @@
 import Link from 'next/link';
 import { useState } from 'react';
 
-export function LandingPage() {
+export function LandingPage({ workspaceHref }: { workspaceHref?: string }) {
   const [open, setOpen] = useState(false);
+  const appHref = workspaceHref ?? '/sign-up';
 
   return (
     <main className="landing">
@@ -25,8 +26,8 @@ export function LandingPage() {
           <a href="#workflow">How it works</a>
           <a href="#security">Security</a>
         </div>
-        <Link className="nav-signin" href="/sign-in">
-          Sign in
+        <Link className="nav-signin" href={workspaceHref ?? '/sign-in'}>
+          {workspaceHref ? 'Open workspace' : 'Sign in'}
         </Link>
       </nav>
       <section className="hero">
@@ -38,8 +39,8 @@ export function LandingPage() {
             and bring every update safely back into sync.
           </p>
           <div className="hero-actions">
-            <Link className="primary" href="/sign-up">
-              Get started
+            <Link className="primary" href={appHref}>
+              {workspaceHref ? 'Open workspace' : 'Get started'}
             </Link>
             <a className="secondary" href="#workflow">
               See how it works
@@ -121,7 +122,7 @@ export function LandingPage() {
           Coordinate teams, dispatch work, capture inspections, and review
           results through one dependable office-and-field experience.
         </p>
-        <Link className="primary" href="/sign-up">
+        <Link className="primary" href={appHref}>
           Open FieldPilot
         </Link>
       </section>
