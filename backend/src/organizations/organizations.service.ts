@@ -55,9 +55,18 @@ export class OrganizationsService {
     `;
     return Promise.all(
       rows.map(({ organization_id: organizationId }) =>
-        this.tenants.withMembership({ organizationId, userId }, (tx) =>
-          tx.organization.findUniqueOrThrow({ where: { id: organizationId } }),
-        ),
+        this.tenants.withMembership({ organizationId, userId }, async (tx) => {
+          const [organization, membership] = await Promise.all([
+            tx.organization.findUniqueOrThrow({
+              where: { id: organizationId },
+            }),
+            tx.membership.findUniqueOrThrow({
+              where: { organizationId_userId: { organizationId, userId } },
+              select: { role: true, status: true, isExternal: true },
+            }),
+          ]);
+          return { ...organization, membership };
+        }),
       ),
     );
   }
@@ -114,6 +123,26 @@ export class OrganizationsService {
               user: usersById.get(member.userId),
             })),
         }));
+      },
+    );
+  }
+
+  listMyTeams(organizationId: string, userId: string) {
+    return this.tenants.withMembership(
+      { organizationId, userId },
+      async (tx) => {
+        const memberships = await tx.teamMembership.findMany({
+          where: { organizationId, userId },
+          select: { teamId: true },
+        });
+        return tx.team.findMany({
+          where: {
+            organizationId,
+            id: { in: memberships.map(({ teamId }) => teamId) },
+          },
+          orderBy: { name: 'asc' },
+          select: { id: true, name: true },
+        });
       },
     );
   }
@@ -238,6 +267,48 @@ export class OrganizationsService {
           resourceType: 'membership',
           resourceId: membership.id,
           summary: { beforeRole: current.role, afterRole: membership.role },
+        });
+        return membership;
+      },
+    );
+  }
+
+  revokeMembership(
+    organizationId: string,
+    actorId: string,
+    membershipId: string,
+  ) {
+    return this.tenants.withMembership(
+      { organizationId, userId: actorId },
+      async (tx) => {
+        const current = await tx.membership.findFirst({
+          where: { id: membershipId, organizationId },
+        });
+        if (!current) throw new NotFoundException('Membership not found');
+        if (current.role === 'owner' && current.status === 'active') {
+          const owners = await tx.membership.count({
+            where: { organizationId, role: 'owner', status: 'active' },
+          });
+          if (owners === 1)
+            throw new ConflictException('Organization must retain an owner');
+        }
+        await tx.teamMembership.deleteMany({
+          where: { organizationId, userId: current.userId },
+        });
+        await tx.projectAccess.deleteMany({
+          where: { organizationId, userId: current.userId },
+        });
+        const membership = await tx.membership.update({
+          where: { id: membershipId },
+          data: { status: 'revoked' },
+        });
+        await this.audit.write(tx, {
+          organizationId,
+          actorId,
+          action: 'membership.revoked',
+          resourceType: 'membership',
+          resourceId: membership.id,
+          summary: { userId: membership.userId, role: current.role },
         });
         return membership;
       },

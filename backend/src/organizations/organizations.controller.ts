@@ -76,6 +76,14 @@ export class OrganizationsController {
     return this.organizations.listTeams(organizationId, user.id);
   }
 
+  @Get('organizations/:organizationId/my-teams')
+  myTeams(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('organizationId', ParseUUIDPipe) organizationId: string,
+  ) {
+    return this.organizations.listMyTeams(organizationId, user.id);
+  }
+
   @Post('organizations/:organizationId/invitations')
   @RequiresCapability(Capability.MembersInvite)
   invite(
@@ -105,6 +113,20 @@ export class OrganizationsController {
       membershipId,
       body.role,
       body.isExternal,
+    );
+  }
+
+  @Post('organizations/:organizationId/members/:membershipId/revoke')
+  @RequiresCapability(Capability.OrganizationManage)
+  revokeMembership(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('organizationId', ParseUUIDPipe) organizationId: string,
+    @Param('membershipId', ParseUUIDPipe) membershipId: string,
+  ) {
+    return this.organizations.revokeMembership(
+      organizationId,
+      user.id,
+      membershipId,
     );
   }
 
