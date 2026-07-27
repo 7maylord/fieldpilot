@@ -83,6 +83,8 @@ export function MembersScreen({
       apiRequest<Project[]>(`/organizations/${organizationId}/projects`),
     enabled: Boolean(organizationId),
   });
+  const activeMembers =
+    members.data?.filter((member) => member.status === 'active') ?? [];
 
   const inviteForm = useForm<z.infer<typeof inviteSchema>>({
     resolver: zodResolver(inviteSchema),
@@ -133,6 +135,17 @@ export function MembersScreen({
     onSuccess: async () => {
       await refresh();
       toast.success('Role updated.');
+    },
+  });
+  const revokeMember = useMutation({
+    mutationFn: (membershipId: string) =>
+      apiRequest(
+        `/organizations/${organizationId}/members/${membershipId}/revoke`,
+        { method: 'POST' },
+      ),
+    onSuccess: async () => {
+      await refresh();
+      toast.success('Member access revoked.');
     },
   });
   const createTeam = useMutation({
@@ -213,10 +226,36 @@ export function MembersScreen({
                       {member.isExternal ? 'external' : 'internal'}
                     </span>
                   </div>
-                  <span className="status-pill">{member.role}</span>
+                  <div className="member-actions">
+                    <span className="status-pill">{member.role}</span>
+                    {member.status === 'active' && (
+                      <button
+                        className="secondary small-button"
+                        type="button"
+                        disabled={revokeMember.isPending}
+                        onClick={() => {
+                          if (
+                            window.confirm(
+                              `Revoke access for ${
+                                member.user?.email ?? member.userId
+                              }?`,
+                            )
+                          )
+                            revokeMember.mutate(member.id);
+                        }}
+                      >
+                        Revoke
+                      </button>
+                    )}
+                  </div>
                 </li>
               ))}
             </ul>
+          )}
+          {revokeMember.isError && (
+            <p className="field-error" role="alert">
+              {revokeMember.error.message}
+            </p>
           )}
           <form
             className="project-form"
@@ -229,7 +268,7 @@ export function MembersScreen({
               Member
               <select {...roleForm.register('membershipId')}>
                 <option value="">Select member</option>
-                {members.data?.map((member) => (
+                {activeMembers.map((member) => (
                   <option key={member.id} value={member.id}>
                     {member.user?.email ?? member.userId}
                   </option>
@@ -369,7 +408,7 @@ export function MembersScreen({
               Member
               <select {...teamMemberForm.register('userId')}>
                 <option value="">Select member</option>
-                {members.data?.map((member) => (
+                {activeMembers.map((member) => (
                   <option key={member.id} value={member.userId}>
                     {member.user?.email ?? member.userId}
                   </option>
@@ -416,7 +455,7 @@ export function MembersScreen({
               Member
               <select {...accessForm.register('userId')}>
                 <option value="">Select member</option>
-                {members.data?.map((member) => (
+                {activeMembers.map((member) => (
                   <option key={member.id} value={member.userId}>
                     {member.user?.email ?? member.userId}
                   </option>

@@ -90,6 +90,17 @@ a:focus-visible {
   margin: 16px 0 0;
   padding: 0;
 }
+.panel > .project-list,
+.panel > .domain-list,
+.panel > .field-work-list,
+.panel > .work-list {
+  max-height: clamp(260px, 46vh, 560px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 6px;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+}
 .project-list li {
   display: flex;
   align-items: center;
@@ -101,17 +112,45 @@ a:focus-visible {
 .project-list li div {
   display: grid;
   gap: 5px;
+  min-width: 0;
+}
+.project-list li strong,
+.domain-list li strong,
+.field-work-list li strong,
+.work-row strong {
+  overflow-wrap: anywhere;
 }
 .project-list li span {
   color: var(--muted);
   font-size: 13px;
 }
-.project-list .status-pill {
+.status-pill {
   padding: 5px 9px;
   color: #076dd2;
   background: #e6f2ff;
   border-radius: 999px;
   text-transform: capitalize;
+}
+.project-list li .member-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.project-list-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border: 0;
+  background: transparent;
+  color: #15253d;
+  padding: 0;
+  text-align: left;
+}
+.project-list-button:hover,
+.project-list-button.selected {
+  color: #076dd2;
 }
 .project-list select {
   min-height: 38px;
@@ -123,6 +162,11 @@ a:focus-visible {
   display: grid;
   gap: 14px;
   margin-top: 16px;
+}
+.project-form label span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
 }
 .project-form label {
   display: grid;
@@ -192,6 +236,23 @@ a:focus-visible {
 .domain-list li > a {
   margin: 12px 4px;
   text-decoration: none;
+}
+.domain-list li.domain-list-action-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 4px;
+}
+.domain-list li.domain-list-action-row > div {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+}
+.domain-list li.domain-list-action-row > a {
+  flex-shrink: 0;
+  margin: 0;
+  white-space: nowrap;
 }
 .domain-list li div div,
 .domain-list li button {
@@ -389,6 +450,30 @@ a:focus-visible {
   color: var(--muted);
   font-size: 13px;
   overflow-wrap: anywhere;
+}
+.profile-workspace-card {
+  display: grid;
+  gap: 6px;
+  margin: 4px 0;
+  padding: 12px;
+  border: 1px solid #d7e9fb;
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at top right, #dff1ff, transparent 45%),
+    #f7fbff;
+}
+.profile-workspace-label {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.profile-role-badge {
+  width: fit-content;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: #0b7ff3;
+  color: #fff !important;
+  font-weight: 800;
+  text-transform: capitalize;
 }
 .profile-menu a,
 .profile-menu button {
@@ -666,6 +751,77 @@ a:focus-visible {
   display: grid;
   gap: 16px;
 }
+.detail-stack,
+.project-detail-grid {
+  display: grid;
+  gap: 14px;
+  margin-top: 16px;
+}
+.detail-stack section,
+.project-detail-grid section {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #f8fbff;
+}
+.detail-stack ul,
+.project-detail-grid ul,
+.download-inventory,
+.conflict-list {
+  margin: 10px 0 0;
+  padding-left: 18px;
+}
+.detail-stack p,
+.project-detail-grid p {
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+.download-inventory {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+  padding-left: 0;
+  list-style: none;
+}
+.download-inventory li {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #f8fbff;
+}
+.download-inventory strong {
+  display: block;
+  color: #076dd2;
+  font-size: 28px;
+}
+.download-inventory span,
+.conflict-list span {
+  color: var(--muted);
+  font-size: 13px;
+}
+.conflict-list {
+  list-style: none;
+  padding-left: 0;
+}
+.conflict-list li {
+  display: grid;
+  gap: 10px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.actions button {
+  border: 1px solid #bdd9f5;
+  border-radius: 10px;
+  background: #e5f2ff;
+  color: #075cae;
+  padding: 10px 12px;
+  font-weight: 700;
+}
 .big-number {
   font-size: 46px;
   font-weight: 800;
@@ -703,6 +859,11 @@ a:focus-visible {
 .alerts {
   display: grid;
   gap: 8px;
+  max-height: clamp(260px, 46vh, 560px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
 }
 .alerts button {
   border: 0;
@@ -1051,6 +1212,13 @@ a:focus-visible {
   }
   .domain-wide {
     grid-column: auto;
+  }
+  .domain-list li.domain-list-action-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .domain-list li.domain-list-action-row > a {
+    width: fit-content;
   }
   .field-work-grid {
     grid-template-columns: 1fr;
