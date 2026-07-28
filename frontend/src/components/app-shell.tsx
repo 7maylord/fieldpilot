@@ -24,7 +24,12 @@ const officeLinks = [
 ];
 const fieldLinks = ['Today', 'My work', 'Downloads', 'Conflicts'];
 type CurrentUser = { email: string };
-type Organization = { id: string; slug: string };
+type Organization = {
+  id: string;
+  name: string;
+  slug: string;
+  membership?: { role: string; isExternal: boolean };
+};
 
 export function AppShell({
   mode,
@@ -109,6 +114,16 @@ export function AppShell({
             <div className="profile-menu" role="dialog" aria-label="Profile">
               <strong>Signed in</strong>
               <span>{profile.data?.email ?? 'Current account'}</span>
+              {organization && (
+                <div className="profile-workspace-card">
+                  <span className="profile-workspace-label">Workspace</span>
+                  <strong>{organization.name}</strong>
+                  <span className="profile-role-badge">
+                    {roleLabel(organization.membership?.role)}
+                  </span>
+                  <span>{roleLine(organization.membership?.role)}</span>
+                </div>
+              )}
               <Link href="/organizations">Switch organization</Link>
               <button type="button" onClick={() => void logout()}>
                 Sign out
@@ -126,6 +141,10 @@ export function AppShell({
                   ? '/field/today'
                   : label === 'My work'
                     ? '/field/work'
+                    : label === 'Downloads'
+                      ? '/field/downloads'
+                      : label === 'Conflicts'
+                        ? '/field/conflicts'
                     : '#'
                 : label === 'Overview'
                   ? `/${organizationSlug}/dashboard`
@@ -174,4 +193,19 @@ export function AppShell({
 
 function initials(email?: string) {
   return (email?.trim()[0] ?? 'P').toUpperCase();
+}
+
+function roleLabel(role?: string) {
+  return role ? role.replaceAll('_', ' ') : 'workspace member';
+}
+
+function roleLine(role?: string) {
+  if (role === 'owner') return 'The keys, the map, and the final say.';
+  if (role === 'admin') return 'Control tower access for people and settings.';
+  if (role === 'manager') return 'Runs the operation without changing ownership.';
+  if (role === 'coordinator') return 'Dispatch brain: teams, work, and field flow.';
+  if (role === 'member') return 'Field-ready: assigned work, inspections, and defects.';
+  if (role === 'viewer') return 'Read-only eyes on the workspace.';
+  if (role === 'external') return 'Scoped collaborator access.';
+  return 'Signed into this workspace.';
 }
