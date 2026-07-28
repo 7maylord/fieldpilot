@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -19,6 +20,21 @@ type Project = {
   timezone: string;
   version: number;
   updatedAt: string;
+};
+type Site = { id: string; name: string; code: string; status: string };
+type WorkOrder = {
+  id: string;
+  title: string;
+  status: string;
+  priority: string;
+  assignments: unknown[];
+};
+type Asset = { id: string; name: string; status: string };
+type Report = { id: string; reportDate: string; status: string };
+type FormTemplate = {
+  id: string;
+  name: string;
+  versions: Array<{ id: string; status: string; versionNumber: number }>;
 };
 const schema = z.object({
   name: z.string().min(1),
@@ -71,6 +87,57 @@ export function ProjectsScreen({
   const query = useQuery({
     queryKey: ['projects', organizationSlug],
     queryFn: () => loadProjects(organizationSlug),
+  });
+  const [selectedProjectId, setSelectedProjectId] = useState('');
+  useEffect(() => {
+    if (
+      query.data?.projects.length &&
+      !query.data.projects.some((project) => project.id === selectedProjectId)
+    )
+      setSelectedProjectId(query.data.projects[0]!.id);
+  }, [query.data?.projects, selectedProjectId]);
+  const selectedProject = query.data?.projects.find(
+    (project) => project.id === selectedProjectId,
+  );
+  const sites = useQuery({
+    queryKey: ['project-detail-sites', query.data?.organizationId, selectedProjectId],
+    enabled: Boolean(query.data?.organizationId && selectedProjectId),
+    queryFn: () =>
+      apiRequest<Site[]>(
+        `/organizations/${query.data!.organizationId}/projects/${selectedProjectId}/sites`,
+      ),
+  });
+  const workOrders = useQuery({
+    queryKey: ['project-detail-work', query.data?.organizationId, selectedProjectId],
+    enabled: Boolean(query.data?.organizationId && selectedProjectId),
+    queryFn: () =>
+      apiRequest<WorkOrder[]>(
+        `/organizations/${query.data!.organizationId}/work-orders?projectId=${selectedProjectId}`,
+      ),
+  });
+  const assets = useQuery({
+    queryKey: ['project-detail-assets', query.data?.organizationId, selectedProjectId],
+    enabled: Boolean(query.data?.organizationId && selectedProjectId),
+    queryFn: () =>
+      apiRequest<Asset[]>(
+        `/organizations/${query.data!.organizationId}/assets?projectId=${selectedProjectId}`,
+      ),
+  });
+  const reports = useQuery({
+    queryKey: ['project-detail-reports', query.data?.organizationId, selectedProjectId],
+    enabled: Boolean(query.data?.organizationId && selectedProjectId),
+    queryFn: () =>
+      apiRequest<Report[]>(
+        `/organizations/${query.data!.organizationId}/daily-reports?projectId=${selectedProjectId}`,
+      ),
+  });
+  const forms = useQuery({
+    queryKey: ['project-detail-forms', query.data?.organizationId],
+    enabled: Boolean(query.data?.organizationId),
+    queryFn: () =>
+      apiRequest<FormTemplate[]>(
+        `/organizations/${query.data!.organizationId}/form-templates`,
+      ),
   });
   const {
     register,
@@ -127,13 +194,21 @@ export function ProjectsScreen({
             <ul className="project-list">
               {query.data.projects.map((project) => (
                 <li key={project.id}>
-                  <div>
-                    <strong>{project.name}</strong>
-                    <span>
-                      {project.code} · {project.timezone}
-                    </span>
-                  </div>
-                  <span className="status-pill">{project.status}</span>
+                  <button
+                    className={`project-list-button ${
+                      selectedProjectId === project.id ? 'selected' : ''
+                    }`}
+                    type="button"
+                    onClick={() => setSelectedProjectId(project.id)}
+                  >
+                    <div>
+                      <strong>{project.name}</strong>
+                      <span>
+                        {project.code} · {project.timezone}
+                      </span>
+                    </div>
+                    <span className="status-pill">{project.status}</span>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -142,6 +217,75 @@ export function ProjectsScreen({
               <strong>No projects yet</strong>
               <span>Create the first project for this organization.</span>
             </div>
+          )}
+        </section>
+        <section className="panel">
+          <h2>Project details</h2>
+          {selectedProject ? (
+            <>
+              <span className="status-pill">{selectedProject.status}</span>
+              <h3>{selectedProject.name}</h3>
+              <dl>
+                <div>
+                  <dt>Code</dt>
+                  <dd>{selectedProject.code}</dd>
+                </div>
+                <div>
+                  <dt>Timezone</dt>
+                  <dd>{selectedProject.timezone}</dd>
+                </div>
+                <div>
+                  <dt>Version</dt>
+                  <dd>v{selectedProject.version}</dd>
+                </div>
+              </dl>
+              <div className="project-detail-grid">
+                <ProjectDetailList
+                  title={`Sites (${sites.data?.length ?? 0})`}
+                  items={(sites.data ?? []).map(
+                    (site) => `${site.code} · ${site.name} · ${site.status}`,
+                  )}
+                />
+                <ProjectDetailList
+                  title={`Work orders (${workOrders.data?.length ?? 0})`}
+                  items={(workOrders.data ?? []).map(
+                    (workOrder) =>
+                      `${workOrder.priority} · ${workOrder.title} · ${
+                        workOrder.status
+                      } · ${workOrder.assignments.length} assigned`,
+                  )}
+                />
+                <ProjectDetailList
+                  title={`Assets (${assets.data?.length ?? 0})`}
+                  items={(assets.data ?? []).map(
+                    (asset) => `${asset.name} · ${asset.status}`,
+                  )}
+                />
+                <ProjectDetailList
+                  title={`Reports (${reports.data?.length ?? 0})`}
+                  items={(reports.data ?? []).map(
+                    (report) =>
+                      `${report.reportDate.slice(0, 10)} · ${report.status}`,
+                  )}
+                />
+                <ProjectDetailList
+                  title="Published forms/checklists"
+                  items={(forms.data ?? [])
+                    .flatMap((form) =>
+                      form.versions
+                        .filter((version) => version.status === 'published')
+                        .map(
+                          (version) =>
+                            `${form.name} · v${version.versionNumber}`,
+                        ),
+                    )
+                    .slice(0, 12)}
+                  empty="No published forms yet"
+                />
+              </div>
+            </>
+          ) : (
+            <p>Select a project to see its sites, work, assets, and reports.</p>
           )}
         </section>
         <section className="panel">
@@ -189,5 +333,30 @@ export function ProjectsScreen({
         </section>
       </div>
     </>
+  );
+}
+
+function ProjectDetailList({
+  title,
+  items,
+  empty = 'Nothing here yet',
+}: {
+  title: string;
+  items: string[];
+  empty?: string;
+}) {
+  return (
+    <section>
+      <strong>{title}</strong>
+      {items.length ? (
+        <ul>
+          {items.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      ) : (
+        <p>{empty}</p>
+      )}
+    </section>
   );
 }
