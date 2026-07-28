@@ -17,15 +17,34 @@ type Location = {
 };
 type WorkOrder = {
   id: string;
+  projectId: string;
+  siteId?: string | null;
+  checklistId?: string | null;
   title: string;
+  description?: string | null;
   status: string;
   priority: string;
+  workType?: string;
   version: number;
   assignments: Assignment[];
   plannedStart?: string | null;
   plannedEnd?: string | null;
+  dueAt?: string | null;
+  evidenceRequirements?: string[];
+  requiredSkills?: string[];
 };
 type Assignment = { id: string; assigneeType: string; assigneeId: string };
+type Team = { id: string; name: string };
+type Member = {
+  userId: string;
+  status: string;
+  user?: { email: string };
+};
+type FormTemplate = {
+  id: string;
+  name: string;
+  versions: Array<{ id: string; status: string; versionNumber: number }>;
+};
 
 async function organization(slug: string) {
   const organizations = await apiRequest<Organization[]>('/organizations');
@@ -222,6 +241,8 @@ export function WorkOrdersScreen({
 }) {
   const workspace = useWorkspace(organizationSlug);
   const client = useQueryClient();
+  const [selectedWorkId, setSelectedWorkId] = useState('');
+  const [assigneeType, setAssigneeType] = useState<'user' | 'team'>('team');
   const work = useQuery({
     queryKey: ['work-orders', workspace.organizationId, workspace.projectId],
     enabled: Boolean(workspace.organizationId && workspace.projectId),
@@ -230,6 +251,46 @@ export function WorkOrdersScreen({
         `/organizations/${workspace.organizationId}/work-orders?projectId=${workspace.projectId}`,
       ),
   });
+  useEffect(() => {
+    if (work.data?.length && !work.data.some((item) => item.id === selectedWorkId))
+      setSelectedWorkId(work.data[0]!.id);
+  }, [selectedWorkId, work.data]);
+  const selectedWork = work.data?.find((item) => item.id === selectedWorkId);
+  const sites = useQuery({
+    queryKey: ['sites', workspace.organizationId, workspace.projectId],
+    enabled: Boolean(workspace.organizationId && workspace.projectId),
+    queryFn: () =>
+      apiRequest<Site[]>(
+        `/organizations/${workspace.organizationId}/projects/${workspace.projectId}/sites`,
+      ),
+  });
+  const forms = useQuery({
+    queryKey: ['forms', workspace.organizationId],
+    enabled: Boolean(workspace.organizationId),
+    queryFn: () =>
+      apiRequest<FormTemplate[]>(
+        `/organizations/${workspace.organizationId}/form-templates`,
+      ),
+  });
+  const teams = useQuery({
+    queryKey: ['teams', workspace.organizationId],
+    enabled: Boolean(assignmentsOnly && workspace.organizationId),
+    queryFn: () => apiRequest<Team[]>(`/organizations/${workspace.organizationId}/teams`),
+  });
+  const members = useQuery({
+    queryKey: ['members', workspace.organizationId],
+    enabled: Boolean(assignmentsOnly && workspace.organizationId),
+    queryFn: () =>
+      apiRequest<Member[]>(`/organizations/${workspace.organizationId}/members`),
+  });
+  const publishedForms = (forms.data ?? []).flatMap((form) =>
+    form.versions
+      .filter((version) => version.status === 'published')
+      .map((version) => ({
+        id: version.id,
+        label: `${form.name} · v${version.versionNumber}`,
+      })),
+  );
   const create = useMutation({
     mutationFn: (input: object) =>
       apiRequest(`/organizations/${workspace.organizationId}/work-orders`, {
@@ -269,10 +330,17 @@ export function WorkOrdersScreen({
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     create.mutate({
-      title: data.get('title'),
-      workType: data.get('workType'),
-      priority: data.get('priority'),
-      evidenceRequirements: data.getAll('evidence'),
+      title: String(data.get('title') ?? ''),
+      description: optionalString(data.get('description')),
+      workType: String(data.get('workType') ?? ''),
+      priority: String(data.get('priority') ?? 'medium'),
+      siteId: optionalString(data.get('siteId')),
+      checklistId: optionalString(data.get('checklistId')),
+      plannedStart: optionalDate(data.get('plannedStart')),
+      plannedEnd: optionalDate(data.get('plannedEnd')),
+      dueAt: optionalDate(data.get('dueAt')),
+      requiredSkills: commaList(data.get('requiredSkills')),
+      evidenceRequirements: data.getAll('evidence').map(String),
     });
     event.currentTarget.reset();
   }
@@ -298,7 +366,10 @@ export function WorkOrdersScreen({
       <ProjectPicker
         projects={workspace.projects.data ?? []}
         value={workspace.projectId}
-        onChange={workspace.setProjectId}
+        onChange={(id) => {
+          workspace.setProjectId(id);
+          setSelectedWorkId('');
+        }}
       />
       <div className="domain-grid">
         <section className="panel domain-wide">
@@ -307,19 +378,37 @@ export function WorkOrdersScreen({
             <ul className="domain-list">
               {work.data.map((item) => (
                 <li key={item.id}>
-                  <div>
-                    <strong>{item.title}</strong>
-                    <span>
-                      {item.priority} · {item.status} ·{' '}
-                      {item.assignments.length} assigned
-                    </span>
-                  </div>
-                  <span className="status-pill">v{item.version}</span>
+                  <button
+                    className={selectedWorkId === item.id ? 'selected' : ''}
+                    type="button"
+                    onClick={() => setSelectedWorkId(item.id)}
+                  >
+                    <div>
+                      <strong>{item.title}</strong>
+                      <span>
+                        {item.priority} · {item.status} ·{' '}
+                        {item.assignments.length} assigned
+                      </span>
+                    </div>
+                    <span className="status-pill">v{item.version}</span>
+                  </button>
                 </li>
               ))}
             </ul>
           ) : (
             <Empty text="No work orders in this project" />
+          )}
+        </section>
+        <section className="panel">
+          <h2>{assignmentsOnly ? 'Assignment details' : 'Work details'}</h2>
+          {selectedWork ? (
+            <WorkOrderDetail
+              forms={publishedForms}
+              sites={sites.data ?? []}
+              workOrder={selectedWork}
+            />
+          ) : (
+            <p>Select a work order to see the project detail.</p>
           )}
         </section>
         <section className="panel">
@@ -338,14 +427,35 @@ export function WorkOrdersScreen({
               </label>
               <label>
                 Assignee type
-                <select name="assigneeType">
+                <select
+                  name="assigneeType"
+                  value={assigneeType}
+                  onChange={(event) =>
+                    setAssigneeType(event.target.value as 'user' | 'team')
+                  }
+                >
                   <option value="user">User</option>
                   <option value="team">Team</option>
                 </select>
               </label>
               <label>
-                Assignee ID
-                <input name="assigneeId" required pattern="[0-9a-fA-F-]{36}" />
+                Assignee
+                <select name="assigneeId" required>
+                  <option value="">Select assignee</option>
+                  {assigneeType === 'team'
+                    ? (teams.data ?? []).map((team) => (
+                        <option key={team.id} value={team.id}>
+                          {team.name}
+                        </option>
+                      ))
+                    : (members.data ?? [])
+                        .filter((member) => member.status === 'active')
+                        .map((member) => (
+                          <option key={member.userId} value={member.userId}>
+                            {member.user?.email ?? member.userId}
+                          </option>
+                        ))}
+                </select>
               </label>
               <button
                 className="primary"
@@ -361,8 +471,40 @@ export function WorkOrdersScreen({
                 <input name="title" required />
               </label>
               <label>
+                Description
+                <input
+                  name="description"
+                  placeholder="Scope, method, safety notes"
+                />
+              </label>
+              <label>
                 Type
                 <input name="workType" required />
+              </label>
+              <label>
+                Site
+                <select name="siteId">
+                  <option value="">No site selected</option>
+                  {sites.data?.map((site) => (
+                    <option key={site.id} value={site.id}>
+                      {site.code} · {site.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Form checklist
+                <select name="checklistId">
+                  <option value="">No checklist</option>
+                  {publishedForms.map((form) => (
+                    <option key={form.id} value={form.id}>
+                      {form.label}
+                    </option>
+                  ))}
+                </select>
+                <span>
+                  Published forms become reusable work-order checklists.
+                </span>
               </label>
               <label>
                 Priority
@@ -372,6 +514,25 @@ export function WorkOrdersScreen({
                   <option>high</option>
                   <option>critical</option>
                 </select>
+              </label>
+              <label>
+                Planned start
+                <input name="plannedStart" type="datetime-local" />
+              </label>
+              <label>
+                Planned end
+                <input name="plannedEnd" type="datetime-local" />
+              </label>
+              <label>
+                Due
+                <input name="dueAt" type="datetime-local" />
+              </label>
+              <label>
+                Required skills
+                <input
+                  name="requiredSkills"
+                  placeholder="drilling, QA, safety"
+                />
               </label>
               <fieldset>
                 <legend>Evidence</legend>
@@ -395,6 +556,137 @@ export function WorkOrdersScreen({
       </div>
     </DomainPage>
   );
+}
+
+function WorkOrderDetail({
+  workOrder,
+  sites,
+  forms,
+}: {
+  workOrder: WorkOrder;
+  sites: Site[];
+  forms: Array<{ id: string; label: string }>;
+}) {
+  const site = workOrder.siteId
+    ? sites.find((candidate) => candidate.id === workOrder.siteId)
+    : undefined;
+  const form = workOrder.checklistId
+    ? forms.find((candidate) => candidate.id === workOrder.checklistId)
+    : undefined;
+  return (
+    <>
+      <span className="status-pill">{workOrder.status.replaceAll('_', ' ')}</span>
+      <h3>{workOrder.title}</h3>
+      {workOrder.description && <p>{workOrder.description}</p>}
+      <dl>
+        <div>
+          <dt>Priority</dt>
+          <dd>{workOrder.priority}</dd>
+        </div>
+        <div>
+          <dt>Type</dt>
+          <dd>{workOrder.workType ?? 'Not set'}</dd>
+        </div>
+        <div>
+          <dt>Site</dt>
+          <dd>
+            {site
+              ? `${site.code} · ${site.name}`
+              : workOrder.siteId || 'Not set'}
+          </dd>
+        </div>
+        <div>
+          <dt>Checklist</dt>
+          <dd>
+            {form
+              ? form.label
+              : workOrder.checklistId
+                ? 'Checklist not published or unavailable'
+                : 'No checklist attached'}
+          </dd>
+        </div>
+        <div>
+          <dt>Schedule</dt>
+          <dd>
+            {workOrder.plannedStart
+              ? `${formatDate(workOrder.plannedStart)} → ${
+                  workOrder.plannedEnd ? formatDate(workOrder.plannedEnd) : 'open'
+                }`
+              : 'Not scheduled'}
+          </dd>
+        </div>
+        <div>
+          <dt>Due</dt>
+          <dd>{workOrder.dueAt ? formatDate(workOrder.dueAt) : 'Not set'}</dd>
+        </div>
+      </dl>
+      <div className="detail-stack">
+        <DetailList
+          title="Assignments"
+          empty="Not assigned yet"
+          items={(workOrder.assignments ?? []).map(
+            (assignment) => `${assignment.assigneeType}: ${assignment.assigneeId}`,
+          )}
+        />
+        <DetailList
+          title="Evidence required"
+          empty="No evidence required"
+          items={workOrder.evidenceRequirements ?? []}
+        />
+        <DetailList
+          title="Skills"
+          empty="No skills listed"
+          items={workOrder.requiredSkills ?? []}
+        />
+      </div>
+    </>
+  );
+}
+
+function DetailList({
+  title,
+  items,
+  empty,
+}: {
+  title: string;
+  items: string[];
+  empty: string;
+}) {
+  return (
+    <section>
+      <strong>{title}</strong>
+      {items.length ? (
+        <ul>
+          {items.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      ) : (
+        <p>{empty}</p>
+      )}
+    </section>
+  );
+}
+
+function optionalString(value: FormDataEntryValue | null) {
+  const text = String(value ?? '').trim();
+  return text || undefined;
+}
+
+function optionalDate(value: FormDataEntryValue | null) {
+  const text = optionalString(value);
+  return text ? new Date(text).toISOString() : undefined;
+}
+
+function commaList(value: FormDataEntryValue | null) {
+  return String(value ?? '')
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function formatDate(value: string) {
+  return new Date(value).toLocaleString();
 }
 
 export function MapsScreen({ organizationSlug }: { organizationSlug: string }) {
@@ -467,7 +759,7 @@ export function MapsScreen({ organizationSlug }: { organizationSlug: string }) {
           {mapped.length ? (
             <ul className="domain-list">
               {mapped.map(({ location, coordinates }) => (
-                <li key={location.id}>
+                <li className="domain-list-action-row" key={location.id}>
                   <div>
                     <strong>{location.name}</strong>
                     <span>
