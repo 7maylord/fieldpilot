@@ -6,17 +6,52 @@ import { db, type OfflineEntity } from '../lib/offline/database';
 import { workOrderRepository } from '../lib/offline/repositories';
 
 type Assignment = { assigneeType: string; assigneeId: string };
+type Project = OfflineEntity & { code: string; name: string };
+type Site = OfflineEntity & {
+  projectId: string;
+  code: string;
+  name: string;
+  status: string;
+};
+type FormVersion = OfflineEntity & {
+  templateName?: string;
+  versionNumber?: number;
+  schema?: { title?: string };
+};
+type FormTemplate = {
+  name: string;
+  versions: Array<{
+    id: string;
+    status: string;
+    versionNumber: number;
+    schema?: { title?: string };
+  }>;
+};
+type Team = { id: string; name: string };
 type WorkOrder = OfflineEntity & {
+  projectId: string;
+  siteId?: string | null;
+  checklistId?: string | null;
   title: string;
+  description?: string | null;
   status: string;
   priority: string;
   workType: string;
   version: number;
   dueAt?: string | null;
   plannedStart?: string | null;
+  plannedEnd?: string | null;
+  estimatedMinutes?: number | null;
+  requiredSkills?: string[];
+  evidenceRequirements?: string[];
   assignments: Assignment[];
 };
-type FieldContext = { organizationId: string; userId: string };
+type FieldContext = { organizationId: string; userId: string; teamIds?: string[] };
+type Lookups = {
+  projects: Map<string, Project>;
+  sites: Map<string, Site>;
+  forms: Map<string, FormVersion>;
+};
 
 async function refreshRepository(): Promise<FieldContext> {
   const [user, organizations] = await Promise.all([
@@ -25,35 +60,68 @@ async function refreshRepository(): Promise<FieldContext> {
   ]);
   const organization = organizations[0];
   if (!organization) throw new Error('No organization available');
-  const projects = await apiRequest<{ id: string }[]>(
-    `/organizations/${organization.id}/projects`,
-  );
-  const batches = await Promise.all(
-    projects.map((project) =>
-      apiRequest<WorkOrder[]>(
-        `/organizations/${organization.id}/work-orders?projectId=${project.id}`,
+  const [projects, templates, teams] = await Promise.all([
+    apiRequest<Project[]>(`/organizations/${organization.id}/projects`),
+    apiRequest<FormTemplate[]>(
+      `/organizations/${organization.id}/form-templates`,
+    ).catch(() => []),
+    apiRequest<Team[]>(`/organizations/${organization.id}/my-teams`).catch(
+      () => [],
+    ),
+  ]);
+  const [batches, siteBatches] = await Promise.all([
+    Promise.all(
+      projects.map((project) =>
+        apiRequest<WorkOrder[]>(
+          `/organizations/${organization.id}/work-orders?projectId=${project.id}`,
+        ),
       ),
     ),
+    Promise.all(
+      projects.map((project) =>
+        apiRequest<Site[]>(
+          `/organizations/${organization.id}/projects/${project.id}/sites`,
+        ).catch(() => []),
+      ),
+    ),
+  ]);
+  const formVersions = templates.flatMap((template) =>
+    template.versions
+      .filter((version) => version.status === 'published')
+      .map((version) => ({ ...version, templateName: template.name })),
   );
   const now = new Date().toISOString();
-  await db.transaction('rw', db.workOrders, db.syncState, async () => {
-    await db.workOrders.bulkPut(
-      batches.flat().map((item) => ({
-        ...item,
-        organizationId: organization.id,
-        serverVersion: item.version,
-        localUpdatedAt: now,
-        serverUpdatedAt: now,
-        syncState: 'synced',
-        tombstone: false,
-      })),
-    );
-    await db.syncState.put({
-      key: 'field-context',
-      value: { organizationId: organization.id, userId: user.id },
-    });
-  });
-  return { organizationId: organization.id, userId: user.id };
+  await db.transaction(
+    'rw',
+    db.projects,
+    db.sites,
+    db.workOrders,
+    db.formVersions,
+    db.syncState,
+    async () => {
+      await Promise.all([
+        db.projects.bulkPut(toOffline(organization.id, projects, now)),
+        db.sites.bulkPut(toOffline(organization.id, siteBatches.flat(), now)),
+        db.workOrders.bulkPut(toOffline(organization.id, batches.flat(), now)),
+        db.formVersions.bulkPut(
+          toOffline(organization.id, formVersions, now),
+        ),
+        db.syncState.put({
+          key: 'field-context',
+          value: {
+            organizationId: organization.id,
+            userId: user.id,
+            teamIds: teams.map(({ id }) => id),
+          },
+        }),
+      ]);
+    },
+  );
+  return {
+    organizationId: organization.id,
+    userId: user.id,
+    teamIds: teams.map(({ id }) => id),
+  };
 }
 
 async function localContext() {
@@ -66,7 +134,11 @@ export function FieldWorkScreen({ view }: { view: 'today' | 'mine' }) {
   const [offline, setOffline] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<string>();
-  const [opened, setOpened] = useState(false);
+  const [lookups, setLookups] = useState<Lookups>({
+    projects: new Map(),
+    sites: new Map(),
+    forms: new Map(),
+  });
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -78,14 +150,38 @@ export function FieldWorkScreen({ view }: { view: 'today' | 'mine' }) {
       const stored = (
         await workOrderRepository.list(context.organizationId)
       ).map((item) => item as OfflineEntity & WorkOrder);
+      const [projects, sites, forms] = await Promise.all([
+        db.projects
+          .where('organizationId')
+          .equals(context.organizationId)
+          .toArray(),
+        db.sites
+          .where('organizationId')
+          .equals(context.organizationId)
+          .toArray(),
+        db.formVersions
+          .where('organizationId')
+          .equals(context.organizationId)
+          .toArray(),
+      ]);
+      setLookups({
+        projects: new Map(
+          projects.map((project) => [project.id, project as Project]),
+        ),
+        sites: new Map(sites.map((site) => [site.id, site as Site])),
+        forms: new Map(forms.map((form) => [form.id, form as FormVersion])),
+      });
       const today = new Date().toISOString().slice(0, 10);
+      const teamIds = new Set(context.teamIds ?? []);
       const visible =
         view === 'mine'
           ? stored.filter((item) =>
               item.assignments?.some(
                 (assignment) =>
-                  assignment.assigneeType === 'user' &&
-                  assignment.assigneeId === context.userId,
+                  (assignment.assigneeType === 'user' &&
+                    assignment.assigneeId === context.userId) ||
+                  (assignment.assigneeType === 'team' &&
+                    teamIds.has(assignment.assigneeId)),
               ),
             )
           : stored.filter(
@@ -95,7 +191,9 @@ export function FieldWorkScreen({ view }: { view: 'today' | 'mine' }) {
                 ) && !['completed', 'cancelled'].includes(item.status),
             );
       setItems(visible);
-      setSelected((current) => current ?? visible[0]?.id);
+      setSelected((current) =>
+        visible.some((item) => item.id === current) ? current : visible[0]?.id,
+      );
     };
     try {
       await showLocal(await localContext());
@@ -128,6 +226,15 @@ export function FieldWorkScreen({ view }: { view: 'today' | 'mine' }) {
     };
   }, [load]);
   const current = items.find((item) => item.id === selected);
+  const currentProject = current
+    ? lookups.projects.get(current.projectId)
+    : undefined;
+  const currentSite = current?.siteId
+    ? lookups.sites.get(current.siteId)
+    : undefined;
+  const currentForm = current?.checklistId
+    ? lookups.forms.get(current.checklistId)
+    : undefined;
 
   return (
     <>
@@ -140,7 +247,7 @@ export function FieldWorkScreen({ view }: { view: 'today' | 'mine' }) {
           <p>
             {view === 'today'
               ? 'Work planned or due today.'
-              : 'Work assigned directly to you.'}
+              : 'Downloaded work assigned to you or one of your teams.'}
           </p>
         </div>
         <button type="button" className="secondary" onClick={() => void load()}>
@@ -195,7 +302,24 @@ export function FieldWorkScreen({ view }: { view: 'today' | 'mine' }) {
                 {current.status.replaceAll('_', ' ')}
               </span>
               <h3>{current.title}</h3>
+              {current.description && <p>{current.description}</p>}
               <dl>
+                <div>
+                  <dt>Project</dt>
+                  <dd>
+                    {currentProject
+                      ? `${currentProject.code} · ${currentProject.name}`
+                      : current.projectId}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Site</dt>
+                  <dd>
+                    {currentSite
+                      ? `${currentSite.code} · ${currentSite.name}`
+                      : current.siteId || 'Not set'}
+                  </dd>
+                </div>
                 <div>
                   <dt>Priority</dt>
                   <dd>{current.priority}</dd>
@@ -212,19 +336,51 @@ export function FieldWorkScreen({ view }: { view: 'today' | 'mine' }) {
                       : 'Not set'}
                   </dd>
                 </div>
+                <div>
+                  <dt>Window</dt>
+                  <dd>
+                    {current.plannedStart
+                      ? `${new Date(current.plannedStart).toLocaleString()} → ${
+                          current.plannedEnd
+                            ? new Date(current.plannedEnd).toLocaleString()
+                            : 'open'
+                        }`
+                      : 'Not scheduled'}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Checklist</dt>
+                  <dd>
+                    {currentForm
+                      ? `${currentForm.templateName ?? currentForm.schema?.title ?? 'Form'} v${
+                          currentForm.versionNumber ?? 1
+                        }`
+                      : current.checklistId
+                        ? 'Checklist unavailable offline'
+                        : 'No checklist attached'}
+                  </dd>
+                </div>
               </dl>
-              <button
-                className="primary"
-                type="button"
-                onClick={() => setOpened(true)}
-              >
-                Open work order
-              </button>
-              {opened && (
-                <p role="status">
-                  Work-order details opened from the local repository.
-                </p>
-              )}
+              <div className="detail-stack">
+                <DetailList
+                  title="Assignments"
+                  empty="Not assigned yet"
+                  items={(current.assignments ?? []).map(
+                    (assignment) =>
+                      `${assignment.assigneeType}: ${assignment.assigneeId}`,
+                  )}
+                />
+                <DetailList
+                  title="Evidence required"
+                  empty="No evidence required"
+                  items={current.evidenceRequirements ?? []}
+                />
+                <DetailList
+                  title="Skills"
+                  empty="No skills listed"
+                  items={current.requiredSkills ?? []}
+                />
+              </div>
             </>
           ) : (
             <p>Select a work order to see its details.</p>
@@ -233,4 +389,45 @@ export function FieldWorkScreen({ view }: { view: 'today' | 'mine' }) {
       </div>
     </>
   );
+}
+
+function DetailList({
+  title,
+  items,
+  empty,
+}: {
+  title: string;
+  items: string[];
+  empty: string;
+}) {
+  return (
+    <section>
+      <strong>{title}</strong>
+      {items.length ? (
+        <ul>
+          {items.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      ) : (
+        <p>{empty}</p>
+      )}
+    </section>
+  );
+}
+
+function toOffline(
+  organizationId: string,
+  rows: Array<Record<string, unknown> & { id: string; version?: number }>,
+  now: string,
+): OfflineEntity[] {
+  return rows.map((row) => ({
+    ...row,
+    organizationId,
+    serverVersion: Number(row.version ?? 1),
+    localUpdatedAt: String(row.updatedAt ?? now),
+    serverUpdatedAt: String(row.updatedAt ?? now),
+    syncState: 'synced',
+    tombstone: false,
+  }));
 }
