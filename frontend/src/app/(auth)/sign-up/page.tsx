@@ -43,8 +43,11 @@ export default function SignUpPage() {
   }
 
   return (
-    <main className="centered-state">
-      <section className="auth-card">
+    <main className="centered-state auth-stage">
+      <Link className="auth-home-link" href="/">
+        ← Back to home
+      </Link>
+      <section className="auth-card sign-in-card">
         <h1>Create account</h1>
         <p>Start with your user account. Create the company after sign-in.</p>
         <form

@@ -24,8 +24,11 @@ export default function SignInPage() {
     formState: { errors, isSubmitting },
   } = useForm<SignInInput>({ resolver: zodResolver(signInSchema) });
   return (
-    <main className="centered-state">
-      <section className="auth-card">
+    <main className="centered-state auth-stage">
+      <Link className="auth-home-link" href="/">
+        ← Back to home
+      </Link>
+      <section className="auth-card sign-in-card">
         <h1>Welcome back</h1>
         <p>Sign in to your FieldPilot workspace.</p>
         <form
