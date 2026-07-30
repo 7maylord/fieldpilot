@@ -8,7 +8,7 @@ import { SyncConflicts } from './sync-conflicts';
 
 type Organization = { id: string; slug: string };
 type Project = { id: string };
-type WorkOrder = {
+export type DashboardWorkOrder = {
   id: string;
   title: string;
   status: string;
@@ -26,6 +26,7 @@ export function OperationsDashboard({
   todayLabel: string;
 }) {
   const [filter, setFilter] = useState('All');
+  const [query, setQuery] = useState('');
   const organization = useQuery({
     queryKey: ['organization', organizationSlug],
     queryFn: async () => {
@@ -49,7 +50,7 @@ export function OperationsDashboard({
       (
         await Promise.all(
           (projects.data ?? []).map(({ id }) =>
-            apiRequest<WorkOrder[]>(
+            apiRequest<DashboardWorkOrder[]>(
               `/organizations/${organization.data!.id}/work-orders?projectId=${id}`,
             ),
           ),
@@ -57,7 +58,8 @@ export function OperationsDashboard({
       ).flat(),
   });
   const workOrders = work.data ?? [];
-  const visibleWork = filteredWork(workOrders, filter);
+  const visibleWork = searchWork(filteredWork(workOrders, filter), query);
+  const hasSearch = Boolean(query.trim());
   const reviewCount = filteredWork(workOrders, 'Review').length;
   const overdueCount = filteredWork(workOrders, 'Overdue').length;
   const assignedCount = filteredWork(workOrders, 'Assigned').length;
@@ -77,6 +79,26 @@ export function OperationsDashboard({
         <Link className="primary" href={`/${organizationSlug}/work`}>
           New work order
         </Link>
+      </section>
+      <section className="context-console" aria-label="Operations context">
+        <div>
+          <p className="eyebrow">Command center</p>
+          <h2>Find the operational context before the field asks twice.</h2>
+        </div>
+        <label className="context-command">
+          <span>Search work, status, priority</span>
+          <input
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Try drilling, submitted, high..."
+          />
+        </label>
+        <div className="context-metrics" aria-label="Live workspace counts">
+          <Metric label="Projects" value={projects.data?.length ?? 0} />
+          <Metric label="Work orders" value={workOrders.length} />
+          <Metric label="Assigned" value={assignedCount} />
+          <Metric label="Needs attention" value={reviewCount + overdueCount} />
+        </div>
       </section>
       {errorCopy && (
         <div className="notice" role="alert">
@@ -125,10 +147,20 @@ export function OperationsDashboard({
             {(error || isLoading || visibleWork.length === 0) && (
               <div className="empty-state">
                 <strong>
-                  {emptyTitle(filter, { error, isLoading, noProjects })}
+                  {emptyTitle(filter, {
+                    error,
+                    hasSearch,
+                    isLoading,
+                    noProjects,
+                  })}
                 </strong>
                 <span>
-                  {emptyText(filter, { error, isLoading, noProjects })}
+                  {emptyText(filter, {
+                    error,
+                    hasSearch,
+                    isLoading,
+                    noProjects,
+                  })}
                 </span>
               </div>
             )}
@@ -173,7 +205,16 @@ export function OperationsDashboard({
   );
 }
 
-function filteredWork(workOrders: WorkOrder[], filter: string) {
+function Metric({ label, value }: { label: string; value: number }) {
+  return (
+    <div>
+      <strong>{value}</strong>
+      <span>{label}</span>
+    </div>
+  );
+}
+
+function filteredWork(workOrders: DashboardWorkOrder[], filter: string) {
   if (filter === 'Assigned')
     return workOrders.filter(({ assignments }) => assignments?.length);
   if (filter === 'Review')
@@ -192,7 +233,18 @@ function filteredWork(workOrders: WorkOrder[], filter: string) {
   return workOrders;
 }
 
-function workTime(workOrder: WorkOrder) {
+export function searchWork(workOrders: DashboardWorkOrder[], query: string) {
+  const term = query.trim().toLowerCase();
+  if (!term) return workOrders;
+  return workOrders.filter((workOrder) =>
+    [workOrder.title, workOrder.status, workOrder.priority]
+      .join(' ')
+      .toLowerCase()
+      .includes(term),
+  );
+}
+
+function workTime(workOrder: DashboardWorkOrder) {
   const value = workOrder.plannedStart ?? workOrder.dueAt;
   return value ? new Date(value).toLocaleString() : 'Unscheduled';
 }
@@ -214,10 +266,16 @@ function dashboardError(error: unknown) {
 
 function emptyTitle(
   filter: string,
-  state: { error: unknown; isLoading: boolean; noProjects: boolean },
+  state: {
+    error: unknown;
+    hasSearch: boolean;
+    isLoading: boolean;
+    noProjects: boolean;
+  },
 ) {
   if (state.error) return 'Dashboard data unavailable';
   if (state.isLoading) return 'Loading dashboard data…';
+  if (state.hasSearch) return 'No matching work orders';
   if (state.noProjects) return 'No projects yet';
   if (filter === 'Review') return 'No work is waiting for review';
   if (filter === 'Overdue') return 'No overdue work orders';
@@ -227,11 +285,17 @@ function emptyTitle(
 
 function emptyText(
   filter: string,
-  state: { error: unknown; isLoading: boolean; noProjects: boolean },
+  state: {
+    error: unknown;
+    hasSearch: boolean;
+    isLoading: boolean;
+    noProjects: boolean;
+  },
 ) {
   if (state.error)
     return 'Refresh after the connection or API server recovers.';
   if (state.isLoading) return 'Live dashboard data is loading.';
+  if (state.hasSearch) return 'Clear the search or try another term.';
   if (state.noProjects) return 'Create a project before raising work orders.';
   if (filter === 'All') return 'Raise the first work order when work is ready.';
   return 'Try another filter or update the matching work orders.';
