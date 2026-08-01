@@ -8,21 +8,51 @@ import { toast } from 'sonner';
 import { apiRequest } from '../lib/api';
 import { OfflineStatus } from './offline-status';
 
-const officeLinks = [
-  'Overview',
-  'Projects',
-  'Sites',
-  'Work',
-  'Assignments',
-  'Dispatch',
-  'Assets',
-  'Members',
-  'Maps',
-  'Forms',
-  'Reports',
-  'Notifications',
+const officeNav: [string, [string, string][]][] = [
+  [
+    'Plan',
+    [
+      ['Overview', 'dashboard'],
+      ['Projects', 'projects'],
+      ['Sites', 'sites'],
+      ['Maps', 'maps'],
+    ],
+  ],
+  [
+    'Execute',
+    [
+      ['Work', 'work'],
+      ['Assignments', 'assignments'],
+      ['Dispatch', 'dispatch'],
+      ['Assets', 'assets'],
+    ],
+  ],
+  [
+    'Govern',
+    [
+      ['Members', 'members'],
+      ['Forms', 'forms'],
+      ['Reports', 'reports'],
+      ['Notifications', 'notifications'],
+    ],
+  ],
 ];
-const fieldLinks = ['Today', 'My work', 'Downloads', 'Conflicts'];
+const fieldNav: [string, [string, string][]][] = [
+  [
+    'On site',
+    [
+      ['Today', 'today'],
+      ['My work', 'work'],
+    ],
+  ],
+  [
+    'Sync',
+    [
+      ['Downloads', 'downloads'],
+      ['Conflicts', 'conflicts'],
+    ],
+  ],
+];
 type CurrentUser = { email: string };
 type Organization = {
   id: string;
@@ -58,7 +88,8 @@ export function AppShell({
       : organizationSlug
         ? `/${organizationSlug}/dashboard`
         : '/organizations';
-  const links = mode === 'office' ? officeLinks : fieldLinks;
+  const groups = mode === 'office' ? officeNav : fieldNav;
+  const base = mode === 'field' ? '/field' : `/${organizationSlug}`;
   const profile = useQuery({
     queryKey: ['current-user'],
     queryFn: () => apiRequest<CurrentUser>('/auth/me'),
@@ -74,10 +105,35 @@ export function AppShell({
 
   return (
     <div className="app-frame">
-      <header className="glass topbar">
+      <aside className="sidebar">
         <Link className="brand" href={brandHref}>
           FieldPilot
         </Link>
+        <nav aria-label={`${mode} navigation`}>
+          {groups.map(([group, items]) => (
+            <div key={group}>
+              <p className="rail-group">{group}</p>
+              {items.map(([label, segment]) => {
+                const href = `${base}/${segment}`;
+                return (
+                  <Link
+                    className={pathname === href ? 'active' : ''}
+                    href={href}
+                    key={label}
+                  >
+                    {label}
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
+        </nav>
+      </aside>
+      <header className="topbar">
+        <Link className="brand" href={brandHref}>
+          FieldPilot
+        </Link>
+        {organization && <p className="topbar-context">{organization.name}</p>}
         <nav className="mode-switch" aria-label="Workspace mode">
           <Link
             className={mode === 'office' ? 'active' : ''}
@@ -132,57 +188,6 @@ export function AppShell({
           )}
         </div>
       </header>
-      <aside className="glass sidebar">
-        <nav aria-label={`${mode} navigation`}>
-          {links.map((label) => {
-            const href =
-              mode === 'field'
-                ? label === 'Today'
-                  ? '/field/today'
-                  : label === 'My work'
-                    ? '/field/work'
-                    : label === 'Downloads'
-                      ? '/field/downloads'
-                      : label === 'Conflicts'
-                        ? '/field/conflicts'
-                    : '#'
-                : label === 'Overview'
-                  ? `/${organizationSlug}/dashboard`
-                  : label === 'Projects'
-                    ? `/${organizationSlug}/projects`
-                    : label === 'Sites'
-                      ? `/${organizationSlug}/sites`
-                      : label === 'Work'
-                        ? `/${organizationSlug}/work`
-                        : label === 'Assignments'
-                          ? `/${organizationSlug}/assignments`
-                          : label === 'Dispatch'
-                            ? `/${organizationSlug}/dispatch`
-                            : label === 'Assets'
-                              ? `/${organizationSlug}/assets`
-                              : label === 'Members'
-                                ? `/${organizationSlug}/members`
-                                : label === 'Maps'
-                                  ? `/${organizationSlug}/maps`
-                                  : label === 'Forms'
-                                    ? `/${organizationSlug}/forms`
-                                    : label === 'Reports'
-                                      ? `/${organizationSlug}/reports`
-                                      : label === 'Notifications'
-                                        ? `/${organizationSlug}/notifications`
-                                        : '#';
-            return (
-              <Link
-                className={pathname === href ? 'active' : ''}
-                href={href}
-                key={label}
-              >
-                {label}
-              </Link>
-            );
-          })}
-        </nav>
-      </aside>
       <main className="workspace">
         <OfflineStatus organizationId={organization?.id} />
         {children}
@@ -202,9 +207,12 @@ function roleLabel(role?: string) {
 function roleLine(role?: string) {
   if (role === 'owner') return 'The keys, the map, and the final say.';
   if (role === 'admin') return 'Control tower access for people and settings.';
-  if (role === 'manager') return 'Runs the operation without changing ownership.';
-  if (role === 'coordinator') return 'Dispatch brain: teams, work, and field flow.';
-  if (role === 'member') return 'Field-ready: assigned work, inspections, and defects.';
+  if (role === 'manager')
+    return 'Runs the operation without changing ownership.';
+  if (role === 'coordinator')
+    return 'Dispatch brain: teams, work, and field flow.';
+  if (role === 'member')
+    return 'Field-ready: assigned work, inspections, and defects.';
   if (role === 'viewer') return 'Read-only eyes on the workspace.';
   if (role === 'external') return 'Scoped collaborator access.';
   return 'Signed into this workspace.';

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import { apiRequest } from '../lib/api';
 import { db, type OfflineEntity } from '../lib/offline/database';
 import {
@@ -133,26 +133,67 @@ export function OfflineStatus({ organizationId }: { organizationId?: string }) {
     }
   }
 
+  const held = status.pending + status.media;
+
   return (
-    <section className="offline-status" aria-label="Offline work status">
-      <span className={online ? 'healthy' : 'warning'}>
-        {online ? 'Online' : 'Offline'}
-      </span>
-      <span>Package: {status.packageVersion ?? 'not downloaded'}</span>
-      {organizationId && (
-        <button type="button" onClick={downloadPackage} disabled={downloading}>
-          {downloading ? 'Downloading…' : 'Download package'}
+    <section className="datum" aria-label="Sync status">
+      <p className="datum-readout">
+        <span className={online ? 'datum-state' : 'datum-state is-offline'}>
+          {online ? 'Online' : 'Offline'}
+        </span>
+        <span className="datum-package">
+          Package {status.packageVersion ?? 'not downloaded'}
+        </span>
+      </p>
+      <div
+        className={held ? 'datum-rule' : 'datum-rule is-synced'}
+        style={{ '--split': `${splitPercent(held)}%` } as CSSProperties}
+        aria-hidden="true"
+      >
+        <span className="datum-marker" />
+      </div>
+      <dl className="datum-counts">
+        <div className={held ? 'held' : undefined}>
+          <dt>Held here</dt>
+          <dd>{held}</dd>
+        </div>
+        <div>
+          <dt>Conflicts</dt>
+          <dd>{status.conflicts}</dd>
+        </div>
+      </dl>
+      <div className="datum-actions">
+        {organizationId && (
+          <button
+            type="button"
+            onClick={downloadPackage}
+            disabled={downloading}
+          >
+            {downloading ? 'Downloading…' : 'Download package'}
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={exportRecovery}
+          disabled={!organizationId}
+        >
+          Export recovery data
         </button>
-      )}
-      <span>Pending: {status.pending}</span>
-      <span>Media: {status.media}</span>
-      <span>Conflicts: {status.conflicts}</span>
-      <button type="button" onClick={exportRecovery} disabled={!organizationId}>
-        Export recovery data
-      </button>
-      {message && <span role="status">{message}</span>}
+      </div>
+      <p className="datum-message" role="status">
+        {message ||
+          (held
+            ? `${held} change${held === 1 ? '' : 's'} are still on this device. They sync when the connection returns.`
+            : 'Everything on this device matches the server.')}
+      </p>
     </section>
   );
+}
+
+/* Where the datum marker sits: full width when nothing is outstanding, pulled
+   back as unsynced work piles up behind it. */
+function splitPercent(held: number) {
+  return held === 0 ? 100 : Math.max(20, 100 - held * 7);
 }
 
 async function ensureDevice(organizationId: string) {

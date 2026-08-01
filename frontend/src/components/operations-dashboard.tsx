@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useState } from 'react';
 import { ApiError, apiRequest } from '../lib/api';
+import { formatTimestamp } from '../lib/format-date';
 import { SyncConflicts } from './sync-conflicts';
 
 type Organization = { id: string; slug: string };
@@ -82,15 +83,15 @@ export function OperationsDashboard({
       </section>
       <section className="context-console" aria-label="Operations context">
         <div>
-          <p className="eyebrow">Command center</p>
-          <h2>Find the operational context before the field asks twice.</h2>
+          <p className="eyebrow">Live workspace</p>
+          <h2>What needs a decision today.</h2>
         </div>
         <label className="context-command">
           <span>Search work, status, priority</span>
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Try drilling, submitted, high..."
+            placeholder="e.g. spalling, submitted, high"
           />
         </label>
         <div className="context-metrics" aria-label="Live workspace counts">
@@ -133,7 +134,7 @@ export function OperationsDashboard({
                   href={`/${organizationSlug}/work`}
                   key={item.id}
                 >
-                  <span className="status-dot" />
+                  <span className={`status-dot ${item.status}`} />
                   <span>
                     <strong>{item.title}</strong>
                     <small>{item.status.replaceAll('_', ' ')}</small>
@@ -246,7 +247,7 @@ export function searchWork(workOrders: DashboardWorkOrder[], query: string) {
 
 function workTime(workOrder: DashboardWorkOrder) {
   const value = workOrder.plannedStart ?? workOrder.dueAt;
-  return value ? new Date(value).toLocaleString() : 'Unscheduled';
+  return value ? formatTimestamp(value) : 'Unscheduled';
 }
 
 function dashboardError(error: unknown) {
