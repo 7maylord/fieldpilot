@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState, type FormEvent } from 'react';
 import { toast } from 'sonner';
 import { apiBase, apiRequest } from '../lib/api';
+import { formatDay } from '../lib/format-date';
 
 type Report = {
   id: string;
@@ -117,9 +118,7 @@ export function ReportsScreen({
             {reports.data?.map((report) => (
               <li key={report.id}>
                 <div>
-                  <strong>
-                    {new Date(report.reportDate).toLocaleDateString()}
-                  </strong>
+                  <strong>{formatDay(report.reportDate)}</strong>
                   <span>
                     {report.status} · revision {report.currentRevision}
                   </span>

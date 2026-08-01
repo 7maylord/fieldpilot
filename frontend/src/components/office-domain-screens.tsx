@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
 import { toast } from 'sonner';
 import { apiRequest } from '../lib/api';
+import { formatTimestamp } from '../lib/format-date';
 
 type Organization = { id: string; slug: string };
 type Project = { id: string; name: string; code: string };
@@ -252,7 +253,10 @@ export function WorkOrdersScreen({
       ),
   });
   useEffect(() => {
-    if (work.data?.length && !work.data.some((item) => item.id === selectedWorkId))
+    if (
+      work.data?.length &&
+      !work.data.some((item) => item.id === selectedWorkId)
+    )
       setSelectedWorkId(work.data[0]!.id);
   }, [selectedWorkId, work.data]);
   const selectedWork = work.data?.find((item) => item.id === selectedWorkId);
@@ -275,13 +279,16 @@ export function WorkOrdersScreen({
   const teams = useQuery({
     queryKey: ['teams', workspace.organizationId],
     enabled: Boolean(assignmentsOnly && workspace.organizationId),
-    queryFn: () => apiRequest<Team[]>(`/organizations/${workspace.organizationId}/teams`),
+    queryFn: () =>
+      apiRequest<Team[]>(`/organizations/${workspace.organizationId}/teams`),
   });
   const members = useQuery({
     queryKey: ['members', workspace.organizationId],
     enabled: Boolean(assignmentsOnly && workspace.organizationId),
     queryFn: () =>
-      apiRequest<Member[]>(`/organizations/${workspace.organizationId}/members`),
+      apiRequest<Member[]>(
+        `/organizations/${workspace.organizationId}/members`,
+      ),
   });
   const publishedForms = (forms.data ?? []).flatMap((form) =>
     form.versions
@@ -575,7 +582,9 @@ function WorkOrderDetail({
     : undefined;
   return (
     <>
-      <span className="status-pill">{workOrder.status.replaceAll('_', ' ')}</span>
+      <span className="status-pill">
+        {workOrder.status.replaceAll('_', ' ')}
+      </span>
       <h3>{workOrder.title}</h3>
       {workOrder.description && <p>{workOrder.description}</p>}
       <dl>
@@ -610,7 +619,9 @@ function WorkOrderDetail({
           <dd>
             {workOrder.plannedStart
               ? `${formatDate(workOrder.plannedStart)} → ${
-                  workOrder.plannedEnd ? formatDate(workOrder.plannedEnd) : 'open'
+                  workOrder.plannedEnd
+                    ? formatDate(workOrder.plannedEnd)
+                    : 'open'
                 }`
               : 'Not scheduled'}
           </dd>
@@ -625,7 +636,8 @@ function WorkOrderDetail({
           title="Assignments"
           empty="Not assigned yet"
           items={(workOrder.assignments ?? []).map(
-            (assignment) => `${assignment.assigneeType}: ${assignment.assigneeId}`,
+            (assignment) =>
+              `${assignment.assigneeType}: ${assignment.assigneeId}`,
           )}
         />
         <DetailList
@@ -686,7 +698,7 @@ function commaList(value: FormDataEntryValue | null) {
 }
 
 function formatDate(value: string) {
-  return new Date(value).toLocaleString();
+  return formatTimestamp(value);
 }
 
 export function MapsScreen({ organizationSlug }: { organizationSlug: string }) {
@@ -837,7 +849,7 @@ export function DispatchScreen({
                   <strong>{workOrder.title}</strong>
                   <span>
                     {workOrder.plannedStart
-                      ? new Date(workOrder.plannedStart).toLocaleString()
+                      ? formatTimestamp(workOrder.plannedStart)
                       : 'Unscheduled'}{' '}
                     · {workOrder.status}
                   </span>

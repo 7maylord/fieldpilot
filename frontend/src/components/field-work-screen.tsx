@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { apiRequest } from '../lib/api';
+import { formatTimestamp } from '../lib/format-date';
 import { db, type OfflineEntity } from '../lib/offline/database';
 import { workOrderRepository } from '../lib/offline/repositories';
 
@@ -46,7 +47,11 @@ type WorkOrder = OfflineEntity & {
   evidenceRequirements?: string[];
   assignments: Assignment[];
 };
-type FieldContext = { organizationId: string; userId: string; teamIds?: string[] };
+type FieldContext = {
+  organizationId: string;
+  userId: string;
+  teamIds?: string[];
+};
 type Lookups = {
   projects: Map<string, Project>;
   sites: Map<string, Site>;
@@ -103,9 +108,7 @@ async function refreshRepository(): Promise<FieldContext> {
         db.projects.bulkPut(toOffline(organization.id, projects, now)),
         db.sites.bulkPut(toOffline(organization.id, siteBatches.flat(), now)),
         db.workOrders.bulkPut(toOffline(organization.id, batches.flat(), now)),
-        db.formVersions.bulkPut(
-          toOffline(organization.id, formVersions, now),
-        ),
+        db.formVersions.bulkPut(toOffline(organization.id, formVersions, now)),
         db.syncState.put({
           key: 'field-context',
           value: {
@@ -331,18 +334,16 @@ export function FieldWorkScreen({ view }: { view: 'today' | 'mine' }) {
                 <div>
                   <dt>Due</dt>
                   <dd>
-                    {current.dueAt
-                      ? new Date(current.dueAt).toLocaleString()
-                      : 'Not set'}
+                    {current.dueAt ? formatTimestamp(current.dueAt) : 'Not set'}
                   </dd>
                 </div>
                 <div>
                   <dt>Window</dt>
                   <dd>
                     {current.plannedStart
-                      ? `${new Date(current.plannedStart).toLocaleString()} → ${
+                      ? `${formatTimestamp(current.plannedStart)} → ${
                           current.plannedEnd
-                            ? new Date(current.plannedEnd).toLocaleString()
+                            ? formatTimestamp(current.plannedEnd)
                             : 'open'
                         }`
                       : 'Not scheduled'}

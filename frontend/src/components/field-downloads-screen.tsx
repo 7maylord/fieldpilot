@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { apiRequest } from '../lib/api';
+import { formatTimestamp } from '../lib/format-date';
 import { db } from '../lib/offline/database';
 
 type Organization = { id: string; name: string; slug: string };
@@ -68,7 +69,10 @@ export function FieldDownloadsScreen() {
       db.locations.where('organizationId').equals(organization.id).count(),
       db.workOrders.where('organizationId').equals(organization.id).count(),
       db.formVersions.where('organizationId').equals(organization.id).count(),
-      db.inspectionDrafts.where('organizationId').equals(organization.id).count(),
+      db.inspectionDrafts
+        .where('organizationId')
+        .equals(organization.id)
+        .count(),
       db.referenceData.where('organizationId').equals(organization.id).count(),
       db.pendingOperations
         .where('[organizationId+state]')
@@ -129,7 +133,7 @@ export function FieldDownloadsScreen() {
               <dt>Expires</dt>
               <dd>
                 {summary.expiresAt
-                  ? new Date(summary.expiresAt).toLocaleString()
+                  ? formatTimestamp(summary.expiresAt)
                   : 'Not set'}
               </dd>
             </div>
