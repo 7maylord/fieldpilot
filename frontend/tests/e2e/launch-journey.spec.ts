@@ -148,19 +148,24 @@ test('Nigerian QA journey: company setup, work orders, offline field sync, defec
     ),
   ).resolves.toBe(true);
   await page.goto(`/${organization.slug}/projects`);
-  await expect(page.getByText('Third Mainland Bridge expansion')).toBeVisible();
+  // Named in both the project list and the auto-selected detail panel.
+  await expect(
+    page.getByText('Third Mainland Bridge expansion').first(),
+  ).toBeVisible();
   await page.goto(`/${organization.slug}/sites`);
   await expect(page.getByText('Oworonshoki yard')).toBeVisible();
   await expect(page.getByText('Ikoyi Pier 4')).toBeVisible();
   await page.goto(`/${organization.slug}/work`);
-  await expect(page.getByText('Inspect Ikoyi expansion joint')).toBeVisible();
+  await expect(
+    page.getByText('Inspect Ikoyi expansion joint').first(),
+  ).toBeVisible();
   const uiWorkOrder = 'Repair Apapa scaffold access';
   await page.getByLabel('Title').fill(uiWorkOrder);
   await page.getByLabel('Type').fill('repair');
   await page.getByLabel('Priority').selectOption('critical');
   await page.getByLabel('Photo').check();
   await page.getByRole('button', { name: 'Create work order' }).click();
-  await expect(page.getByText(uiWorkOrder)).toBeVisible();
+  await expect(page.getByText(uiWorkOrder).first()).toBeVisible();
   await page.goto(`/${organization.slug}/dispatch`);
   await expect(page.getByText('Lagos QA Crew')).toBeVisible();
   await page.goto(`/${organization.slug}/assets`);

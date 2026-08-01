@@ -33,9 +33,7 @@ describe('operations dashboard search', () => {
     expect(searchWork(workOrders, 'submitted').map(({ id }) => id)).toEqual([
       'wo-2',
     ]);
-    expect(searchWork(workOrders, 'LOW').map(({ id }) => id)).toEqual([
-      'wo-3',
-    ]);
+    expect(searchWork(workOrders, 'LOW').map(({ id }) => id)).toEqual(['wo-3']);
   });
 
   it('ignores surrounding whitespace and returns everything for blank search', () => {

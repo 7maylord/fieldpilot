@@ -100,7 +100,11 @@ export function ProjectsScreen({
     (project) => project.id === selectedProjectId,
   );
   const sites = useQuery({
-    queryKey: ['project-detail-sites', query.data?.organizationId, selectedProjectId],
+    queryKey: [
+      'project-detail-sites',
+      query.data?.organizationId,
+      selectedProjectId,
+    ],
     enabled: Boolean(query.data?.organizationId && selectedProjectId),
     queryFn: () =>
       apiRequest<Site[]>(
@@ -108,7 +112,11 @@ export function ProjectsScreen({
       ),
   });
   const workOrders = useQuery({
-    queryKey: ['project-detail-work', query.data?.organizationId, selectedProjectId],
+    queryKey: [
+      'project-detail-work',
+      query.data?.organizationId,
+      selectedProjectId,
+    ],
     enabled: Boolean(query.data?.organizationId && selectedProjectId),
     queryFn: () =>
       apiRequest<WorkOrder[]>(
@@ -116,7 +124,11 @@ export function ProjectsScreen({
       ),
   });
   const assets = useQuery({
-    queryKey: ['project-detail-assets', query.data?.organizationId, selectedProjectId],
+    queryKey: [
+      'project-detail-assets',
+      query.data?.organizationId,
+      selectedProjectId,
+    ],
     enabled: Boolean(query.data?.organizationId && selectedProjectId),
     queryFn: () =>
       apiRequest<Asset[]>(
@@ -124,7 +136,11 @@ export function ProjectsScreen({
       ),
   });
   const reports = useQuery({
-    queryKey: ['project-detail-reports', query.data?.organizationId, selectedProjectId],
+    queryKey: [
+      'project-detail-reports',
+      query.data?.organizationId,
+      selectedProjectId,
+    ],
     enabled: Boolean(query.data?.organizationId && selectedProjectId),
     queryFn: () =>
       apiRequest<Report[]>(

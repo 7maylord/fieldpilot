@@ -9,7 +9,7 @@ test('landing page exposes the primary navigation and action', async ({
   await expect(
     page.getByRole('heading', {
       level: 1,
-      name: 'Keep field work moving, wherever the job takes you.',
+      name: 'The field keeps working. The record keeps up.',
     }),
   ).toBeVisible();
   await expect(
@@ -42,5 +42,7 @@ test('mobile landing navigation opens', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/');
   await page.getByRole('button', { name: 'Menu' }).click();
-  await expect(page.getByRole('link', { name: 'Features' })).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Features' }).first(),
+  ).toBeVisible();
 });
