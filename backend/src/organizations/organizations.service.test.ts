@@ -71,7 +71,9 @@ describe('OrganizationsService', () => {
         findMany: vi.fn().mockResolvedValue([{ teamId: 'team-1' }]),
       },
       team: {
-        findMany: vi.fn().mockResolvedValue([{ id: 'team-1', name: 'Drillers' }]),
+        findMany: vi
+          .fn()
+          .mockResolvedValue([{ id: 'team-1', name: 'Drillers' }]),
       },
     };
     const { service } = serviceWith(tx);
