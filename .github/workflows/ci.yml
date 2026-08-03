@@ -32,7 +32,7 @@ jobs:
       - run: pnpm --dir backend test
       - run: pnpm --dir backend run --if-present prisma:validate
       - run: pnpm --dir backend migrations:check
-      - run: docker compose up -d --wait postgres redis
+      - run: docker compose up -d --wait postgres redis mailpit
       - run: pnpm --dir backend prisma:migrate
         env:
           DATABASE_URL: postgresql://fieldpilot:fieldpilot@localhost:5433/fieldpilot
