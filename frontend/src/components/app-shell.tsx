@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useState, type ReactNode } from 'react';
 import { toast } from 'sonner';
 import { apiRequest } from '../lib/api';
+import { BrandMark } from './brand-mark';
 import { OfflineStatus } from './offline-status';
 
 const officeNav: [string, [string, string][]][] = [
@@ -107,6 +108,7 @@ export function AppShell({
     <div className="app-frame">
       <aside className="sidebar">
         <Link className="brand" href={brandHref}>
+          <BrandMark />
           FieldPilot
         </Link>
         <nav aria-label={`${mode} navigation`}>
@@ -131,6 +133,7 @@ export function AppShell({
       </aside>
       <header className="topbar">
         <Link className="brand" href={brandHref}>
+          <BrandMark />
           FieldPilot
         </Link>
         {organization && <p className="topbar-context">{organization.name}</p>}

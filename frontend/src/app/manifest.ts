@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: 'Offline-first field operations',
     start_url: '/field/today',
     display: 'standalone',
-    background_color: '#f8fbff',
-    theme_color: '#087ff5',
+    background_color: '#e6e8e2',
+    theme_color: '#15201c',
     icons: [
       {
         src: '/fieldpilot-icon.svg',

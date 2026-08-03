@@ -1,1 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#087ff5"/><path fill="#fff" d="M128 112h272v80H208v64h160v80H208v96h-80z"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#15201c"/>
+  <g transform="translate(80,112) scale(11)">
+    <rect x="2" y="7" width="14.5" height="3" fill="#e8eae5"/>
+    <rect x="18.5" y="7" width="5" height="3" fill="#d6006e"/>
+    <rect x="25" y="7" width="5" height="3" fill="#d6006e"/>
+    <polygon points="16.25,12 23,26 9.5,26" fill="#e8eae5"/>
+  </g>
+</svg>

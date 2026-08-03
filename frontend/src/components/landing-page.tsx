@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState, type CSSProperties } from 'react';
+import { BrandMark } from './brand-mark';
 
 /* The six stations are the operational sequence from the product brief, so they
    are numbered the way infrastructure work actually is: by chainage. */
@@ -46,6 +47,7 @@ export function LandingPage({ workspaceHref }: { workspaceHref?: string }) {
     <main className="landing">
       <nav className="landing-nav" aria-label="Main navigation">
         <Link className="brand" href="/">
+          <BrandMark />
           FieldPilot
         </Link>
         <button
@@ -211,6 +213,7 @@ export function LandingPage({ workspaceHref }: { workspaceHref?: string }) {
       <footer className="landing-footer">
         <div>
           <Link className="brand" href="/">
+            <BrandMark />
             FieldPilot
           </Link>
           <p>
