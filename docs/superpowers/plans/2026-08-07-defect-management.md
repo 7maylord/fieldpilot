@@ -14,6 +14,7 @@
 - Only `defect_create` is accepted by the sync path. Every other defect operation type must be **rejected with an explicit code**, never silently dropped and never reported as merged.
 - The client generates the defect UUID; the server must persist it as the row id. Media links and inspection links are written against that id before push.
 - Never introduce a second validation path. Sync reuses `CreateDefectDto` rules via a shared service method.
+- The frontend never hand-duplicates data that already exists on the backend. Where both sides need the same constants (e.g. defect status transitions), the frontend copy is generated from the backend source at build time and checked in CI, following the existing `api:generate`/`api:check` convention (`frontend/package.json`).
 - Capability checks are re-verified server-side. Client-side capability checks are UX only.
 - Do not add screens to `frontend/src/components/office-domain-screens.tsx` (981 lines). Defects get their own files.
 - All new user-facing copy is sentence case, active voice, and reuses the existing status vocabulary.
@@ -568,71 +569,73 @@ git commit -m 'fix(sync): apply defect_create instead of silently reporting succ
 
 ---
 
-### Task 4: Shared defect vocabulary with a parity guard
+### Task 4: Generated defect vocabulary — no hand-copied duplicate
 
-Office and field must agree on status labels and allowed transitions, and the client table must match the server state machine exactly.
+Office and field must agree on status labels and allowed transitions. Rather than hand-copy the server's transition table into a second file and test that the two happen to match, generate the frontend's copy directly from `backend/src/defects/defect-state.ts` at build time — the same convention `api:generate`/`api:check` already use for the OpenAPI schema (`frontend/package.json:16-17`). The generated file can only be wrong if the generator is wrong, and `defect-status:check` in CI fails the build the moment the two drift, exactly like `api:check` does today.
 
 **Files:**
-- Create: `frontend/src/lib/defect-status.ts`
+- Create: `frontend/scripts/generate-defect-status.mjs` (generator; its parsing function is imported directly by the test, not just run as a script)
+- Create: `frontend/src/generated/defect-status.ts` (generated output — data only)
+- Create: `frontend/src/lib/defect-status.ts` (hand-written helpers, imports the generated data)
+- Modify: `frontend/package.json` — add `defect-status:generate` and `defect-status:check`
+- Modify: `.github/workflows/ci.yml` — add a `defect-status:check` step next to the existing `frontend api:check` step
 - Test: `frontend/tests/defect-status.test.ts`
 
 **Interfaces:**
 - Consumes: nothing.
-- Produces, from `frontend/src/lib/defect-status.ts`:
-  - `defectStatuses: readonly DefectStatus[]`
-  - `type DefectStatus`
-  - `defectTransitions: Record<DefectStatus, readonly DefectStatus[]>`
-  - `statusLabel(status: DefectStatus): string`
-  - `severityLabel(severity: string): string`
-  - `allowedTransitions(status: DefectStatus): readonly DefectStatus[]`
-  - `needsOfficeAction: readonly DefectStatus[]`
+- Produces:
+  - From `frontend/src/generated/defect-status.ts`: `defectStatuses: readonly DefectStatus[]`, `type DefectStatus`, `defectTransitions: Record<DefectStatus, readonly DefectStatus[]>`.
+  - From `frontend/scripts/generate-defect-status.mjs`: `parseDefectState(source: string): { statuses: string[]; transitions: Record<string, string[]> }` — a named export, so the test can call it against a fixture string without shelling out or touching the filesystem.
+  - From `frontend/src/lib/defect-status.ts`: re-exports `defectStatuses`, `defectTransitions`, `type DefectStatus` from the generated file, plus `statusLabel(status: DefectStatus): string`, `severityLabel(severity: string): string`, `allowedTransitions(status: DefectStatus): readonly DefectStatus[]`, `needsOfficeAction: readonly DefectStatus[]`.
 
-- [ ] **Step 1: Write the failing test**
+- [ ] **Step 1: Write the failing test for the parser**
 
 Create `frontend/tests/defect-status.test.ts`:
 
 ```ts
-import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import {
-  allowedTransitions,
-  defectStatuses,
-  defectTransitions,
-  statusLabel,
-} from '../src/lib/defect-status';
+import { parseDefectState } from '../scripts/generate-defect-status.mjs';
 
-const serverSource = readFileSync(
-  '../backend/src/defects/defect-state.ts',
-  'utf8',
-);
+const fixture = `
+export const defectStatuses = [
+  'reported',
+  'triaged',
+  'cancelled',
+] as const;
+export type DefectStatus = (typeof defectStatuses)[number];
 
-describe('defect status vocabulary', () => {
-  it('lists every status the server defines', () => {
-    for (const status of defectStatuses)
-      expect(serverSource).toContain(`'${status}'`);
-    const serverCount = (serverSource.match(/^\s{2}'[a-z_]+',$/gm) ?? []).length;
-    expect(defectStatuses.length).toBe(serverCount);
+const transitions: Record<DefectStatus, readonly DefectStatus[]> = {
+  reported: ['triaged', 'cancelled'],
+  triaged: ['cancelled'],
+  cancelled: [],
+};
+`;
+
+describe('parseDefectState', () => {
+  it('extracts every status in declaration order', () => {
+    expect(parseDefectState(fixture).statuses).toEqual([
+      'reported',
+      'triaged',
+      'cancelled',
+    ]);
   });
 
-  it('matches the server transition table exactly', () => {
-    for (const [from, targets] of Object.entries(defectTransitions)) {
-      const row = new RegExp(`${from}: \\[([^\\]]*)\\]`).exec(serverSource);
-      expect(row, `no server row for ${from}`).not.toBeNull();
-      const serverTargets = (row?.[1].match(/'([a-z_]+)'/g) ?? []).map((value) =>
-        value.replaceAll("'", ''),
-      );
-      expect([...targets].sort()).toEqual(serverTargets.sort());
-    }
+  it('extracts each status’s allowed transitions', () => {
+    expect(parseDefectState(fixture).transitions).toEqual({
+      reported: ['triaged', 'cancelled'],
+      triaged: ['cancelled'],
+      cancelled: [],
+    });
   });
 
-  it('offers no transitions from a terminal status', () => {
-    expect(allowedTransitions('cancelled')).toEqual([]);
+  it('throws if the transitions table has a different row count than the statuses list', () => {
+    const mismatched = fixture.replace("cancelled: [],\n", '');
+    expect(() => parseDefectState(mismatched)).toThrow(/out of sync/);
   });
 
-  it('renders sentence-case labels', () => {
-    expect(statusLabel('ready_for_verification')).toBe('Ready for verification');
-    expect(statusLabel('correction_in_progress')).toBe(
-      'Correction in progress',
+  it('throws if it cannot find the statuses list at all', () => {
+    expect(() => parseDefectState('export const somethingElse = 1;')).toThrow(
+      /defectStatuses/,
     );
   });
 });
@@ -641,36 +644,125 @@ describe('defect status vocabulary', () => {
 - [ ] **Step 2: Run test to verify it fails**
 
 Run: `pnpm --dir frontend exec vitest run tests/defect-status.test.ts`
-Expected: FAIL — module not found.
+Expected: FAIL — `frontend/scripts/generate-defect-status.mjs` does not exist.
 
-- [ ] **Step 3: Implement the module**
+- [ ] **Step 3: Write the generator**
 
-Create `frontend/src/lib/defect-status.ts`. The transition table must be copied from `backend/src/defects/defect-state.ts` exactly:
+Create `frontend/scripts/generate-defect-status.mjs`:
 
-```ts
+```js
+#!/usr/bin/env node
+// Generates src/generated/defect-status.ts from the single source of truth
+// at backend/src/defects/defect-state.ts. Never hand-edit the output — run
+// `pnpm --dir frontend defect-status:generate` after changing the backend
+// file, or let `defect-status:check` catch the drift in CI.
+import { readFileSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const root = path.dirname(fileURLToPath(import.meta.url));
+
+export function parseDefectState(source) {
+  const statusesMatch = /export const defectStatuses = \[([\s\S]*?)\] as const;/.exec(
+    source,
+  );
+  if (!statusesMatch)
+    throw new Error('Could not find `defectStatuses` in defect-state.ts');
+  const statuses = [...statusesMatch[1].matchAll(/'([a-z_]+)'/g)].map(
+    (match) => match[1],
+  );
+
+  const transitionsMatch = /const transitions: Record<DefectStatus, readonly DefectStatus\[\]> = \{([\s\S]*?)\n\};/.exec(
+    source,
+  );
+  if (!transitionsMatch)
+    throw new Error('Could not find the `transitions` table in defect-state.ts');
+  const transitions = {};
+  for (const line of transitionsMatch[1].split('\n')) {
+    const row = /^\s*(\w+): \[([^\]]*)\],?$/.exec(line);
+    if (!row) continue;
+    const [, from, targetsRaw] = row;
+    transitions[from] = [...targetsRaw.matchAll(/'([a-z_]+)'/g)].map(
+      (match) => match[1],
+    );
+  }
+
+  if (Object.keys(transitions).length !== statuses.length)
+    throw new Error(
+      `Extracted ${Object.keys(transitions).length} transition rows but ${statuses.length} statuses — defect-state.ts's format changed in a way this generator does not understand. Update the regexes in generate-defect-status.mjs.`,
+    );
+
+  return { statuses, transitions };
+}
+
+function main() {
+  const sourcePath = path.join(root, '../../backend/src/defects/defect-state.ts');
+  const outPath = path.join(root, '../src/generated/defect-status.ts');
+  const { statuses, transitions } = parseDefectState(
+    readFileSync(sourcePath, 'utf8'),
+  );
+
+  const output = `// GENERATED FILE — do not edit by hand.
+// Source of truth: backend/src/defects/defect-state.ts
+// Regenerate with: pnpm --dir frontend defect-status:generate
+
 export const defectStatuses = [
-  'reported', 'triaged', 'assigned', 'correction_in_progress',
-  'ready_for_verification', 'verified', 'closed', 'reopened',
-  'deferred', 'cancelled',
+${statuses.map((status) => `  '${status}',`).join('\n')}
 ] as const;
 export type DefectStatus = (typeof defectStatuses)[number];
 
 export const defectTransitions: Record<DefectStatus, readonly DefectStatus[]> = {
-  reported: ['triaged', 'deferred', 'cancelled'],
-  triaged: ['assigned', 'deferred', 'cancelled'],
-  assigned: ['correction_in_progress', 'deferred', 'cancelled'],
-  correction_in_progress: ['ready_for_verification'],
-  ready_for_verification: ['verified', 'correction_in_progress'],
-  verified: ['closed'],
-  closed: ['reopened'],
-  reopened: ['assigned'],
-  deferred: ['triaged', 'cancelled'],
-  cancelled: [],
+${statuses
+    .map(
+      (status) =>
+        `  ${status}: [${transitions[status].map((t) => `'${t}'`).join(', ')}],`,
+    )
+    .join('\n')}
 };
+`;
+  writeFileSync(outPath, output);
+  console.log(`Wrote ${outPath}`);
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) main();
+```
+
+- [ ] **Step 4: Run test to verify it passes**
+
+Run: `pnpm --dir frontend exec vitest run tests/defect-status.test.ts`
+Expected: PASS, 4 tests.
+
+- [ ] **Step 5: Generate the output file and add the npm scripts**
+
+Run: `mkdir -p frontend/src/generated && node frontend/scripts/generate-defect-status.mjs`
+Expected: prints `Wrote .../frontend/src/generated/defect-status.ts`. Open it and confirm it lists all 10 statuses (`reported` through `cancelled`) and every transition row matches `backend/src/defects/defect-state.ts`.
+
+In `frontend/package.json`, add two scripts next to `api:generate`/`api:check`:
+
+```json
+    "defect-status:generate": "node scripts/generate-defect-status.mjs && prettier --write src/generated/defect-status.ts",
+    "defect-status:check": "pnpm defect-status:generate && git diff --exit-code -- src/generated/defect-status.ts"
+```
+
+`defect-status:check` has nothing to verify yet in this task — its job starts the day someone edits `defect-state.ts` without regenerating. It runs for the first time in Step 8's check suite, and for real once this task's commit gives it a baseline to diff against.
+
+- [ ] **Step 6: Write the hand-written helpers**
+
+Create `frontend/src/lib/defect-status.ts`:
+
+```ts
+export {
+  defectStatuses,
+  defectTransitions,
+  type DefectStatus,
+} from '../generated/defect-status';
+import { defectTransitions, type DefectStatus } from '../generated/defect-status';
 
 /* States waiting on the office, used as the queue's default filter. */
 export const needsOfficeAction: readonly DefectStatus[] = [
-  'reported', 'triaged', 'ready_for_verification',
+  'reported',
+  'triaged',
+  'ready_for_verification',
 ];
 
 export function allowedTransitions(status: DefectStatus) {
@@ -687,16 +779,47 @@ export function severityLabel(severity: string) {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+Append to `frontend/tests/defect-status.test.ts`:
+
+```ts
+import {
+  allowedTransitions,
+  statusLabel,
+} from '../src/lib/defect-status';
+
+describe('defect status helpers', () => {
+  it('offers no transitions from a terminal status', () => {
+    expect(allowedTransitions('cancelled')).toEqual([]);
+  });
+
+  it('renders sentence-case labels', () => {
+    expect(statusLabel('ready_for_verification')).toBe('Ready for verification');
+    expect(statusLabel('correction_in_progress')).toBe('Correction in progress');
+  });
+});
+```
 
 Run: `pnpm --dir frontend exec vitest run tests/defect-status.test.ts`
-Expected: PASS, 4 tests.
+Expected: PASS, 6 tests total.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 7: Wire the CI gate**
+
+In `.github/workflows/ci.yml`, immediately after the existing `- run: pnpm --dir frontend api:check` line, add:
+
+```yaml
+      - run: pnpm --dir frontend defect-status:check
+```
+
+- [ ] **Step 8: Run the full frontend check suite**
+
+Run: `pnpm --dir frontend format:check && pnpm --dir frontend lint && pnpm --dir frontend typecheck && pnpm --dir frontend test && pnpm --dir frontend defect-status:check`
+Expected: PASS. `defect-status:check` regenerates the file and diffs it against what Step 5 wrote — since nothing has changed in between, the diff is empty and it exits 0. If `format:check` fails on the generated file, run `pnpm --dir frontend exec prettier --write src/generated/defect-status.ts` — the generator already pipes through prettier in Step 5's script, so this should not be necessary in practice.
+
+- [ ] **Step 9: Commit**
 
 ```bash
-git add frontend/src/lib/defect-status.ts frontend/tests/defect-status.test.ts
-git commit -m 'feat(defects): add shared status vocabulary with server parity test'
+git add frontend/scripts/generate-defect-status.mjs frontend/src/generated/defect-status.ts frontend/src/lib/defect-status.ts frontend/tests/defect-status.test.ts frontend/package.json .github/workflows/ci.yml
+git commit -m 'feat(defects): generate the client status vocabulary from the server source of truth'
 ```
 
 ---
@@ -824,7 +947,7 @@ git commit -m 'feat(defects): add the office defect queue'
 - Consumes: `allowedTransitions`, `statusLabel` (Task 4); `Defect` (Task 5).
 - Produces:
   - `availableActions(defect: Defect, capabilities: string[]): DefectAction[]` where `type DefectAction = { kind: 'transition'; to: DefectStatus } | { kind: 'assign' } | { kind: 'correct' } | { kind: 'verify' }`, from `frontend/src/components/defects-screen.tsx`
-  - `capabilitiesForRole(role: string, isExternal: boolean): string[]`, added to `frontend/src/lib/defect-status.ts` (Task 4's file) and covered by extending Task 4's parity test
+  - `capabilitiesForRole(role: string, isExternal: boolean): string[]`, added to `frontend/src/lib/defect-status.ts` (Task 4's file) and covered by a new test in `frontend/tests/defect-status.test.ts` (Task 4's test file)
 
 - [ ] **Step 1: Write the failing test**
 
@@ -899,7 +1022,7 @@ export function availableActions(
 
 Render the detail panel beside the queue using `.field-detail` and `.detail-stack`. Each action calls its endpoint with `apiRequest`, always sending `version: defect.version`. Correction submission posts `rootCause`, `correctiveAction` and `evidenceIds: []`.
 
-Capabilities come from the membership role already loaded in `app-shell.tsx`; fetch `/organizations` in this screen and map the role through the same table `frontend/src/lib/defect-status.ts` does not own — add a small `capabilitiesForRole(role: string, isExternal: boolean): string[]` to `frontend/src/lib/defect-status.ts` mirroring `backend/src/authorization/capability.ts`, and extend the Task 4 parity test to assert the two role tables match.
+Capabilities come from the membership role already loaded in `app-shell.tsx`; fetch `/organizations` in this screen and map the role through the same table `frontend/src/lib/defect-status.ts` does not own — add a small `capabilitiesForRole(role: string, isExternal: boolean): string[]` to `frontend/src/lib/defect-status.ts` mirroring `backend/src/authorization/capability.ts`, and add a test to `frontend/tests/defect-status.test.ts` asserting the two role tables match (same shape as Task 1's `hasCapability` test).
 
 On a 409 response, show `.notice` with: "This defect changed while you were looking at it. Reload to see the latest." and a button that refetches. Never retry the stale payload.
 
@@ -1226,6 +1349,7 @@ docker compose up -d --wait postgres redis minio mailpit clamav
 pnpm --dir backend test:integration
 pnpm --dir frontend build && pnpm --dir backend build
 pnpm --dir backend openapi:check && pnpm --dir frontend api:check
+pnpm --dir frontend defect-status:check
 pnpm --dir frontend test:e2e
 docker compose down -v
 ```
