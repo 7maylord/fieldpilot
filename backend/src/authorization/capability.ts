@@ -41,3 +41,12 @@ export const roleCapabilities: Record<string, readonly Capability[]> = {
   viewer: [],
   external: memberCapabilities,
 };
+
+export function hasCapability(
+  role: string,
+  isExternal: boolean,
+  capability: Capability,
+): boolean {
+  const effectiveRole = isExternal ? 'external' : role;
+  return roleCapabilities[effectiveRole]?.includes(capability) ?? false;
+}
