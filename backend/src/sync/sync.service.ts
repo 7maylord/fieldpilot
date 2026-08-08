@@ -449,8 +449,15 @@ export class SyncService {
       );
     if (operation.entityType === 'defect') {
       if (operation.operationType !== 'defect_create')
-        return this.storeOutcome(tx, organizationId, userId, deviceId, operation,
-          'rejected', { rejectionCode: 'UNSUPPORTED_OPERATION' });
+        return this.storeOutcome(
+          tx,
+          organizationId,
+          userId,
+          deviceId,
+          operation,
+          'rejected',
+          { rejectionCode: 'UNSUPPORTED_OPERATION' },
+        );
 
       const membership = await tx.membership.findUniqueOrThrow({
         where: { organizationId_userId: { organizationId, userId } },
@@ -462,25 +469,56 @@ export class SyncService {
           Capability.DefectsCreate,
         )
       )
-        return this.storeOutcome(tx, organizationId, userId, deviceId, operation,
-          'rejected', { rejectionCode: 'FORBIDDEN' });
+        return this.storeOutcome(
+          tx,
+          organizationId,
+          userId,
+          deviceId,
+          operation,
+          'rejected',
+          { rejectionCode: 'FORBIDDEN' },
+        );
 
       const payload = plainToInstance(CreateDefectDto, operation.payload);
       const errors = await validate(payload, { whitelist: true });
       if (errors.length)
-        return this.storeOutcome(tx, organizationId, userId, deviceId, operation,
-          'rejected', { rejectionCode: 'VALIDATION_FAILED' });
+        return this.storeOutcome(
+          tx,
+          organizationId,
+          userId,
+          deviceId,
+          operation,
+          'rejected',
+          { rejectionCode: 'VALIDATION_FAILED' },
+        );
 
       try {
         await this.defects.createInTransaction(
-          tx, organizationId, userId, payload, operation.entityId,
+          tx,
+          organizationId,
+          userId,
+          payload,
+          operation.entityId,
         );
       } catch {
-        return this.storeOutcome(tx, organizationId, userId, deviceId, operation,
-          'rejected', { rejectionCode: 'ENTITY_NOT_FOUND' });
+        return this.storeOutcome(
+          tx,
+          organizationId,
+          userId,
+          deviceId,
+          operation,
+          'rejected',
+          { rejectionCode: 'ENTITY_NOT_FOUND' },
+        );
       }
-      return this.storeOutcome(tx, organizationId, userId, deviceId, operation,
-        'applied');
+      return this.storeOutcome(
+        tx,
+        organizationId,
+        userId,
+        deviceId,
+        operation,
+        'applied',
+      );
     }
     if (operation.entityType === 'work_order' && !workOrder)
       return this.storeOutcome(

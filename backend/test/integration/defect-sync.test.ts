@@ -24,12 +24,18 @@ describe('defect creation with a caller-supplied id', () => {
     const created = await tenants.withMembership(
       { organizationId, userId },
       (tx) =>
-        defects.createInTransaction(tx, organizationId, userId, {
-          projectId,
-          category: 'quality',
-          severity: 'high',
-          title: 'Spalling at pier 4',
-        }, id),
+        defects.createInTransaction(
+          tx,
+          organizationId,
+          userId,
+          {
+            projectId,
+            category: 'quality',
+            severity: 'high',
+            title: 'Spalling at pier 4',
+          },
+          id,
+        ),
     );
 
     expect(created.id).toBe(id);
@@ -87,7 +93,7 @@ describe('defect_create via sync push', () => {
       ],
     });
 
-    expect(response.results[0].status).toBe('applied');
+    expect(response.results[0]!.status).toBe('applied');
     const row = await tenants.withTenant({ organizationId, userId }, (tx) =>
       tx.defect.findUnique({ where: { id: entityId } }),
     );
@@ -115,11 +121,19 @@ describe('defect_create via sync push', () => {
       },
     };
 
-    const first = await push({ organizationId, deviceId, operations: [operation] });
-    const second = await push({ organizationId, deviceId, operations: [operation] });
+    const first = await push({
+      organizationId,
+      deviceId,
+      operations: [operation],
+    });
+    const second = await push({
+      organizationId,
+      deviceId,
+      operations: [operation],
+    });
 
-    expect(first.results[0].status).toBe('applied');
-    expect(second.results[0].status).toBe('already_applied');
+    expect(first.results[0]!.status).toBe('applied');
+    expect(second.results[0]!.status).toBe('already_applied');
     expect(await defectCount(organizationId, userId, entityId)).toBe(1);
   });
 
@@ -144,8 +158,8 @@ describe('defect_create via sync push', () => {
       ],
     });
 
-    expect(response.results[0].status).toBe('rejected');
-    expect(response.results[0].rejectionCode).toBe('UNSUPPORTED_OPERATION');
+    expect(response.results[0]!.status).toBe('rejected');
+    expect(response.results[0]!.rejectionCode).toBe('UNSUPPORTED_OPERATION');
     expect(await defectCount(organizationId, userId, entityId)).toBe(0);
   });
 
@@ -181,8 +195,8 @@ describe('defect_create via sync push', () => {
       ],
     });
 
-    expect(response.results[0].status).toBe('rejected');
-    expect(response.results[0].rejectionCode).toBe('FORBIDDEN');
+    expect(response.results[0]!.status).toBe('rejected');
+    expect(response.results[0]!.rejectionCode).toBe('FORBIDDEN');
     expect(await defectCount(organizationId, userId, entityId)).toBe(0);
   });
 
@@ -214,9 +228,86 @@ describe('defect_create via sync push', () => {
     });
 
     const after = await defectCount(organizationId, userId);
-    if (['applied', 'auto_merged'].includes(response.results[0].status))
+    if (['applied', 'auto_merged'].includes(response.results[0]!.status))
       expect(after).toBe(before + 1);
     else expect(after).toBe(before);
+  });
+});
+
+// Separate describe block (own app instance, own throttler bucket): the
+// 'defect_create via sync push' block above already spends its full
+// AUTH_THROTTLE_LIMIT_PER_MINUTE (5/min, see auth.controller.ts) budget on
+// its 5 seedProject() registrations, so a 6th registration in that block
+// 429s. A fresh app here gets a fresh in-memory throttler counter.
+describe('defect_create batch isolation on invalid references', () => {
+  let app: Awaited<ReturnType<typeof createApiApp>>;
+  let tenants: TenantDatabase;
+
+  beforeAll(async () => {
+    app = await createApiApp(loadConfig({ NODE_ENV: 'test' }));
+    await app.init();
+    tenants = app.get(TenantDatabase);
+  });
+
+  afterAll(async () => app.close());
+
+  it('rejects a defect_create referencing a nonexistent work order without aborting the rest of the batch', async () => {
+    const { organizationId, userId, projectId, deviceId, push } =
+      await seedProject(app);
+    const badEntityId = randomUUID();
+    const goodEntityId = randomUUID();
+
+    const response = await push({
+      organizationId,
+      deviceId,
+      operations: [
+        {
+          operationId: randomUUID(),
+          entityType: 'defect',
+          entityId: badEntityId,
+          operationType: 'defect_create',
+          baseVersion: null,
+          clientCreatedAt: new Date().toISOString(),
+          payload: {
+            projectId,
+            workOrderId: randomUUID(),
+            category: 'safety',
+            severity: 'high',
+            title: 'References a work order that does not exist',
+          },
+        },
+        {
+          operationId: randomUUID(),
+          entityType: 'defect',
+          entityId: goodEntityId,
+          operationType: 'defect_create',
+          baseVersion: null,
+          clientCreatedAt: new Date().toISOString(),
+          payload: {
+            projectId,
+            category: 'quality',
+            severity: 'low',
+            title: 'Still applies after the bad operation in the same batch',
+          },
+        },
+      ],
+    });
+
+    expect(response.results[0]).toMatchObject({
+      status: 'rejected',
+      rejectionCode: 'ENTITY_NOT_FOUND',
+    });
+    expect(response.results[1]!.status).toBe('applied');
+
+    const [badCount, goodCount] = await tenants.withTenant(
+      { organizationId, userId },
+      async (tx) => [
+        await tx.defect.count({ where: { id: badEntityId } }),
+        await tx.defect.count({ where: { id: goodEntityId } }),
+      ],
+    );
+    expect(badCount).toBe(0);
+    expect(goodCount).toBe(1);
   });
 });
 
@@ -257,12 +348,16 @@ async function seedProject(app: Awaited<ReturnType<typeof createApiApp>>) {
   const session = login.headers['set-cookie'] as unknown as string[];
 
   const authed = (method: 'post' | 'get', path: string) =>
-    request(server)[method](path)
+    request(server)
+      [method](path)
       .set('Cookie', [...cookies, ...session])
       .set('x-csrf-token', csrf);
 
   const organization = await authed('post', '/api/v1/organizations')
-    .send({ name: 'Defect Test Ltd', slug: `defect-${randomUUID().slice(0, 8)}` })
+    .send({
+      name: 'Defect Test Ltd',
+      slug: `defect-${randomUUID().slice(0, 8)}`,
+    })
     .expect(201);
   const organizationId = organization.body.id as string;
 
@@ -279,7 +374,12 @@ async function seedProject(app: Awaited<ReturnType<typeof createApiApp>>) {
 
   const deviceId = randomUUID();
   await authed('post', `/api/v1/organizations/${organizationId}/devices`)
-    .send({ deviceId, name: 'test device', platform: 'web', appVersion: '1.0.0' })
+    .send({
+      deviceId,
+      name: 'test device',
+      platform: 'web',
+      appVersion: '1.0.0',
+    })
     .expect(201);
 
   const push = async (body: object) => {
@@ -291,5 +391,11 @@ async function seedProject(app: Awaited<ReturnType<typeof createApiApp>>) {
     };
   };
 
-  return { organizationId, userId, projectId: project.body.id as string, deviceId, push };
+  return {
+    organizationId,
+    userId,
+    projectId: project.body.id as string,
+    deviceId,
+    push,
+  };
 }

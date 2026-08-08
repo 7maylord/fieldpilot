@@ -86,6 +86,28 @@ export class DefectsService {
       }))
     )
       throw new BadRequestException('Asset must belong to the project');
+    if (
+      input.workOrderId &&
+      !(await tx.workOrder.findFirst({
+        where: {
+          id: input.workOrderId,
+          organizationId,
+          projectId: input.projectId,
+        },
+      }))
+    )
+      throw new BadRequestException('Work order must belong to the project');
+    if (
+      input.inspectionId &&
+      !(await tx.inspection.findFirst({
+        where: {
+          id: input.inspectionId,
+          organizationId,
+          projectId: input.projectId,
+        },
+      }))
+    )
+      throw new BadRequestException('Inspection must belong to the project');
     const defect = await tx.defect.create({
       data: {
         id,

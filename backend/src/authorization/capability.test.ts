@@ -17,11 +17,15 @@ describe('hasCapability', () => {
   });
 
   it('denies defect creation to viewers', () => {
-    expect(hasCapability('viewer', false, Capability.DefectsCreate)).toBe(false);
+    expect(hasCapability('viewer', false, Capability.DefectsCreate)).toBe(
+      false,
+    );
   });
 
   it('denies assignment to members', () => {
-    expect(hasCapability('member', false, Capability.DefectsAssign)).toBe(false);
+    expect(hasCapability('member', false, Capability.DefectsAssign)).toBe(
+      false,
+    );
   });
 
   it('treats external members as the external role regardless of stored role', () => {
