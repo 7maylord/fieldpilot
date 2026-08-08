@@ -7,5 +7,6 @@ import { DefectsService } from './defects.service';
   imports: [DatabaseModule, AuditModule],
   controllers: [DefectsController],
   providers: [DefectsService],
+  exports: [DefectsService],
 })
 export class DefectsModule {}

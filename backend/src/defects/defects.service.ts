@@ -46,70 +46,79 @@ export class DefectsService {
   create(organizationId: string, actorId: string, input: CreateDefectDto) {
     return this.tenants.withMembership(
       { organizationId, userId: actorId },
-      async (tx) => {
-        await this.assertProjectAccess(
-          tx,
+      (tx) =>
+        this.createInTransaction(tx, organizationId, actorId, input, newId()),
+    );
+  }
+
+  async createInTransaction(
+    tx: Prisma.TransactionClient,
+    organizationId: string,
+    actorId: string,
+    input: CreateDefectDto,
+    id: string,
+  ) {
+    await this.assertProjectAccess(
+      tx,
+      organizationId,
+      actorId,
+      input.projectId,
+    );
+    if (
+      input.locationId &&
+      !(await tx.location.findFirst({
+        where: {
+          id: input.locationId,
           organizationId,
-          actorId,
-          input.projectId,
-        );
-        if (
-          input.locationId &&
-          !(await tx.location.findFirst({
-            where: {
-              id: input.locationId,
-              organizationId,
-              projectId: input.projectId,
-            },
-          }))
-        )
-          throw new BadRequestException('Location must belong to the project');
-        if (
-          input.assetId &&
-          !(await tx.asset.findFirst({
-            where: {
-              id: input.assetId,
-              organizationId,
-              projectId: input.projectId,
-            },
-          }))
-        )
-          throw new BadRequestException('Asset must belong to the project');
-        const defect = await tx.defect.create({
-          data: {
+          projectId: input.projectId,
+        },
+      }))
+    )
+      throw new BadRequestException('Location must belong to the project');
+    if (
+      input.assetId &&
+      !(await tx.asset.findFirst({
+        where: {
+          id: input.assetId,
+          organizationId,
+          projectId: input.projectId,
+        },
+      }))
+    )
+      throw new BadRequestException('Asset must belong to the project');
+    const defect = await tx.defect.create({
+      data: {
+        id,
+        organizationId,
+        projectId: input.projectId,
+        locationId: input.locationId,
+        inspectionId: input.inspectionId,
+        workOrderId: input.workOrderId,
+        assetId: input.assetId,
+        category: input.category.trim(),
+        severity: input.severity,
+        title: input.title.trim(),
+        description: input.description,
+        dueAt: input.dueAt ? new Date(input.dueAt) : undefined,
+        createdBy: actorId,
+        statusEvents: {
+          create: {
             id: newId(),
             organizationId,
-            projectId: input.projectId,
-            locationId: input.locationId,
-            inspectionId: input.inspectionId,
-            workOrderId: input.workOrderId,
-            assetId: input.assetId,
-            category: input.category.trim(),
-            severity: input.severity,
-            title: input.title.trim(),
-            description: input.description,
-            dueAt: input.dueAt ? new Date(input.dueAt) : undefined,
-            createdBy: actorId,
-            statusEvents: {
-              create: {
-                id: newId(),
-                organizationId,
-                toStatus: 'reported',
-                actorId,
-              },
-            },
+            toStatus: 'reported',
+            actorId,
           },
-        });
-        await this.record(
-          tx,
-          organizationId,
-          actorId,
-          defect.id,
-          'defect.reported',
-        );
-        return defect;
+        },
       },
+    });
+    await this.record(
+      tx,
+      organizationId,
+      actorId,
+      defect.id,
+      'defect.reported',
     );
+    return defect;
   }
 
   assign(
