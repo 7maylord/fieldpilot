@@ -211,4 +211,53 @@ describe('media listing by entity', () => {
       clean.mediaId,
     ]);
   });
+
+  it('never returns media whose real project does not match the requested projectId', async () => {
+    const { authed, organizationId, projectId } = await seedProject();
+    const otherProject = await authed(
+      'post',
+      `/api/v1/organizations/${organizationId}/projects`,
+    )
+      .send({
+        name: 'A different project',
+        code: `T-${randomUUID().slice(0, 6).toUpperCase()}`,
+        timezone: 'UTC',
+      })
+      .expect(201);
+    const otherProjectId = otherProject.body.id as string;
+    const otherDefect = await authed(
+      'post',
+      `/api/v1/organizations/${organizationId}/defects`,
+    )
+      .send({
+        projectId: otherProjectId,
+        category: 'quality',
+        severity: 'low',
+        title: 'Belongs to a different project entirely',
+      })
+      .expect(201);
+    const otherDefectId = otherDefect.body.id as string;
+    const otherProjectMedia = await uploadMedia(
+      authed,
+      organizationId,
+      otherProjectId,
+      otherDefectId,
+      Buffer.concat([
+        pngHeader,
+        Buffer.from('evidence from the other project'),
+      ]),
+    );
+    expect(otherProjectMedia.status).toBe('ready');
+
+    // projectId points at the first project; entityId points at a defect
+    // that actually belongs to the second project. The two client-supplied
+    // identifiers don't line up, so nothing should come back, even though
+    // the media is ready/clean and the caller is a legitimate org member.
+    const response = await authed(
+      'get',
+      `/api/v1/organizations/${organizationId}/media?projectId=${projectId}&entityType=defect&entityId=${otherDefectId}`,
+    ).expect(200);
+
+    expect(response.body).toEqual([]);
+  });
 });

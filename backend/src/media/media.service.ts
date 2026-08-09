@@ -254,7 +254,7 @@ export class MediaService {
       async (tx) => {
         await this.assertProjectAccess(tx, organizationId, userId, projectId);
         const links = await tx.mediaLink.findMany({
-          where: { organizationId, entityType, entityId },
+          where: { organizationId, entityType, entityId, media: { projectId } },
           include: { media: true },
         });
         return links
