@@ -61,3 +61,42 @@ describe('defect status helpers', () => {
     );
   });
 });
+
+import { capabilitiesForRole } from '../src/lib/defect-status';
+import { roleCapabilities as backendRoleCapabilities } from '../../backend/src/authorization/capability';
+
+describe('capabilitiesForRole', () => {
+  it('matches the backend capability table for every role', () => {
+    for (const role of Object.keys(backendRoleCapabilities))
+      expect([...capabilitiesForRole(role, false)].sort()).toEqual(
+        [...backendRoleCapabilities[role]!].sort(),
+      );
+  });
+
+  it('grants defect creation to members', () => {
+    expect(capabilitiesForRole('member', false)).toContain('defects.create');
+  });
+
+  it('denies defect creation to viewers', () => {
+    expect(capabilitiesForRole('viewer', false)).not.toContain(
+      'defects.create',
+    );
+  });
+
+  it('denies assignment to members', () => {
+    expect(capabilitiesForRole('member', false)).not.toContain(
+      'defects.assign',
+    );
+  });
+
+  it('treats external members as the external role regardless of stored role', () => {
+    expect(capabilitiesForRole('admin', true)).not.toContain(
+      'organization.manage',
+    );
+    expect(capabilitiesForRole('admin', true)).toContain('defects.create');
+  });
+
+  it('denies unknown roles', () => {
+    expect(capabilitiesForRole('robot', false)).toEqual([]);
+  });
+});
