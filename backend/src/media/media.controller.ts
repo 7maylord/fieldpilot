@@ -5,6 +5,7 @@ import {
   Param,
   ParseUUIDPipe,
   Post,
+  Query,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CurrentUser } from '../auth/auth.decorators';
@@ -16,6 +17,23 @@ import { MediaService } from './media.service';
 @Controller('organizations/:organizationId/media')
 export class MediaController {
   constructor(private readonly media: MediaService) {}
+
+  @Get()
+  list(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('organizationId', ParseUUIDPipe) organizationId: string,
+    @Query('projectId', ParseUUIDPipe) projectId: string,
+    @Query('entityType') entityType: string,
+    @Query('entityId', ParseUUIDPipe) entityId: string,
+  ) {
+    return this.media.listForEntity(
+      organizationId,
+      user.id,
+      projectId,
+      entityType,
+      entityId,
+    );
+  }
 
   @Post('upload-sessions')
   create(

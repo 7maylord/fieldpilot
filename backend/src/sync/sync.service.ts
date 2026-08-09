@@ -6,10 +6,15 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
+import { plainToInstance } from 'class-transformer';
+import { validate } from 'class-validator';
 import { validate as validateUuid } from 'uuid';
 import { AuditService } from '../audit/audit.service';
+import { Capability, hasCapability } from '../authorization/capability';
 import { newId } from '../common/id';
 import { TenantDatabase } from '../database/tenant-database.service';
+import { CreateDefectDto } from '../defects/dto';
+import { DefectsService } from '../defects/defects.service';
 import {
   assertWorkOrderTransition,
   type WorkOrderStatus,
@@ -43,6 +48,7 @@ export class SyncService {
     private readonly tenants: TenantDatabase,
     private readonly audit: AuditService,
     private readonly metrics: MetricsService,
+    private readonly defects: DefectsService,
   ) {}
 
   bootstrap(organizationId: string, userId: string, input: SyncBootstrapDto) {
@@ -441,6 +447,79 @@ export class SyncService {
           rejectionCode: 'UNSUPPORTED_OPERATION',
         },
       );
+    if (operation.entityType === 'defect') {
+      if (operation.operationType !== 'defect_create')
+        return this.storeOutcome(
+          tx,
+          organizationId,
+          userId,
+          deviceId,
+          operation,
+          'rejected',
+          { rejectionCode: 'UNSUPPORTED_OPERATION' },
+        );
+
+      const membership = await tx.membership.findUniqueOrThrow({
+        where: { organizationId_userId: { organizationId, userId } },
+      });
+      if (
+        !hasCapability(
+          membership.role,
+          membership.isExternal,
+          Capability.DefectsCreate,
+        )
+      )
+        return this.storeOutcome(
+          tx,
+          organizationId,
+          userId,
+          deviceId,
+          operation,
+          'rejected',
+          { rejectionCode: 'FORBIDDEN' },
+        );
+
+      const payload = plainToInstance(CreateDefectDto, operation.payload);
+      const errors = await validate(payload, { whitelist: true });
+      if (errors.length)
+        return this.storeOutcome(
+          tx,
+          organizationId,
+          userId,
+          deviceId,
+          operation,
+          'rejected',
+          { rejectionCode: 'VALIDATION_FAILED' },
+        );
+
+      try {
+        await this.defects.createInTransaction(
+          tx,
+          organizationId,
+          userId,
+          payload,
+          operation.entityId,
+        );
+      } catch {
+        return this.storeOutcome(
+          tx,
+          organizationId,
+          userId,
+          deviceId,
+          operation,
+          'rejected',
+          { rejectionCode: 'ENTITY_NOT_FOUND' },
+        );
+      }
+      return this.storeOutcome(
+        tx,
+        organizationId,
+        userId,
+        deviceId,
+        operation,
+        'applied',
+      );
+    }
     if (operation.entityType === 'work_order' && !workOrder)
       return this.storeOutcome(
         tx,

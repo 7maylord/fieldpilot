@@ -43,6 +43,7 @@ jobs:
       - run: pnpm --dir backend build
       - run: pnpm --dir backend openapi:check
       - run: pnpm --dir frontend api:check
+      - run: pnpm --dir frontend defect-status:check
       - run: pnpm --dir frontend audit --prod --audit-level high
       - run: pnpm --dir backend audit --prod --audit-level high
       - run: docker build -f frontend/Dockerfile .

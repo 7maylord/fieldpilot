@@ -26,6 +26,7 @@ const officeNav: [string, [string, string][]][] = [
       ['Assignments', 'assignments'],
       ['Dispatch', 'dispatch'],
       ['Assets', 'assets'],
+      ['Defects', 'defects'],
     ],
   ],
   [

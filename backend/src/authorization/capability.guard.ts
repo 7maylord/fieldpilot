@@ -8,7 +8,7 @@ import {
 import { Reflector } from '@nestjs/core';
 import type { AuthenticatedRequest } from '../auth/auth.types';
 import { TenantDatabase } from '../database/tenant-database.service';
-import { Capability, roleCapabilities } from './capability';
+import { Capability, hasCapability } from './capability';
 
 const CAPABILITY = 'capability';
 export const RequiresCapability = (capability: Capability) =>
@@ -43,10 +43,7 @@ export class CapabilityGuard implements CanActivate {
             organizationId_userId: { organizationId, userId: request.user.id },
           },
         });
-        const effectiveRole = membership.isExternal
-          ? 'external'
-          : membership.role;
-        if (!roleCapabilities[effectiveRole]?.includes(capability))
+        if (!hasCapability(membership.role, membership.isExternal, capability))
           throw new ForbiddenException('Capability denied');
         return true;
       },
