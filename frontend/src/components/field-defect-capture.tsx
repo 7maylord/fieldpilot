@@ -108,6 +108,10 @@ export function FieldDefectCapture() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [message, setMessage] = useState('');
+  const [lastSaved, setLastSaved] = useState<{
+    id: string;
+    projectId: string;
+  }>();
 
   const refreshLocal = useCallback(async (id: string) => {
     const [localProjects, defects] = await Promise.all([
@@ -174,19 +178,25 @@ export function FieldDefectCapture() {
       },
       organizationId,
     );
-    await db.transaction(
-      'rw',
-      db.defectDrafts,
-      db.pendingOperations,
-      async () => {
-        await db.defectDrafts.add(draft);
-        await db.pendingOperations.add(operation);
-      },
-    );
+    try {
+      await db.transaction(
+        'rw',
+        db.defectDrafts,
+        db.pendingOperations,
+        async () => {
+          await db.defectDrafts.add(draft);
+          await db.pendingOperations.add(operation);
+        },
+      );
+    } catch {
+      setMessage("Couldn't save this defect on your device. Try again.");
+      return;
+    }
     setCategory('');
     setTitle('');
     setDescription('');
     setMessage('Defect saved. It uploads when you reconnect.');
+    setLastSaved({ id: draft.id, projectId });
     await refreshLocal(organizationId);
   }
 
@@ -250,7 +260,10 @@ export function FieldDefectCapture() {
               Title
               <input
                 value={title}
-                onChange={(event) => setTitle(event.target.value)}
+                onChange={(event) => {
+                  setTitle(event.target.value);
+                  if (lastSaved) setLastSaved(undefined);
+                }}
                 required
               />
             </label>
@@ -268,10 +281,21 @@ export function FieldDefectCapture() {
         ) : (
           <p>Sign in and open Today at least once to report defects offline.</p>
         )}
-        {message && (
-          <p role="status" className="field-error">
-            {message}
-          </p>
+        {message && <p role="status">{message}</p>}
+        {organizationId && lastSaved && (
+          <label>
+            Add a photo to this defect
+            <MediaCapture
+              type="photo"
+              scope={{
+                organizationId,
+                projectId: lastSaved.projectId,
+                entityType: 'defect',
+                entityId: lastSaved.id,
+              }}
+              onCaptured={() => setMessage('Photo saved to this device.')}
+            />
+          </label>
         )}
       </section>
       <section className="panel">
