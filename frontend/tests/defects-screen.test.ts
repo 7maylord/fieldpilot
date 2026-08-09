@@ -42,9 +42,29 @@ describe('filterDefects', () => {
   });
 });
 
-import { availableActions } from '../src/components/defects-screen';
+import {
+  availableActions,
+  toggleEvidenceSelection,
+} from '../src/components/defects-screen';
 
 describe('availableActions', () => {
+  it('offers correction only once a defect is in correction_in_progress, not merely assigned', () => {
+    const inProgress = defect({ status: 'correction_in_progress' });
+    expect(
+      availableActions(inProgress, ['defects.create']).some(
+        (a) => a.kind === 'correct',
+      ),
+    ).toBe(true);
+    expect(
+      availableActions(inProgress, []).some((a) => a.kind === 'correct'),
+    ).toBe(false);
+    expect(
+      availableActions(defect({ status: 'assigned' }), ['defects.create']).some(
+        (a) => a.kind === 'correct',
+      ),
+    ).toBe(false);
+  });
+
   it('offers assignment only on triaged defects and only with the capability', () => {
     const triaged = defect({ status: 'triaged' });
     expect(
@@ -82,5 +102,19 @@ describe('availableActions', () => {
         'defects.verify',
       ]),
     ).toEqual([]);
+  });
+});
+
+describe('toggleEvidenceSelection', () => {
+  it('builds evidenceIds from the reviewer checking items in the fetched evidence list', () => {
+    let selected: string[] = [];
+    selected = toggleEvidenceSelection(selected, 'media-1');
+    selected = toggleEvidenceSelection(selected, 'media-2');
+    expect(selected).toEqual(['media-1', 'media-2']);
+  });
+
+  it('unchecking a previously selected item removes only that id', () => {
+    const selected = toggleEvidenceSelection(['media-1', 'media-2'], 'media-1');
+    expect(selected).toEqual(['media-2']);
   });
 });

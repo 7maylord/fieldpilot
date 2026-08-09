@@ -12,6 +12,7 @@ import {
   statusLabel,
   type DefectStatus,
 } from '../lib/defect-status';
+import { formatTimestamp } from '../lib/format-date';
 
 type Organization = {
   id: string;
@@ -28,6 +29,7 @@ type StatusEvent = {
 };
 type Team = { id: string; name: string };
 type Member = { userId: string; status: string; user?: { email: string } };
+type MediaItem = { id: string; mimeType: string; createdAt: string };
 
 export type Defect = {
   id: string;
@@ -58,7 +60,7 @@ export function availableActions(
     .map((to) => ({ kind: 'transition', to }) as const);
   if (defect.status === 'triaged' && can('defects.assign'))
     actions.push({ kind: 'assign' });
-  if (defect.status === 'assigned' && can('defects.create'))
+  if (defect.status === 'correction_in_progress' && can('defects.create'))
     actions.push({ kind: 'correct' });
   if (defect.status === 'ready_for_verification' && can('defects.verify'))
     actions.push({ kind: 'verify' });
@@ -173,6 +175,14 @@ export function DefectsScreen({
     queryFn: () =>
       apiRequest<Member[]>(`/organizations/${organizationId}/members`),
   });
+  const evidence = useQuery({
+    queryKey: ['media', organizationId, selected?.id],
+    enabled: Boolean(organizationId && selected) && openAction === 'correct',
+    queryFn: () =>
+      apiRequest<MediaItem[]>(
+        `/organizations/${organizationId}/media?projectId=${selected!.projectId}&entityType=defect&entityId=${selected!.id}`,
+      ),
+  });
 
   function onActionError(error: unknown) {
     if (error instanceof ApiError && error.status === 409) setStale(true);
@@ -229,11 +239,13 @@ export function DefectsScreen({
       version,
       rootCause,
       correctiveAction,
+      evidenceIds,
     }: {
       id: string;
       version: number;
       rootCause: string;
       correctiveAction: string;
+      evidenceIds: string[];
     }) =>
       apiRequest(`/organizations/${organizationId}/defects/${id}/corrections`, {
         method: 'POST',
@@ -241,7 +253,7 @@ export function DefectsScreen({
           version,
           rootCause,
           correctiveAction,
-          evidenceIds: [],
+          evidenceIds,
         }),
       }),
     onSuccess: () => onActionSuccess('Correction submitted.'),
@@ -474,6 +486,7 @@ export function DefectsScreen({
               {openAction === 'correct' && (
                 <CorrectForm
                   defect={selected}
+                  evidence={evidence.data ?? []}
                   pending={correct.isPending}
                   onSubmit={(input) => correct.mutate(input)}
                 />
@@ -592,20 +605,33 @@ function AssignForm({
   );
 }
 
+export function toggleEvidenceSelection(current: string[], mediaId: string) {
+  return current.includes(mediaId)
+    ? current.filter((id) => id !== mediaId)
+    : [...current, mediaId];
+}
+
 function CorrectForm({
   defect,
+  evidence,
   pending,
   onSubmit,
 }: {
   defect: Defect;
+  evidence: MediaItem[];
   pending: boolean;
   onSubmit: (input: {
     id: string;
     version: number;
     rootCause: string;
     correctiveAction: string;
+    evidenceIds: string[];
   }) => void;
 }) {
+  const [evidenceIds, setEvidenceIds] = useState<string[]>([]);
+  function toggleEvidence(mediaId: string) {
+    setEvidenceIds((current) => toggleEvidenceSelection(current, mediaId));
+  }
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -614,6 +640,7 @@ function CorrectForm({
       version: defect.version,
       rootCause: String(data.get('rootCause') ?? ''),
       correctiveAction: String(data.get('correctiveAction') ?? ''),
+      evidenceIds,
     });
   }
   return (
@@ -627,6 +654,29 @@ function CorrectForm({
         Corrective action
         <textarea name="correctiveAction" required />
       </label>
+      <fieldset>
+        <legend>Evidence</legend>
+        {evidence.length ? (
+          <ul className="conflict-list">
+            {evidence.map((item) => (
+              <li key={item.id}>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={evidenceIds.includes(item.id)}
+                    onChange={() => toggleEvidence(item.id)}
+                  />
+                  {item.mimeType} — {formatTimestamp(item.createdAt)}
+                </label>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="empty-state">
+            <strong>No evidence attached to this defect yet</strong>
+          </div>
+        )}
+      </fieldset>
       <button className="primary" disabled={pending}>
         {pending ? 'Submitting…' : 'Submit correction'}
       </button>

@@ -242,6 +242,36 @@ export class MediaService {
     );
   }
 
+  listForEntity(
+    organizationId: string,
+    userId: string,
+    projectId: string,
+    entityType: string,
+    entityId: string,
+  ) {
+    return this.tenants.withMembership(
+      { organizationId, userId },
+      async (tx) => {
+        await this.assertProjectAccess(tx, organizationId, userId, projectId);
+        const links = await tx.mediaLink.findMany({
+          where: { organizationId, entityType, entityId },
+          include: { media: true },
+        });
+        return links
+          .map(({ media }) => media)
+          .filter(
+            (media) => media.status === 'ready' && media.scanStatus === 'clean',
+          )
+          .map((media) => ({
+            id: media.id,
+            mimeType: media.mimeType,
+            byteSize: Number(media.byteSize),
+            createdAt: media.createdAt,
+          }));
+      },
+    );
+  }
+
   signedUrl(organizationId: string, userId: string, mediaId: string) {
     return this.tenants.withMembership(
       { organizationId, userId },

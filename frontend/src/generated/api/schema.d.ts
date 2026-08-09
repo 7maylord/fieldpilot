@@ -496,6 +496,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  '/api/v1/organizations/{organizationId}/media': {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List media objects
+     * @description List media objects. Requires a valid FieldPilot session cookie.
+     */
+    get: operations['MediaController_list'];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   '/api/v1/organizations/{organizationId}/media/upload-sessions': {
     parameters: {
       query?: never;
@@ -4452,6 +4472,99 @@ export interface operations {
         };
         content: {
           'application/json': components['schemas']['JsonObject'];
+        };
+      };
+      /** @description Validation failed, malformed input, or an invalid route/query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Authentication cookie is missing, expired, or revoked. */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Capability, tenant access, CSRF, or membership check failed. */
+      403: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Requested tenant-scoped resource was not found. */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Optimistic version, state-machine, idempotency, or sync conflict. */
+      409: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Rate limit exceeded. */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+      /** @description Unexpected server error. */
+      500: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/problem+json': components['schemas']['ProblemDetails'];
+        };
+      };
+    };
+  };
+  MediaController_list: {
+    parameters: {
+      query: {
+        /** @description Project UUID. */
+        projectId: string;
+        /** @description entity type */
+        entityType: string;
+        /** @description entity id */
+        entityId: string;
+      };
+      header?: never;
+      path: {
+        /** @description Organization UUID tenant scope. */
+        organizationId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Request succeeded. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          'application/json': components['schemas']['JsonArray'];
         };
       };
       /** @description Validation failed, malformed input, or an invalid route/query parameter. */

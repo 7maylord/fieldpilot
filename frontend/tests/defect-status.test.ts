@@ -63,6 +63,11 @@ describe('defect status helpers', () => {
 });
 
 import { capabilitiesForRole } from '../src/lib/defect-status';
+// Deliberate, test-only exception to "no backend source in frontend": this
+// import never ships (capability.ts has zero external deps and this file
+// only runs under vitest, never `next build`) and it's the only way to
+// actually prove the hand-written mirror below hasn't drifted, rather than
+// asserting it against a second hand-written copy of itself.
 import { roleCapabilities as backendRoleCapabilities } from '../../backend/src/authorization/capability';
 
 describe('capabilitiesForRole', () => {
