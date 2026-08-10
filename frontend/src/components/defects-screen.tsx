@@ -56,6 +56,8 @@ export function availableActions(
 ): DefectAction[] {
   const can = (capability: string) => capabilities.includes(capability);
   const actions: DefectAction[] = allowedTransitions(defect.status)
+    .filter((to) => to !== 'assigned')
+    .filter((to) => to !== 'verified' || can('defects.verify'))
     .filter(() => can('defects.create'))
     .map((to) => ({ kind: 'transition', to }) as const);
   if (defect.status === 'triaged' && can('defects.assign'))
