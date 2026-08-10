@@ -153,6 +153,12 @@ export class DefectsService {
       { organizationId, userId: actorId },
       async (tx) => {
         const defect = await this.get(tx, organizationId, defectId);
+        await this.assertProjectAccess(
+          tx,
+          organizationId,
+          actorId,
+          defect.projectId,
+        );
         if (defect.status !== 'triaged')
           throw new BadRequestException('Only triaged defects can be assigned');
         const exists =
@@ -205,6 +211,12 @@ export class DefectsService {
       { organizationId, userId: actorId },
       async (tx) => {
         const defect = await this.get(tx, organizationId, defectId);
+        await this.assertProjectAccess(
+          tx,
+          organizationId,
+          actorId,
+          defect.projectId,
+        );
         if (
           input.status === 'assigned' &&
           !(await tx.defectAssignment.count({ where: { defectId } }))
@@ -240,6 +252,12 @@ export class DefectsService {
       { organizationId, userId: actorId },
       async (tx) => {
         const defect = await this.get(tx, organizationId, defectId);
+        await this.assertProjectAccess(
+          tx,
+          organizationId,
+          actorId,
+          defect.projectId,
+        );
         if (defect.status !== 'correction_in_progress')
           throw new BadRequestException('Defect is not accepting a correction');
         const evidence = await tx.mediaObject.findMany({
@@ -300,6 +318,12 @@ export class DefectsService {
       { organizationId, userId: actorId },
       async (tx) => {
         const defect = await this.get(tx, organizationId, defectId);
+        await this.assertProjectAccess(
+          tx,
+          organizationId,
+          actorId,
+          defect.projectId,
+        );
         if (defect.status !== 'ready_for_verification')
           throw new BadRequestException('Defect is not ready for verification');
         const correction = await tx.defectCorrection.findFirst({

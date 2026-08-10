@@ -1533,6 +1533,57 @@ describe('platform integration', () => {
       .query({ projectId: "' OR 1=1 --" })
       .set('Cookie', `fieldpilot_session=${viewerToken}`)
       .expect(400);
+
+    const externalId = uuidv7();
+    const externalSessionId = uuidv7();
+    const externalMembershipId = uuidv7();
+    const externalToken = createToken();
+    const externalCsrf = createToken();
+    await prisma.user.create({
+      data: {
+        id: externalId,
+        email: `${externalId}@example.test`,
+        passwordHash: 'not-used',
+      },
+    });
+    await prisma.session.create({
+      data: {
+        id: externalSessionId,
+        userId: externalId,
+        tokenHash: hashToken(externalToken),
+        refreshTokenHash: hashToken(createToken()),
+        expiresAt: new Date(Date.now() + 60_000),
+        refreshExpiresAt: new Date(Date.now() + 120_000),
+      },
+    });
+    await tenants.withTenant(
+      { organizationId, userId: registration.body.userId as string },
+      (tx) =>
+        tx.membership.create({
+          data: {
+            id: externalMembershipId,
+            organizationId,
+            userId: externalId,
+            role: 'member',
+            isExternal: true,
+          },
+        }),
+    );
+    // External membership has defects.create (the `external` capability set
+    // mirrors `member`) but was never granted ProjectAccess on this project —
+    // the transition must be denied, not merely gated on capability.
+    await request(app.getHttpServer())
+      .post(
+        `/api/v1/organizations/${organizationId}/defects/${defect.body.id as string}/transitions`,
+      )
+      .set('Cookie', [
+        `fieldpilot_session=${externalToken}`,
+        `fieldpilot_csrf=${externalCsrf}`,
+      ])
+      .set('x-csrf-token', externalCsrf)
+      .send({ version: 9, status: 'triaged' })
+      .expect(403);
+
     await tenants.withTenant(
       { organizationId, userId: registration.body.userId as string },
       (tx) =>
