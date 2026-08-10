@@ -108,6 +108,7 @@ export function FieldDefectCapture() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [message, setMessage] = useState('');
+  const [messageIsError, setMessageIsError] = useState(false);
   const [lastSaved, setLastSaved] = useState<{
     id: string;
     projectId: string;
@@ -189,12 +190,14 @@ export function FieldDefectCapture() {
         },
       );
     } catch {
+      setMessageIsError(true);
       setMessage("Couldn't save this defect on your device. Try again.");
       return;
     }
     setCategory('');
     setTitle('');
     setDescription('');
+    setMessageIsError(false);
     setMessage('Defect saved. It uploads when you reconnect.');
     setLastSaved({ id: draft.id, projectId });
     await refreshLocal(organizationId);
@@ -281,7 +284,11 @@ export function FieldDefectCapture() {
         ) : (
           <p>Sign in and open Today at least once to report defects offline.</p>
         )}
-        {message && <p role="status">{message}</p>}
+        {message && (
+          <p role="status" className={messageIsError ? 'field-error' : undefined}>
+            {message}
+          </p>
+        )}
         {organizationId && lastSaved && (
           <label>
             Add a photo to this defect
@@ -293,7 +300,10 @@ export function FieldDefectCapture() {
                 entityType: 'defect',
                 entityId: lastSaved.id,
               }}
-              onCaptured={() => setMessage('Photo saved to this device.')}
+              onCaptured={() => {
+                setMessageIsError(false);
+                setMessage('Photo saved to this device.');
+              }}
             />
           </label>
         )}
@@ -333,7 +343,10 @@ export function FieldDefectCapture() {
                     entityType: 'defect',
                     entityId: draft.id,
                   }}
-                  onCaptured={() => setMessage('Photo saved to this device.')}
+                  onCaptured={() => {
+                    setMessageIsError(false);
+                    setMessage('Photo saved to this device.');
+                  }}
                 />
               </li>
             ))}
