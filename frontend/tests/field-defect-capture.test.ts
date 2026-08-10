@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   buildDefectOperation,
   captureState,
+  defectSeedFromItem,
 } from '../src/components/field-defect-capture';
 
 describe('buildDefectOperation', () => {
@@ -54,5 +55,33 @@ describe('captureState', () => {
 
   it('reports synced only once the operation applied', () => {
     expect(captureState({ syncState: 'synced' }, 'applied')).toBe('synced');
+  });
+});
+
+describe('defectSeedFromItem', () => {
+  const context = { projectId: 'p1', inspectionId: 'i1', locationId: 'l1' };
+
+  it('carries the inspection link through so the defect traces back', () => {
+    const seed = defectSeedFromItem(
+      { id: 'f1', label: 'Bearing condition' },
+      context,
+    );
+    expect(seed.inspectionId).toBe('i1');
+    expect(seed.projectId).toBe('p1');
+    expect(seed.locationId).toBe('l1');
+  });
+
+  it('seeds the title from the failed item label', () => {
+    const seed = defectSeedFromItem(
+      { id: 'f1', label: 'Bearing condition' },
+      context,
+    );
+    expect(seed.title).toBe('Bearing condition');
+  });
+
+  it('defaults to medium severity so the reporter makes a deliberate choice', () => {
+    expect(defectSeedFromItem({ id: 'f1', label: 'x' }, context).severity).toBe(
+      'medium',
+    );
   });
 });

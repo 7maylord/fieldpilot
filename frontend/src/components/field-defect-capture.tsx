@@ -25,6 +25,20 @@ export type DefectCaptureInput = {
   locationId?: string;
 };
 
+export function defectSeedFromItem(
+  item: { id: string; label: string },
+  context: { projectId: string; inspectionId: string; locationId?: string },
+): DefectCaptureInput {
+  return {
+    projectId: context.projectId,
+    inspectionId: context.inspectionId,
+    locationId: context.locationId,
+    title: item.label,
+    category: 'quality',
+    severity: 'medium',
+  };
+}
+
 export function buildDefectOperation(
   input: DefectCaptureInput,
   organizationId: string,
@@ -63,6 +77,23 @@ export function buildDefectOperation(
   };
 }
 
+export async function saveDefectCapture(
+  input: DefectCaptureInput,
+  organizationId: string,
+): Promise<OfflineEntity> {
+  const { draft, operation } = buildDefectOperation(input, organizationId);
+  await db.transaction(
+    'rw',
+    db.defectDrafts,
+    db.pendingOperations,
+    async () => {
+      await db.defectDrafts.add(draft);
+      await db.pendingOperations.add(operation);
+    },
+  );
+  return draft;
+}
+
 export function captureState(
   draft: { syncState: string },
   operationState: string,
@@ -76,7 +107,7 @@ export function captureState(
 
 type Project = OfflineEntity & { code: string; name: string };
 type Row = { draft: OfflineEntity; state: 'synced' | 'held' | 'rejected' };
-const severities = ['low', 'medium', 'high', 'critical'];
+export const severities = ['low', 'medium', 'high', 'critical'];
 
 async function loadLocalDefects(organizationId: string): Promise<Row[]> {
   const [drafts, operations] = await Promise.all([
@@ -166,28 +197,17 @@ export function FieldDefectCapture() {
     event.preventDefault();
     if (!organizationId || !projectId || !category.trim() || !title.trim())
       return;
-    // ponytail: this screen raises a standalone defect, so inspectionId and
-    // locationId stay unset; wire them up if a "raise from inspection" entry
-    // point needs them later.
-    const { draft, operation } = buildDefectOperation(
-      {
-        projectId,
-        category: category.trim(),
-        severity,
-        title: title.trim(),
-        description: description.trim() || undefined,
-      },
-      organizationId,
-    );
+    let draft: OfflineEntity;
     try {
-      await db.transaction(
-        'rw',
-        db.defectDrafts,
-        db.pendingOperations,
-        async () => {
-          await db.defectDrafts.add(draft);
-          await db.pendingOperations.add(operation);
+      draft = await saveDefectCapture(
+        {
+          projectId,
+          category: category.trim(),
+          severity,
+          title: title.trim(),
+          description: description.trim() || undefined,
         },
+        organizationId,
       );
     } catch {
       setMessageIsError(true);
