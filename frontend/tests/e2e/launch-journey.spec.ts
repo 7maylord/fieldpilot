@@ -7,6 +7,7 @@ import {
   test,
   type APIRequestContext,
   type APIResponse,
+  type Page,
 } from '@playwright/test';
 
 const API_ORIGIN = 'http://localhost:3011';
@@ -327,6 +328,77 @@ test('Nigerian QA journey: company setup, work orders, offline field sync, defec
   );
   expect(review.decision).toBe('approve');
 
+  // Regression coverage for the original data-loss bug: a defect raised
+  // offline through the field form must survive the reconnect-and-sync
+  // round trip, not just the direct-API path exercised above.
+  await page.goto('/field/today');
+  // "Repository refreshed" is also the eyebrow's *default* text (offline
+  // starts false), so it renders on mount before the refresh actually
+  // lands — poll IndexedDB directly for the write it's supposed to
+  // confirm instead of trusting that label.
+  await expect.poll(() => readFieldContext(page)).toBeTruthy();
+  // Warm the service worker's runtime cache for /field/defects — the SW
+  // only precaches a fixed shell list and falls back to /field/today for
+  // any other route it has never fetched while online.
+  await page.goto('/field/defects');
+  await expect(page.getByLabel('Title')).toBeVisible();
+  await context.setOffline(true);
+  await page.goto('/field/defects');
+  await page.getByLabel('Title').fill('Offline raised defect');
+  await page.getByLabel('Category').fill('safety');
+  await page.getByRole('button', { name: 'Save defect' }).click();
+  await expect(page.getByText('Defect saved.')).toBeVisible();
+  await expect(page.getByText('Offline raised defect')).toBeVisible();
+  const offlineDefectOperation = await page.evaluate(async () => {
+    const database = await new Promise<IDBDatabase>((resolve, reject) => {
+      const open = indexedDB.open('fieldpilot');
+      open.onsuccess = () => resolve(open.result);
+      open.onerror = () => reject(open.error);
+    });
+    return new Promise<Record<string, unknown>>((resolve, reject) => {
+      const request = database
+        .transaction('pendingOperations')
+        .objectStore('pendingOperations')
+        .getAll();
+      request.onsuccess = () =>
+        resolve(
+          request.result.find(
+            (item: { entityType: string }) => item.entityType === 'defect',
+          ),
+        );
+      request.onerror = () => reject(request.error);
+    });
+  });
+  await context.setOffline(false);
+  const offlineDefectSync = await post(
+    '/sync/push',
+    {
+      organizationId: organization.id,
+      deviceId,
+      operations: [
+        {
+          operationId: offlineDefectOperation.id,
+          entityType: offlineDefectOperation.entityType,
+          entityId: offlineDefectOperation.entityId,
+          operationType: offlineDefectOperation.action,
+          baseVersion: offlineDefectOperation.baseVersion,
+          clientCreatedAt: offlineDefectOperation.clientCreatedAt,
+          payload: offlineDefectOperation.payload,
+        },
+      ],
+    },
+    { 'idempotency-key': randomUUID() },
+  );
+  expect(offlineDefectSync.results[0].status).toBe('applied');
+  const offlineDefects = await owner.get(
+    `/organizations/${organization.id}/defects?projectId=${project.id}`,
+  );
+  expect(
+    offlineDefects.some(
+      (row: { title: string }) => row.title === 'Offline raised defect',
+    ),
+  ).toBe(true);
+
   const defect = await post(`/organizations/${organization.id}/defects`, {
     projectId: project.id,
     locationId: location.id,
@@ -335,29 +407,48 @@ test('Nigerian QA journey: company setup, work orders, offline field sync, defec
     severity: 'high',
     title: 'Ikoyi pier temperature variance',
   });
-  await post(
-    `/organizations/${organization.id}/defects/${defect.id}/transitions`,
-    {
-      version: 1,
-      status: 'triaged',
-    },
-  );
-  await post(
-    `/organizations/${organization.id}/defects/${defect.id}/assignments`,
-    {
-      version: 2,
-      assigneeType: 'team',
-      assigneeId: team.id,
-    },
-  );
-  await post(
-    `/organizations/${organization.id}/defects/${defect.id}/transitions`,
-    {
-      version: 3,
-      status: 'correction_in_progress',
-    },
-  );
-  const evidence = await uploadEvidence(
+  await page.goto(`/${organization.slug}/defects`);
+  await page.getByRole('button', { name: 'All' }).click();
+  // Named in both the queue row and the auto-selected detail panel.
+  await expect(page.getByText(defect.title).first()).toBeVisible();
+  await page.getByRole('button', { name: defect.title }).click();
+  const defectActions = page.locator('.actions');
+
+  await defectActions.getByRole('button', { name: 'Triaged' }).click();
+  await expect(
+    defectActions.getByRole('button', { name: 'Assign', exact: true }),
+  ).toBeVisible();
+
+  await defectActions
+    .getByRole('button', { name: 'Assign', exact: true })
+    .click();
+  const assignForm = page.locator('form.project-form');
+  // Not getByLabel('Assignee'): the wrapping <label> folds its <select>'s
+  // own displayed option text into the computed accessible name (becoming
+  // "Assignee Select assignee Lagos QA Crew"), so no exact match on
+  // "Assignee" is possible and a substring match collides with the
+  // sibling "Assignee type" label. The name attribute sidesteps both.
+  await assignForm
+    .locator('select[name="assigneeId"]')
+    .selectOption({ label: team.name });
+  await assignForm.getByRole('button', { name: 'Assign' }).click();
+  await expect(
+    defectActions.getByRole('button', { name: 'Correction in progress' }),
+  ).toBeVisible();
+
+  await defectActions
+    .getByRole('button', { name: 'Correction in progress' })
+    .click();
+  await expect(
+    defectActions.getByRole('button', {
+      name: 'Submit correction',
+      exact: true,
+    }),
+  ).toBeVisible();
+
+  // Picked up by CorrectForm's evidence checklist below — the office UI
+  // selects it by list position, not by id, so the return value is unused.
+  await uploadEvidence(
     request,
     owner.csrf,
     organization.id,
@@ -365,28 +456,34 @@ test('Nigerian QA journey: company setup, work orders, offline field sync, defec
     'defect',
     defect.id,
   );
-  const correction = await post(
-    `/organizations/${organization.id}/defects/${defect.id}/corrections`,
-    {
-      version: 4,
-      rootCause: 'Lekki aggregate delivery delay',
-      correctiveAction: 'Reworked pour and verified concrete temperature',
-      evidenceIds: [evidence],
-    },
-  );
-  await post(
-    `/organizations/${organization.id}/defects/${defect.id}/verifications`,
-    {
-      version: 5,
-      correctionId: correction.id,
-      decision: 'verified',
-    },
-  );
-  const closed = await post(
-    `/organizations/${organization.id}/defects/${defect.id}/transitions`,
-    { version: 6, status: 'closed' },
-  );
-  expect(closed.status).toBe('closed');
+
+  await defectActions
+    .getByRole('button', { name: 'Submit correction', exact: true })
+    .click();
+  const correctForm = page.locator('form.project-form');
+  await correctForm
+    .getByLabel('Root cause')
+    .fill('Lekki aggregate delivery delay');
+  await correctForm
+    .getByLabel('Corrective action')
+    .fill('Reworked pour and verified concrete temperature');
+  await correctForm.getByRole('checkbox').check();
+  await correctForm.getByRole('button', { name: 'Submit correction' }).click();
+  await expect(
+    defectActions.getByRole('button', { name: 'Verify' }),
+  ).toBeVisible();
+
+  await defectActions.getByRole('button', { name: 'Verify' }).click();
+  const verifyForm = page.locator('form.project-form');
+  await verifyForm.getByRole('button', { name: 'Record decision' }).click();
+  await expect(
+    defectActions.getByRole('button', { name: 'Closed' }),
+  ).toBeVisible();
+
+  await defectActions.getByRole('button', { name: 'Closed' }).click();
+  // Named in both the queue row and the detail panel's status pill.
+  await expect(page.getByText(defect.title).first()).toBeVisible();
+  await expect(page.getByText('Closed').first()).toBeVisible();
 
   const report = await post(`/organizations/${organization.id}/daily-reports`, {
     projectId: project.id,
@@ -426,6 +523,30 @@ test('Nigerian QA journey: company setup, work orders, offline field sync, defec
   expect(published.status).toBe('published');
 });
 
+// Reads the field app's cached organization context. Note: the IndexedDB
+// connection this opens must be closed before returning — leaving it open
+// starves the app's own Dexie connection of the write it's making at the
+// same time, which reads back as a false "not written yet".
+function readFieldContext(page: Page) {
+  return page.evaluate(async () => {
+    const database = await new Promise<IDBDatabase>((resolve, reject) => {
+      const open = indexedDB.open('fieldpilot');
+      open.onsuccess = () => resolve(open.result);
+      open.onerror = () => reject(open.error);
+    });
+    const record = await new Promise((resolve, reject) => {
+      const request = database
+        .transaction('syncState')
+        .objectStore('syncState')
+        .get('field-context');
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    database.close();
+    return record;
+  });
+}
+
 async function signUp(
   request: APIRequestContext,
   email: string,
@@ -436,6 +557,7 @@ async function signUp(
   const csrf = (await csrfResponse.json()).csrfToken as string;
   const post = endpoint(request, 'POST', csrf);
   const patch = endpoint(request, 'PATCH', csrf);
+  const get = endpoint(request, 'GET', csrf);
   const registration = await post('/auth/register', { email, password });
   const verificationToken = emailVerificationToken(registration.userId);
   expect(verificationToken).not.toBe('');
@@ -447,7 +569,14 @@ async function signUp(
   });
   const text = await login.text();
   expect(login.status(), `POST /auth/login: ${text}`).toBe(201);
-  return { csrf, cookies: responseCookies(login), post, patch, registration };
+  return {
+    csrf,
+    cookies: responseCookies(login),
+    post,
+    patch,
+    get,
+    registration,
+  };
 }
 
 function responseCookies(response: APIResponse) {
@@ -504,7 +633,7 @@ function postgresValue(sql: string) {
 
 function endpoint(
   request: APIRequestContext,
-  method: 'POST' | 'PATCH',
+  method: 'POST' | 'PATCH' | 'GET',
   csrf: string,
 ) {
   return async (
