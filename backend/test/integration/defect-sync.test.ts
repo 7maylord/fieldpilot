@@ -309,6 +309,87 @@ describe('defect_create batch isolation on invalid references', () => {
     expect(badCount).toBe(0);
     expect(goodCount).toBe(1);
   });
+
+  it('reports already_applied for a re-sent defect id under a new operationId, without aborting the rest of the batch', async () => {
+    const { organizationId, userId, projectId, deviceId, push } =
+      await seedProject(app);
+    const entityId = randomUUID();
+
+    const first = await push({
+      organizationId,
+      deviceId,
+      operations: [
+        {
+          operationId: randomUUID(),
+          entityType: 'defect',
+          entityId,
+          operationType: 'defect_create',
+          baseVersion: null,
+          clientCreatedAt: new Date().toISOString(),
+          payload: {
+            projectId,
+            category: 'safety',
+            severity: 'high',
+            title: 'Original device registration',
+          },
+        },
+      ],
+    });
+    expect(first.results[0]!.status).toBe('applied');
+
+    // Simulates a device re-registering with a new deviceId while stale
+    // pendingOperations for the same defect id survive in local IndexedDB,
+    // so the client re-sends a defect_create for an id the server already
+    // has, under a brand-new operationId.
+    const otherEntityId = randomUUID();
+    const second = await push({
+      organizationId,
+      deviceId,
+      operations: [
+        {
+          operationId: randomUUID(),
+          entityType: 'defect',
+          entityId,
+          operationType: 'defect_create',
+          baseVersion: null,
+          clientCreatedAt: new Date().toISOString(),
+          payload: {
+            projectId,
+            category: 'safety',
+            severity: 'high',
+            title: 'Re-sent after device re-registration',
+          },
+        },
+        {
+          operationId: randomUUID(),
+          entityType: 'defect',
+          entityId: otherEntityId,
+          operationType: 'defect_create',
+          baseVersion: null,
+          clientCreatedAt: new Date().toISOString(),
+          payload: {
+            projectId,
+            category: 'quality',
+            severity: 'low',
+            title: 'Unrelated valid create in the same batch',
+          },
+        },
+      ],
+    });
+
+    expect(second.results[0]!.status).toBe('already_applied');
+    expect(second.results[1]!.status).toBe('applied');
+
+    const [duplicateCount, otherCount] = await tenants.withTenant(
+      { organizationId, userId },
+      async (tx) => [
+        await tx.defect.count({ where: { id: entityId } }),
+        await tx.defect.count({ where: { id: otherEntityId } }),
+      ],
+    );
+    expect(duplicateCount).toBe(1);
+    expect(otherCount).toBe(1);
+  });
 });
 
 import { PrismaClient } from '@prisma/client';
