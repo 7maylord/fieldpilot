@@ -44,9 +44,7 @@ describe('buildDefectOperation', () => {
 
 describe('captureState', () => {
   it('reports a rejected defect as needing attention, not as synced', () => {
-    expect(captureState({ syncState: 'pending' }, 'rejected')).toBe(
-      'rejected',
-    );
+    expect(captureState({ syncState: 'pending' }, 'rejected')).toBe('rejected');
   });
 
   it('never reports synced while an operation is still pending', () => {
