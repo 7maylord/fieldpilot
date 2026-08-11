@@ -221,7 +221,7 @@ export function FieldDefectCapture() {
       setTitle('');
       setDescription('');
       setMessageIsError(false);
-      setMessage('Defect saved. It uploads when you reconnect.');
+      setMessage('Defect saved on this device.');
       setLastSaved({ id: draft.id, projectId });
       await refreshLocal(organizationId);
     } finally {
@@ -235,10 +235,7 @@ export function FieldDefectCapture() {
         <div>
           <p className="eyebrow">On site</p>
           <h1>Report a defect</h1>
-          <p>
-            Capture what you see now. It saves to this device immediately and
-            uploads when you reconnect.
-          </p>
+          <p>Capture what you see now. It saves to this device immediately.</p>
         </div>
       </section>
       <section className="panel">
@@ -385,9 +382,7 @@ export function FieldDefectCapture() {
         ) : (
           <div className="empty-state">
             <strong>No defects captured yet</strong>
-            <span>
-              Reports you save here stay on this device until you reconnect.
-            </span>
+            <span>Reports you save here stay on this device.</span>
           </div>
         )}
       </section>

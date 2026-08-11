@@ -189,7 +189,7 @@ export function OfflineInspectionForm({
               {passed[field.id] === false && (
                 <div className="notice" role="alert">
                   {savedDefectFieldIds.includes(field.id) ? (
-                    <span>Defect saved. It uploads when you reconnect.</span>
+                    <span>Defect saved on this device.</span>
                   ) : defectDraft && defectDraft.fieldId === field.id ? (
                     <form
                       className="project-form"

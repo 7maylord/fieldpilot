@@ -347,7 +347,7 @@ test('Nigerian QA journey: company setup, work orders, offline field sync, defec
   await page.getByLabel('Title').fill('Offline raised defect');
   await page.getByLabel('Category').fill('safety');
   await page.getByRole('button', { name: 'Save defect' }).click();
-  await expect(page.getByText('Defect saved.')).toBeVisible();
+  await expect(page.getByText('Defect saved on this device.')).toBeVisible();
   await expect(page.getByText('Offline raised defect')).toBeVisible();
   const offlineDefectOperation = await page.evaluate(async () => {
     const database = await new Promise<IDBDatabase>((resolve, reject) => {
