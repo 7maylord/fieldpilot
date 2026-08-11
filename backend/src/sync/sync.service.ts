@@ -492,6 +492,19 @@ export class SyncService {
           { rejectionCode: 'VALIDATION_FAILED' },
         );
 
+      const existingDefect = await tx.defect.findUnique({
+        where: { id: operation.entityId },
+      });
+      if (existingDefect)
+        return this.storeOutcome(
+          tx,
+          organizationId,
+          userId,
+          deviceId,
+          operation,
+          'already_applied',
+        );
+
       try {
         await this.defects.createInTransaction(
           tx,
@@ -748,7 +761,8 @@ export class SyncService {
     userId: string,
     deviceId: string,
     operation: SyncOperationDto,
-    status: 'applied' | 'auto_merged' | 'conflict' | 'rejected',
+    status:
+      'applied' | 'auto_merged' | 'conflict' | 'rejected' | 'already_applied',
     extra: { rejectionCode?: string; conflictId?: string } = {},
   ) {
     await tx.syncOperation.create({

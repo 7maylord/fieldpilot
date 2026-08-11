@@ -45,6 +45,7 @@ const fieldNav: [string, [string, string][]][] = [
     [
       ['Today', 'today'],
       ['My work', 'work'],
+      ['Defects', 'defects'],
     ],
   ],
   [

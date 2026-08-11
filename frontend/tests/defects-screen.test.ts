@@ -103,6 +103,47 @@ describe('availableActions', () => {
       ]),
     ).toEqual([]);
   });
+
+  it('never offers the verified transition as a plain status change without defects.verify', () => {
+    const ready = defect({ status: 'ready_for_verification' });
+    expect(
+      availableActions(ready, ['defects.create']).some(
+        (a) => a.kind === 'transition' && a.to === 'verified',
+      ),
+    ).toBe(false);
+  });
+
+  it('never offers the assigned transition as a plain status change, even with every capability', () => {
+    const triaged = defect({ status: 'triaged' });
+    expect(
+      availableActions(triaged, [
+        'defects.create',
+        'defects.assign',
+        'defects.verify',
+      ]).some((a) => a.kind === 'transition' && a.to === 'assigned'),
+    ).toBe(false);
+  });
+
+  it('does not offer the assigned transition on a triaged defect with no assignment yet', () => {
+    const triaged = defect({ status: 'triaged', assignments: [] });
+    expect(
+      availableActions(triaged, ['defects.create']).some(
+        (a) => a.kind === 'transition' && a.to === 'assigned',
+      ),
+    ).toBe(false);
+  });
+
+  it('offers the assigned transition on a reopened defect that already has an assignment', () => {
+    const reopened = defect({
+      status: 'reopened',
+      assignments: [{ assigneeType: 'user', assigneeId: 'u1' }],
+    });
+    expect(
+      availableActions(reopened, ['defects.create']).some(
+        (a) => a.kind === 'transition' && a.to === 'assigned',
+      ),
+    ).toBe(true);
+  });
 });
 
 describe('toggleEvidenceSelection', () => {

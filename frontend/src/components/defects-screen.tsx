@@ -8,6 +8,7 @@ import {
   allowedTransitions,
   capabilitiesForRole,
   needsOfficeAction,
+  severities,
   severityLabel,
   statusLabel,
   type DefectStatus,
@@ -56,6 +57,8 @@ export function availableActions(
 ): DefectAction[] {
   const can = (capability: string) => capabilities.includes(capability);
   const actions: DefectAction[] = allowedTransitions(defect.status)
+    .filter((to) => to !== 'assigned' || defect.assignments.length > 0)
+    .filter((to) => to !== 'verified' || can('defects.verify'))
     .filter(() => can('defects.create'))
     .map((to) => ({ kind: 'transition', to }) as const);
   if (defect.status === 'triaged' && can('defects.assign'))
@@ -67,13 +70,9 @@ export function availableActions(
   return actions;
 }
 
-const severityRank: Record<string, number> = {
-  critical: 0,
-  high: 1,
-  medium: 2,
-  low: 3,
-};
-const severities = ['critical', 'high', 'medium', 'low'];
+const severityRank: Record<string, number> = Object.fromEntries(
+  severities.map((severity, index) => [severity, index]),
+);
 
 export function filterDefects(
   defects: Defect[],
@@ -89,7 +88,11 @@ export function filterDefects(
           : row.status === status,
     )
     .filter((row) => severity === 'All' || row.severity === severity)
-    .sort((a, b) => severityRank[a.severity]! - severityRank[b.severity]!);
+    .sort(
+      (a, b) =>
+        (severityRank[a.severity] ?? Number.MAX_SAFE_INTEGER) -
+        (severityRank[b.severity] ?? Number.MAX_SAFE_INTEGER),
+    );
 }
 
 async function resolveOrganization(slug: string) {

@@ -13,8 +13,10 @@ for (const path of [
   '/horizon/dispatch',
   '/horizon/assets',
   '/horizon/reports',
+  '/horizon/defects',
   '/field/today',
   '/field/work',
+  '/field/defects',
 ]) {
   test(`${path} has no detectable WCAG 2.2 A/AA violations`, async ({
     page,
