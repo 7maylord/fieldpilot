@@ -24,6 +24,8 @@ export function statusLabel(status: DefectStatus) {
   return words.charAt(0).toUpperCase() + words.slice(1);
 }
 
+export const severities = ['critical', 'high', 'medium', 'low'] as const;
+
 export function severityLabel(severity: string) {
   return severity.charAt(0).toUpperCase() + severity.slice(1);
 }

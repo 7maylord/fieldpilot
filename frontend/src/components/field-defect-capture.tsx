@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { apiRequest } from '../lib/api';
-import { severityLabel } from '../lib/defect-status';
+import { severities, severityLabel } from '../lib/defect-status';
 import { formatTimestamp } from '../lib/format-date';
 import {
   db,
@@ -107,7 +107,6 @@ export function captureState(
 
 type Project = OfflineEntity & { code: string; name: string };
 type Row = { draft: OfflineEntity; state: 'synced' | 'held' | 'rejected' };
-export const severities = ['low', 'medium', 'high', 'critical'];
 
 async function loadLocalDefects(organizationId: string): Promise<Row[]> {
   const [drafts, operations] = await Promise.all([
@@ -126,7 +125,9 @@ async function loadLocalDefects(organizationId: string): Promise<Row[]> {
       draft,
       state: captureState(draft, stateByEntity.get(draft.id) ?? 'pending'),
     }))
-    .sort((a, b) => b.draft.localUpdatedAt.localeCompare(a.draft.localUpdatedAt));
+    .sort((a, b) =>
+      b.draft.localUpdatedAt.localeCompare(a.draft.localUpdatedAt),
+    );
 }
 
 export function FieldDefectCapture() {
@@ -140,6 +141,7 @@ export function FieldDefectCapture() {
   const [description, setDescription] = useState('');
   const [message, setMessage] = useState('');
   const [messageIsError, setMessageIsError] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<{
     id: string;
     projectId: string;
@@ -165,9 +167,8 @@ export function FieldDefectCapture() {
     }
     if (!navigator.onLine) return;
     try {
-      const organizations = await apiRequest<{ id: string }[]>(
-        '/organizations',
-      );
+      const organizations =
+        await apiRequest<{ id: string }[]>('/organizations');
       const organization = organizations[0];
       if (!organization) return;
       const remoteProjects = await apiRequest<Project[]>(
@@ -197,30 +198,35 @@ export function FieldDefectCapture() {
     event.preventDefault();
     if (!organizationId || !projectId || !category.trim() || !title.trim())
       return;
-    let draft: OfflineEntity;
+    setSaving(true);
     try {
-      draft = await saveDefectCapture(
-        {
-          projectId,
-          category: category.trim(),
-          severity,
-          title: title.trim(),
-          description: description.trim() || undefined,
-        },
-        organizationId,
-      );
-    } catch {
-      setMessageIsError(true);
-      setMessage("Couldn't save this defect on your device. Try again.");
-      return;
+      let draft: OfflineEntity;
+      try {
+        draft = await saveDefectCapture(
+          {
+            projectId,
+            category: category.trim(),
+            severity,
+            title: title.trim(),
+            description: description.trim() || undefined,
+          },
+          organizationId,
+        );
+      } catch {
+        setMessageIsError(true);
+        setMessage("Couldn't save this defect on your device. Try again.");
+        return;
+      }
+      setCategory('');
+      setTitle('');
+      setDescription('');
+      setMessageIsError(false);
+      setMessage('Defect saved. It uploads when you reconnect.');
+      setLastSaved({ id: draft.id, projectId });
+      await refreshLocal(organizationId);
+    } finally {
+      setSaving(false);
     }
-    setCategory('');
-    setTitle('');
-    setDescription('');
-    setMessageIsError(false);
-    setMessage('Defect saved. It uploads when you reconnect.');
-    setLastSaved({ id: draft.id, projectId });
-    await refreshLocal(organizationId);
   }
 
   return (
@@ -297,7 +303,7 @@ export function FieldDefectCapture() {
                 onChange={(event) => setDescription(event.target.value)}
               />
             </label>
-            <button className="primary" type="submit">
+            <button className="primary" type="submit" disabled={saving}>
               Save defect
             </button>
           </form>
@@ -305,7 +311,10 @@ export function FieldDefectCapture() {
           <p>Sign in and open Today at least once to report defects offline.</p>
         )}
         {message && (
-          <p role="status" className={messageIsError ? 'field-error' : undefined}>
+          <p
+            role="status"
+            className={messageIsError ? 'field-error' : undefined}
+          >
             {message}
           </p>
         )}
@@ -348,7 +357,9 @@ export function FieldDefectCapture() {
                   ) : (
                     <span
                       className={
-                        state === 'synced' ? 'datum-state' : 'datum-state is-offline'
+                        state === 'synced'
+                          ? 'datum-state'
+                          : 'datum-state is-offline'
                       }
                     >
                       {state === 'synced' ? 'Synced' : 'Held on device'}

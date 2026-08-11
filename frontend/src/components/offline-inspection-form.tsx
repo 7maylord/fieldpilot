@@ -4,10 +4,9 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   defectSeedFromItem,
   saveDefectCapture,
-  severities,
   type DefectCaptureInput,
 } from './field-defect-capture';
-import { severityLabel } from '../lib/defect-status';
+import { severities, severityLabel } from '../lib/defect-status';
 import {
   evaluateForm,
   type FormField,
@@ -33,6 +32,7 @@ export function OfflineInspectionForm({
     input: DefectCaptureInput;
   }>();
   const [defectError, setDefectError] = useState('');
+  const [savingDefect, setSavingDefect] = useState(false);
   const [savedDefectFieldIds, setSavedDefectFieldIds] = useState<string[]>([]);
   const answers = draft?.answers ?? {};
   const visible = useMemo(() => {
@@ -93,12 +93,15 @@ export function OfflineInspectionForm({
 
   async function saveDefect() {
     if (!draft || !defectDraft) return;
+    setSavingDefect(true);
     try {
       await saveDefectCapture(defectDraft.input, draft.organizationId);
       setSavedDefectFieldIds((current) => [...current, defectDraft.fieldId]);
       setDefectDraft(undefined);
     } catch {
       setDefectError("Couldn't save this defect on your device. Try again.");
+    } finally {
+      setSavingDefect(false);
     }
   }
 
@@ -268,7 +271,11 @@ export function OfflineInspectionForm({
                           {defectError}
                         </p>
                       )}
-                      <button className="primary" type="submit">
+                      <button
+                        className="primary"
+                        type="submit"
+                        disabled={savingDefect}
+                      >
                         Save defect
                       </button>
                       <button
