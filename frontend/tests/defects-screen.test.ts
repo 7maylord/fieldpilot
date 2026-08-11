@@ -123,6 +123,27 @@ describe('availableActions', () => {
       ]).some((a) => a.kind === 'transition' && a.to === 'assigned'),
     ).toBe(false);
   });
+
+  it('does not offer the assigned transition on a triaged defect with no assignment yet', () => {
+    const triaged = defect({ status: 'triaged', assignments: [] });
+    expect(
+      availableActions(triaged, ['defects.create']).some(
+        (a) => a.kind === 'transition' && a.to === 'assigned',
+      ),
+    ).toBe(false);
+  });
+
+  it('offers the assigned transition on a reopened defect that already has an assignment', () => {
+    const reopened = defect({
+      status: 'reopened',
+      assignments: [{ assigneeType: 'user', assigneeId: 'u1' }],
+    });
+    expect(
+      availableActions(reopened, ['defects.create']).some(
+        (a) => a.kind === 'transition' && a.to === 'assigned',
+      ),
+    ).toBe(true);
+  });
 });
 
 describe('toggleEvidenceSelection', () => {
