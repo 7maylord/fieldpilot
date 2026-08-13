@@ -9,6 +9,8 @@ import type { Prisma } from '@prisma/client';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { validate as validateUuid } from 'uuid';
+import { AssetsService } from '../assets/assets.service';
+import { CreateAssetDto } from '../assets/dto';
 import { AuditService } from '../audit/audit.service';
 import { Capability, hasCapability } from '../authorization/capability';
 import { newId } from '../common/id';
@@ -49,6 +51,7 @@ export class SyncService {
     private readonly audit: AuditService,
     private readonly metrics: MetricsService,
     private readonly defects: DefectsService,
+    private readonly assets: AssetsService,
   ) {}
 
   bootstrap(organizationId: string, userId: string, input: SyncBootstrapDto) {
@@ -507,6 +510,92 @@ export class SyncService {
 
       try {
         await this.defects.createInTransaction(
+          tx,
+          organizationId,
+          userId,
+          payload,
+          operation.entityId,
+        );
+      } catch {
+        return this.storeOutcome(
+          tx,
+          organizationId,
+          userId,
+          deviceId,
+          operation,
+          'rejected',
+          { rejectionCode: 'ENTITY_NOT_FOUND' },
+        );
+      }
+      return this.storeOutcome(
+        tx,
+        organizationId,
+        userId,
+        deviceId,
+        operation,
+        'applied',
+      );
+    }
+    if (operation.entityType === 'asset') {
+      if (operation.operationType !== 'asset_create')
+        return this.storeOutcome(
+          tx,
+          organizationId,
+          userId,
+          deviceId,
+          operation,
+          'rejected',
+          { rejectionCode: 'UNSUPPORTED_OPERATION' },
+        );
+
+      const membership = await tx.membership.findUniqueOrThrow({
+        where: { organizationId_userId: { organizationId, userId } },
+      });
+      if (
+        !hasCapability(
+          membership.role,
+          membership.isExternal,
+          Capability.AssetsManage,
+        )
+      )
+        return this.storeOutcome(
+          tx,
+          organizationId,
+          userId,
+          deviceId,
+          operation,
+          'rejected',
+          { rejectionCode: 'FORBIDDEN' },
+        );
+
+      const payload = plainToInstance(CreateAssetDto, operation.payload);
+      const errors = await validate(payload, { whitelist: true });
+      if (errors.length)
+        return this.storeOutcome(
+          tx,
+          organizationId,
+          userId,
+          deviceId,
+          operation,
+          'rejected',
+          { rejectionCode: 'VALIDATION_FAILED' },
+        );
+
+      const existingAsset = await tx.asset.findFirst({
+        where: { id: operation.entityId, organizationId },
+      });
+      if (existingAsset)
+        return this.storeOutcome(
+          tx,
+          organizationId,
+          userId,
+          deviceId,
+          operation,
+          'already_applied',
+        );
+
+      try {
+        await this.assets.createInTransaction(
           tx,
           organizationId,
           userId,
