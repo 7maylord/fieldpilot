@@ -59,61 +59,62 @@ export class AssetsService {
     );
   }
   create(organizationId: string, userId: string, input: CreateAssetDto) {
-    return this.tenants.withMembership(
-      { organizationId, userId },
-      async (tx) => {
-        await this.assertProjectAccess(
-          tx,
-          organizationId,
-          userId,
-          input.projectId,
-        );
-        if (
-          !(await tx.assetType.findFirst({
-            where: { id: input.assetTypeId, organizationId },
-          }))
-        )
-          throw new BadRequestException(
-            'Asset type does not belong to the organization',
-          );
-        if (
-          input.locationId &&
-          !(await tx.location.findFirst({
-            where: {
-              id: input.locationId,
-              organizationId,
-              projectId: input.projectId,
-            },
-          }))
-        )
-          throw new BadRequestException(
-            'Asset location must belong to the project',
-          );
-        const asset = await tx.asset.create({
-          data: {
-            id: newId(),
-            organizationId,
-            projectId: input.projectId,
-            assetTypeId: input.assetTypeId,
-            locationId: input.locationId,
-            name: input.name.trim(),
-            qrCode: input.qrCode.trim(),
-            serialNumber: input.serialNumber,
-            model: input.model,
-            manufacturer: input.manufacturer,
-            status: input.status,
-          },
-        });
-        await this.record(
-          tx,
-          organizationId,
-          userId,
-          asset.id,
-          'asset.created',
-        );
-        return asset;
-      },
+    return this.tenants.withMembership({ organizationId, userId }, (tx) =>
+      this.createInTransaction(tx, organizationId, userId, input, newId()),
     );
+  }
+
+  async createInTransaction(
+    tx: Prisma.TransactionClient,
+    organizationId: string,
+    actorId: string,
+    input: CreateAssetDto,
+    id: string,
+  ) {
+    await this.assertProjectAccess(
+      tx,
+      organizationId,
+      actorId,
+      input.projectId,
+    );
+    if (
+      !(await tx.assetType.findFirst({
+        where: { id: input.assetTypeId, organizationId },
+      }))
+    )
+      throw new BadRequestException(
+        'Asset type does not belong to the organization',
+      );
+    if (
+      input.locationId &&
+      !(await tx.location.findFirst({
+        where: {
+          id: input.locationId,
+          organizationId,
+          projectId: input.projectId,
+        },
+      }))
+    )
+      throw new BadRequestException(
+        'Asset location must belong to the project',
+      );
+    const asset = await tx.asset.create({
+      data: {
+        id,
+        organizationId,
+        projectId: input.projectId,
+        assetTypeId: input.assetTypeId,
+        locationId: input.locationId,
+        name: input.name.trim(),
+        qrCode: input.qrCode.trim(),
+        serialNumber: input.serialNumber,
+        model: input.model,
+        manufacturer: input.manufacturer,
+        status: input.status,
+      },
+    });
+    await this.record(tx, organizationId, actorId, asset.id, 'asset.created');
+    return asset;
   }
   byQr(organizationId: string, userId: string, qrCode: string) {
     return this.tenants.withMembership(

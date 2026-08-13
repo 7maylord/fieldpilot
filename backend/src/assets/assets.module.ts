@@ -7,5 +7,6 @@ import { AssetsService } from './assets.service';
   imports: [DatabaseModule, AuditModule],
   controllers: [AssetsController],
   providers: [AssetsService],
+  exports: [AssetsService],
 })
 export class AssetsModule {}
